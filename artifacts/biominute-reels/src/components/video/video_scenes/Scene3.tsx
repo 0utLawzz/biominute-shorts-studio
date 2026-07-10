@@ -1,73 +1,63 @@
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { Activity, Zap } from 'lucide-react';
 
 const SPRING_SNAPPY = { type: 'spring' as const, stiffness: 400, damping: 30 };
 const SPRING_SMOOTH = { type: 'spring' as const, stiffness: 120, damping: 25 };
 
 export function Scene3() {
-  const [phase, setPhase] = useState(0);
-
-  useEffect(() => {
-    const timers = [
-      setTimeout(() => setPhase(1), 1000), // Digestion icon
-      setTimeout(() => setPhase(2), 2500), // Plus items
-      setTimeout(() => setPhase(3), 4000), // Energy up
-    ];
-    return () => timers.forEach(t => clearTimeout(t));
-  }, []);
-
   return (
     <motion.div
-      className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden"
-      initial={{ opacity: 0, scale: 1.1 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, x: 'calc(var(--cvw) * -50)' }}
+      className="absolute inset-0 w-full h-full font-display"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }}
       transition={{ duration: 0.8 }}
     >
-      <div className="z-20 w-full px-[calc(var(--cvw)*8)] flex flex-col items-center text-center mt-[calc(var(--cvh)*-5)]">
+      <div className="absolute inset-0 w-full h-full p-[8%] flex flex-col items-center justify-center">
         
-        {/* Core Icon */}
-        <motion.div
-           className="relative flex items-center justify-center w-[calc(var(--cvw)*35)] h-[calc(var(--cvw)*35)] max-w-[180px] max-h-[180px] rounded-full bg-brand-blue/10 border border-brand-blue/30 shadow-[0_0_40px_rgba(47,111,237,0.2)] z-10 mb-[calc(var(--cvh)*6)]"
-           initial={{ scale: 0, y: 50 }}
-           animate={phase >= 1 ? { scale: 1, y: 0 } : { scale: 0, y: 50 }}
-           transition={SPRING_SNAPPY}
+        {/* Center icon */}
+        <motion.div 
+           className="relative flex items-center justify-center w-[50%] aspect-square mb-[calc(var(--cvh)*6)]"
+           initial={{ scale: 0 }}
+           animate={{ scale: 1 }}
+           transition={{ ...SPRING_SMOOTH, delay: 0.2 }}
         >
-           <motion.div
-             className="absolute inset-0 rounded-full border border-brand-blue/50"
-             animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
-             transition={{ duration: 2, repeat: Infinity }}
+           {/* Background pulses */}
+           <motion.div 
+             className="absolute inset-0 rounded-full bg-brand-blue/30 blur-[40px]"
+             animate={{ scale: [1, 1.2, 1], opacity: [0.6, 0.9, 0.6] }}
+             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
            />
-           <svg className="w-[50%] h-[50%] stroke-brand-blue fill-none" viewBox="0 0 24 24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-             <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
-             <path d="M12 8v4l3 3" />
-           </svg>
+           <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/20 to-transparent rounded-full border-[calc(var(--cvw)*0.5)] border-brand-blue/40 shadow-[inset_0_0_20px_rgba(47,111,237,0.3)]" />
+           <Activity className="w-[45%] h-[45%] text-brand-blue relative z-10 drop-shadow-[0_0_15px_rgba(47,111,237,0.8)]" />
         </motion.div>
 
-        {/* Benefits text */}
-        <div className="flex flex-col gap-[calc(var(--cvh)*3)] w-full">
-           <motion.div
-              className="flex items-center gap-4 bg-brand-teal/10 border border-brand-teal/30 p-[calc(var(--cvw)*4)] rounded-2xl"
-              initial={{ opacity: 0, x: -50 }}
-              animate={phase >= 2 ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
-              transition={SPRING_SMOOTH}
+        {/* Text Cards */}
+        <div className="flex flex-col gap-[calc(var(--cvh)*2.5)] w-full">
+           <motion.div 
+             className="bg-white/5 border border-white/10 rounded-[calc(var(--cvw)*5)] p-[calc(var(--cvw)*6)] flex items-center gap-[calc(var(--cvw)*5)] shadow-lg"
+             initial={{ x: -50, opacity: 0 }}
+             animate={{ x: 0, opacity: 1 }}
+             transition={{ ...SPRING_SMOOTH, delay: 0.5 }}
            >
-              <div className="w-[calc(var(--cvw)*10)] h-[calc(var(--cvw)*10)] max-w-[40px] max-h-[40px] shrink-0 bg-brand-teal/20 rounded-full flex items-center justify-center border border-brand-teal/50">
-                <svg className="w-[60%] h-[60%] stroke-brand-teal fill-none" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <div className="w-[calc(var(--cvw)*14)] h-[calc(var(--cvw)*14)] rounded-full bg-brand-teal/20 flex items-center justify-center text-brand-teal shrink-0">
+                <svg className="w-[50%] h-[50%]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
               </div>
-              <span className="font-display text-[calc(var(--cvh)*2.5)] font-bold text-white tracking-wide text-left leading-tight">Aids Digestion</span>
+              <p className="text-white font-bold leading-tight" style={{ fontSize: 'calc(var(--cvw)*6.5)' }}>Aids digestion</p>
            </motion.div>
-           
-           <motion.div
-              className="flex items-center gap-4 bg-brand-orange/10 border border-brand-orange/30 p-[calc(var(--cvw)*4)] rounded-2xl"
-              initial={{ opacity: 0, x: 50 }}
-              animate={phase >= 3 ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
-              transition={SPRING_SMOOTH}
+
+           <motion.div 
+             className="bg-white/5 border border-white/10 rounded-[calc(var(--cvw)*5)] p-[calc(var(--cvw)*6)] flex items-center gap-[calc(var(--cvw)*5)] shadow-lg"
+             initial={{ x: 50, opacity: 0 }}
+             animate={{ x: 0, opacity: 1 }}
+             transition={{ ...SPRING_SMOOTH, delay: 0.8 }}
            >
-              <div className="w-[calc(var(--cvw)*10)] h-[calc(var(--cvw)*10)] max-w-[40px] max-h-[40px] shrink-0 bg-brand-orange/20 rounded-full flex items-center justify-center border border-brand-orange/50">
-                <svg className="w-[60%] h-[60%] stroke-brand-orange fill-none" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+              <div className="w-[calc(var(--cvw)*14)] h-[calc(var(--cvw)*14)] rounded-full bg-brand-emerald/20 flex items-center justify-center text-brand-emerald shrink-0">
+                <Zap className="w-[50%] h-[50%] fill-brand-emerald/20" />
               </div>
-              <span className="font-display text-[calc(var(--cvh)*2.5)] font-bold text-white tracking-wide text-left leading-tight">Beats the Post-Meal Slump</span>
+              <p className="text-white font-bold leading-tight" style={{ fontSize: 'calc(var(--cvw)*6.5)' }}>Reduces post-meal slump</p>
            </motion.div>
         </div>
 

@@ -1,125 +1,101 @@
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
 
+const SPRING_SNAPPY = { type: 'spring' as const, stiffness: 400, damping: 30 };
 const SPRING_SMOOTH = { type: 'spring' as const, stiffness: 120, damping: 25 };
 
 export function Scene2() {
-  const [phase, setPhase] = useState(0);
-
-  useEffect(() => {
-    const timers = [
-      setTimeout(() => setPhase(1), 1000), // Spike graph
-      setTimeout(() => setPhase(2), 3000), // Flatline graph
-      setTimeout(() => setPhase(3), 5000), // Muscles absorb
-    ];
-    return () => timers.forEach(t => clearTimeout(t));
-  }, []);
-
   return (
     <motion.div
-      className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden"
-      initial={{ opacity: 0, x: 'calc(var(--cvw) * 50)' }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, scale: 0.8, filter: 'blur(10px)' }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className="absolute inset-0 w-full h-full font-display"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }}
+      transition={{ duration: 0.8 }}
     >
-      <motion.div
-        className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brand-emerald/10 via-transparent to-transparent z-0"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 2 }}
-      />
-
-      <div className="z-20 w-full px-[calc(var(--cvw)*8)] flex flex-col items-center mt-[calc(var(--cvh)*-5)]">
-        <motion.p
-          className="font-display text-[calc(var(--cvh)*3.5)] text-brand-text font-bold leading-tight mb-[calc(var(--cvh)*6)] text-center"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, ...SPRING_SMOOTH }}
+      <div className="absolute inset-0 w-full h-full p-[8%] flex flex-col items-center justify-center">
+        
+        <motion.div 
+           className="w-full h-[calc(var(--cvh)*35)] bg-white/5 rounded-[calc(var(--cvw)*6)] border border-white/10 p-[calc(var(--cvw)*5)] relative mb-[calc(var(--cvh)*6)] overflow-hidden shadow-2xl"
+           initial={{ y: 50, opacity: 0 }}
+           animate={{ y: 0, opacity: 1 }}
+           transition={{ ...SPRING_SMOOTH, delay: 0.2 }}
         >
-          Steadier <span className="text-brand-emerald">blood sugar</span>
-        </motion.p>
+          {/* Grid lines */}
+          <div className="absolute inset-0 flex flex-col justify-between py-[calc(var(--cvw)*10)] px-[calc(var(--cvw)*5)] opacity-10">
+             {[1,2,3,4].map(i => <div key={i} className="w-full h-px bg-white/50" />)}
+          </div>
 
-        {/* Graph Container */}
-        <div className="relative w-[calc(var(--cvw)*80)] h-[calc(var(--cvh)*25)] bg-brand-navy border border-white/10 rounded-2xl p-4 shadow-xl flex items-end overflow-hidden z-10">
-           {/* Grid lines */}
-           <div className="absolute inset-0 flex flex-col justify-between p-4 opacity-10">
-             <div className="w-full h-px bg-white" />
-             <div className="w-full h-px bg-white" />
-             <div className="w-full h-px bg-white" />
-             <div className="w-full h-px bg-white" />
-           </div>
-
-           {/* Orange Spike Path (Sitting) */}
-           <motion.svg
-             viewBox="0 0 100 50"
-             className="absolute w-full h-full left-0 bottom-0 drop-shadow-[0_0_10px_rgba(249,115,22,0.6)]"
-             preserveAspectRatio="none"
-             initial={{ opacity: 0 }}
-             animate={phase >= 1 && phase < 2 ? { opacity: 1 } : { opacity: 0.3 }}
-             transition={{ duration: 0.5 }}
-           >
-             <motion.path
-               d="M0 45 Q 20 45, 30 10 T 60 40 T 100 45"
-               fill="none"
-               stroke="#F97316"
-               strokeWidth="3"
+          {/* Graph lines */}
+          <svg className="absolute inset-0 w-full h-full pt-[calc(var(--cvw)*5)] overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 100">
+             {/* Spike (Orange) */}
+             <motion.path 
+               d="M 5,80 L 25,80 L 40,20 L 55,80 L 95,80" 
+               fill="none" 
+               stroke="var(--color-brand-orange)" 
+               strokeWidth="2" 
                strokeLinecap="round"
-               initial={{ pathLength: 0 }}
-               animate={phase >= 1 ? { pathLength: 1 } : { pathLength: 0 }}
-               transition={{ duration: 1.5, ease: "easeInOut" }}
-             />
-           </motion.svg>
-
-           {/* Emerald Flat Path (Walking) */}
-           <motion.svg
-             viewBox="0 0 100 50"
-             className="absolute w-full h-full left-0 bottom-0 drop-shadow-[0_0_10px_rgba(16,185,129,0.6)]"
-             preserveAspectRatio="none"
-           >
-             <motion.path
-               d="M0 45 Q 20 45, 40 35 T 80 40 T 100 45"
-               fill="none"
-               stroke="#10B981"
-               strokeWidth="4"
-               strokeLinecap="round"
+               strokeLinejoin="round"
+               strokeDasharray="2 3"
                initial={{ pathLength: 0, opacity: 0 }}
-               animate={phase >= 2 ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
-               transition={{ duration: 1.5, ease: "easeInOut" }}
+               animate={{ pathLength: 1, opacity: 0.4 }}
+               transition={{ duration: 1.5, ease: "linear", delay: 0.5 }}
              />
-           </motion.svg>
-        </div>
+             
+             {/* Flatline (Emerald) */}
+             <motion.path 
+               d="M 5,80 L 25,80 Q 40,70 55,70 L 95,70" 
+               fill="none" 
+               stroke="var(--color-brand-emerald)" 
+               strokeWidth="4" 
+               strokeLinecap="round"
+               strokeLinejoin="round"
+               className="drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]"
+               initial={{ pathLength: 0 }}
+               animate={{ pathLength: 1 }}
+               transition={{ duration: 1.5, ease: "easeOut", delay: 2.0 }}
+             />
+             
+             {/* Pulse Dot on Emerald Line */}
+             <motion.circle
+               cx="95" cy="70" r="3" fill="var(--color-brand-emerald)"
+               className="drop-shadow-[0_0_10px_rgba(16,185,129,1)]"
+               initial={{ opacity: 0, scale: 0 }}
+               animate={{ opacity: [0, 1, 0.5, 1], scale: [0, 1.5, 1, 1.5] }}
+               transition={{ duration: 2, repeat: Infinity, delay: 3.5 }}
+             />
+          </svg>
 
-        {/* Labels */}
-        <div className="flex justify-between w-[calc(var(--cvw)*80)] mt-4">
-           <motion.div
-              className="flex items-center gap-2"
-              initial={{ opacity: 0 }}
-              animate={phase >= 1 ? { opacity: 1 } : { opacity: 0 }}
-           >
-              <div className="w-3 h-3 rounded-full bg-brand-orange" />
-              <span className="font-mono text-[calc(var(--cvh)*1.4)] text-brand-orange font-bold">SITTING</span>
-           </motion.div>
-           <motion.div
-              className="flex items-center gap-2"
-              initial={{ opacity: 0 }}
-              animate={phase >= 2 ? { opacity: 1 } : { opacity: 0 }}
-           >
-              <div className="w-3 h-3 rounded-full bg-brand-emerald" />
-              <span className="font-mono text-[calc(var(--cvh)*1.4)] text-brand-emerald font-bold">WALKING</span>
-           </motion.div>
-        </div>
+          {/* Labels */}
+          <motion.div 
+             className="absolute top-[calc(var(--cvw)*6)] right-[calc(var(--cvw)*6)] bg-brand-emerald/10 border border-brand-emerald/30 text-brand-emerald px-[calc(var(--cvw)*4)] py-[calc(var(--cvw)*2)] rounded-[calc(var(--cvw)*3)] font-bold backdrop-blur-sm shadow-[0_10px_20px_rgba(16,185,129,0.2)]"
+             style={{ fontSize: 'calc(var(--cvw)*4.5)' }}
+             initial={{ opacity: 0, scale: 0, y: 20 }}
+             animate={{ opacity: 1, scale: 1, y: 0 }}
+             transition={{ ...SPRING_SNAPPY, delay: 3.5 }}
+          >
+             Steady Glucose
+          </motion.div>
+        </motion.div>
 
-        {/* Muscle context */}
-        <motion.div
-          className="mt-[calc(var(--cvh)*6)] bg-brand-teal/10 border border-brand-teal/30 px-[calc(var(--cvw)*6)] py-[calc(var(--cvh)*3)] rounded-2xl backdrop-blur-sm"
-          initial={{ opacity: 0, y: 20 }}
-          animate={phase >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={SPRING_SMOOTH}
-        >
-          <p className="font-body text-[calc(var(--cvh)*2.2)] text-brand-teal font-medium text-center">
-            Walking helps muscles absorb glucose from your meal.
-          </p>
+        <motion.div className="flex flex-col items-center text-center gap-[calc(var(--cvh)*2)]">
+           <motion.h2 
+             className="text-white font-bold leading-tight"
+             style={{ fontSize: 'calc(var(--cvw)*9.5)' }}
+             initial={{ y: 30, opacity: 0 }}
+             animate={{ y: 0, opacity: 1 }}
+             transition={{ ...SPRING_SNAPPY, delay: 0.6 }}
+           >
+             Muscles absorb glucose
+           </motion.h2>
+           <motion.p 
+             className="text-white/70 font-medium"
+             style={{ fontSize: 'calc(var(--cvw)*6.5)' }}
+             initial={{ y: 30, opacity: 0 }}
+             animate={{ y: 0, opacity: 1 }}
+             transition={{ ...SPRING_SNAPPY, delay: 0.8 }}
+           >
+             supporting steadier blood sugar
+           </motion.p>
         </motion.div>
 
       </div>

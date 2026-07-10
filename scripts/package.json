@@ -7,6 +7,7 @@
     "hello": "tsx ./src/hello.ts",
     "generate-dashboard": "tsx ./src/generate-dashboard.ts",
     "verify-export": "tsx ./src/verify-export.ts",
+    "export-video": "tsx ./src/export-video.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -14,6 +15,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "playwright-chromium": "^1.61.1",
     "tsx": "catalog:"
   }
 }

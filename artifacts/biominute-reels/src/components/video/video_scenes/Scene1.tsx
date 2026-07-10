@@ -1,98 +1,84 @@
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
 
-const SPRING_SMOOTH = { type: 'spring' as const, stiffness: 120, damping: 25 };
+const BASE_URL = import.meta.env.BASE_URL ?? '/';
 const SPRING_SNAPPY = { type: 'spring' as const, stiffness: 400, damping: 30 };
+const SPRING_SMOOTH = { type: 'spring' as const, stiffness: 120, damping: 25 };
 
 export function Scene1() {
-  const [phase, setPhase] = useState(0);
-
-  useEffect(() => {
-    const timers = [
-      setTimeout(() => setPhase(1), 1000), // Plate
-      setTimeout(() => setPhase(2), 2500), // Clock
-      setTimeout(() => setPhase(3), 4000), // Text 2
-    ];
-    return () => timers.forEach(t => clearTimeout(t));
-  }, []);
-
   return (
     <motion.div
-      className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, x: 'calc(var(--cvw) * -50)' }}
+      className="absolute inset-0 w-full h-full font-display"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }}
       transition={{ duration: 0.8 }}
     >
-      <div className="z-20 w-full px-[calc(var(--cvw)*8)] flex flex-col items-center text-center mt-[calc(var(--cvh)*-10)]">
-        <motion.p
-          className="font-display font-bold text-[calc(var(--cvh)*4)] text-brand-text leading-tight mb-[calc(var(--cvh)*4)]"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, ...SPRING_SMOOTH }}
-        >
-          More than just <span className="text-brand-orange">burning calories.</span>
-        </motion.p>
+      <div className="absolute inset-0 w-full h-full p-[8%] flex flex-col items-center justify-center">
         
-        <div className="relative w-[calc(var(--cvw)*60)] h-[calc(var(--cvw)*60)] max-w-[300px] max-h-[300px] flex items-center justify-center mt-[calc(var(--cvh)*2)]">
-          {/* Background glow */}
-          <motion.div
-             className="absolute w-[80%] h-[80%] bg-brand-emerald/10 rounded-full blur-[30px]"
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             transition={{ delay: 0.5 }}
+        {/* Animated Clock / Plate */}
+        <div className="relative w-[65%] aspect-square mb-[calc(var(--cvh)*6)] flex items-center justify-center">
+          
+          {/* Clock Track */}
+          <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100" overflow="visible">
+            <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="3" className="text-brand-teal/20" />
+            <motion.circle 
+              cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="4" className="text-brand-teal drop-shadow-[0_0_10px_rgba(20,184,166,0.8)]"
+              strokeLinecap="round"
+              strokeDasharray="301.59"
+              initial={{ strokeDashoffset: 301.59 }}
+              animate={{ strokeDashoffset: 150.8 }}
+              transition={{ duration: 1.5, ease: "easeInOut", delay: 0.8 }}
+            />
+          </svg>
+
+          {/* Plate Image */}
+          <motion.img 
+            src={`${BASE_URL}images/plate-overhead.png`} 
+            alt="Plate"
+            className="w-[75%] h-[75%] object-contain relative z-10 drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)]"
+            initial={{ scale: 0, rotate: -90 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ ...SPRING_SMOOTH, delay: 0.4 }}
           />
-
-          {/* Plate */}
-          <motion.div
-             className="absolute w-[60%] h-[60%] border-4 border-brand-teal rounded-full bg-brand-navy flex items-center justify-center shadow-[0_0_20px_rgba(20,184,166,0.2)]"
-             initial={{ rotate: -90, scale: 0, opacity: 0 }}
-             animate={phase >= 1 ? { rotate: 0, scale: 1, opacity: 1 } : { rotate: -90, scale: 0, opacity: 0 }}
-             transition={SPRING_SMOOTH}
+          
+          {/* 30 Min Badge */}
+          <motion.div 
+            className="absolute -right-[5%] -bottom-[5%] bg-brand-orange text-white rounded-full flex items-center justify-center font-bold z-20 shadow-[0_10px_20px_rgba(249,115,22,0.4)] border-[calc(var(--cvw)*1)] border-brand-navy"
+            style={{ 
+               width: 'calc(var(--cvw)*22)', 
+               height: 'calc(var(--cvw)*22)',
+               fontSize: 'calc(var(--cvw)*6)' 
+            }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ ...SPRING_SNAPPY, delay: 2.0 }}
           >
-             {/* Food representation */}
-             <div className="w-[40%] h-[40%] bg-brand-orange/80 rounded-l-full absolute left-[10%]" />
-             <div className="w-[40%] h-[40%] bg-brand-emerald/80 rounded-tr-full absolute top-[10%] right-[10%]" />
-             <div className="w-[40%] h-[40%] bg-brand-blue/80 rounded-br-full absolute bottom-[10%] right-[10%]" />
-          </motion.div>
-
-          {/* Clock */}
-          <motion.div
-             className="absolute -bottom-[calc(var(--cvh)*2)] -right-[calc(var(--cvw)*2)] w-[calc(var(--cvw)*20)] h-[calc(var(--cvw)*20)] max-w-[80px] max-h-[80px] border-4 border-brand-blue bg-brand-navy rounded-full shadow-[0_0_20px_rgba(47,111,237,0.4)] flex items-center justify-center z-10"
-             initial={{ scale: 0, opacity: 0 }}
-             animate={phase >= 2 ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
-             transition={SPRING_SNAPPY}
-          >
-             <svg viewBox="0 0 24 24" className="w-[60%] h-[60%] stroke-brand-blue fill-none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <motion.path 
-                  d="M12 6v6l4 2" 
-                  initial={{ pathLength: 0 }}
-                  animate={phase >= 2 ? { pathLength: 1 } : { pathLength: 0 }}
-                  transition={{ duration: 1, delay: 0.2 }}
-                />
-             </svg>
-             {phase >= 2 && (
-               <motion.span 
-                 className="absolute -bottom-[calc(var(--cvh)*3)] font-mono text-[calc(var(--cvh)*1.6)] text-brand-blue tracking-widest font-bold whitespace-nowrap bg-brand-navy/90 px-2 py-1 rounded"
-                 initial={{ opacity: 0, y: -10 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ delay: 0.5 }}
-               >
-                 30 MIN
-               </motion.span>
-             )}
+            30 Min
           </motion.div>
         </div>
 
-        <motion.p
-          className="font-body text-[calc(var(--cvh)*2.2)] text-brand-muted mt-[calc(var(--cvh)*8)] max-w-[90%] leading-relaxed text-center font-medium"
-          initial={{ opacity: 0, y: 20 }}
-          animate={phase >= 3 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={SPRING_SMOOTH}
-        >
-          Light movement right after eating changes how your body works.
-        </motion.p>
+        {/* Text */}
+        <motion.div className="flex flex-col items-center text-center gap-[calc(var(--cvh)*2)] w-full">
+           <motion.p 
+             className="text-white/80 font-medium tracking-wide uppercase"
+             style={{ fontSize: 'calc(var(--cvw)*5.5)' }}
+             initial={{ y: 30, opacity: 0 }}
+             animate={{ y: 0, opacity: 1 }}
+             transition={{ ...SPRING_SNAPPY, delay: 0.8 }}
+           >
+             Light movement within
+           </motion.p>
+           <motion.p 
+             className="text-brand-teal font-bold bg-brand-teal/10 px-[calc(var(--cvw)*6)] py-[calc(var(--cvw)*3)] rounded-[calc(var(--cvw)*4)] border border-brand-teal/20"
+             style={{ fontSize: 'calc(var(--cvw)*8.5)' }}
+             initial={{ y: 30, opacity: 0 }}
+             animate={{ y: 0, opacity: 1 }}
+             transition={{ ...SPRING_SNAPPY, delay: 1.0 }}
+           >
+             30 minutes of eating
+           </motion.p>
+        </motion.div>
+
       </div>
     </motion.div>
   );
