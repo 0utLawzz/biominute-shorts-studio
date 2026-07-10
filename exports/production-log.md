@@ -8,7 +8,7 @@ Persistent tracker for all BioMinute reel/short episodes. **Read this file befor
 
 | Episode # | Title | Status | Date Completed | Export Folder | Notes |
 |---|---|---|---|---|---|
-| 1 | Walk After Meals | Built — awaiting export | — | `exports/Episode-01-Walk-After-Meals/` | Scenes built 2026-07-10; thumbnail ready; MP4 needs export from preview. |
+| 1 | Walk After Meals | Built — awaiting export | — | `exports/Episode-01-Walk-After-Meals/` | Scenes built 2026-07-10; thumbnail ready; `episode1.mp4` uploaded 2026-07-10. Known issues: 1280×720 (16:9), not 1080×1920; audio stream present but missing BioMinute background music and scene SFX. |
 | 2 | Drink Water Before Your Morning Coffee | Uncomplete | — | `exports/Episode-02-drink-water-before-your-morning/` | Starting now — rebuild and export this episode first. |
 | 3 | Are You Eating Protein at the Wrong Time? | Uncomplete | — | `exports/Episode-03-are-you-eating-protein-at/` | Queued for rebuild. |
 | 4 | Is 10,000 Steps Actually a Myth? | Uncomplete | — | `exports/Episode-04-is-10-000-steps-actually/` | Queued for rebuild. |
