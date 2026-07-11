@@ -7,87 +7,66 @@ const SPRING_SMOOTH = { type: 'spring' as const, stiffness: 120, damping: 25 };
 export function Scene5() {
   return (
     <motion.div
-      className="absolute inset-0 w-full h-full font-display bg-brand-navy"
+      className="absolute inset-0 w-full h-full font-display"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }}
+      exit={{ opacity: 0 }}
       transition={{ duration: 0.8 }}
     >
-      <div className="absolute inset-0 w-full h-full p-[8%] flex flex-col items-center justify-center">
+      <div className="absolute inset-0 w-full h-full flex flex-col justify-center items-center p-[8%]">
 
-        {/* Animated background rings */}
+        {/* Citation Chip */}
         <motion.div
-          className="absolute inset-0 flex items-center justify-center opacity-15 pointer-events-none"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.15 }}
-          transition={{ duration: 2 }}
+          className="absolute top-[8%] left-[8%] right-[8%] bg-white/5 border border-white/10 rounded-xl p-3"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...SPRING_SMOOTH, delay: 0.5 }}
         >
-          <div className="w-[160%] aspect-square rounded-full border-[calc(var(--cvw)*0.5)] border-brand-teal/40" />
-          <div className="absolute w-[120%] aspect-square rounded-full border-[calc(var(--cvw)*0.5)] border-brand-blue/40" />
-          <div className="absolute w-[80%] aspect-square rounded-full border-[calc(var(--cvw)*0.5)] border-brand-emerald/40" />
+          <p className="text-white/40 text-[9px] uppercase tracking-wider mb-1">Source</p>
+          <p className="text-white/70 text-[10px] leading-tight">
+            Popkin BM et al. (2010), Nutrition Reviews — Water, hydration and health
+          </p>
         </motion.div>
 
-        {/* BioMinute Logo */}
+        {/* Logo Mark */}
         <motion.div
-          className="relative w-[55%] mb-[calc(var(--cvh)*4)]"
-          initial={{ scale: 0.5, opacity: 0, y: 50 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ ...SPRING_SMOOTH, delay: 0.2 }}
+          className="relative w-[30%] aspect-square mb-[calc(var(--cvh)*4)] flex items-center justify-center"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ ...SPRING_SNAPPY, delay: 1 }}
         >
-          <img
-            src={`${BASE_URL}images/biominute-logo.png`}
-            alt="BioMinute Logo"
-            className="w-full h-auto drop-shadow-[0_10px_30px_rgba(20,184,166,0.4)]"
-          />
+          <div className="absolute inset-0 bg-brand-emerald/20 blur-[30px] rounded-full" />
+          <div className="absolute w-[80%] h-[80%] rounded-full border-[2px] border-brand-teal flex items-center justify-center relative overflow-hidden bg-brand-navy">
+            {/* Simple DNA/Heartbeat Logo abstraction */}
+            <svg viewBox="0 0 100 100" className="w-[60%] h-[60%]">
+              <path d="M 10 50 L 30 50 L 40 20 L 60 80 L 70 50 L 90 50" fill="none" stroke="#10b981" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
         </motion.div>
 
         {/* Wordmark */}
-        <motion.h1
-          className="text-gradient-emerald-teal font-extrabold tracking-tight mb-[calc(var(--cvh)*3)]"
+        <motion.div
+          className="text-transparent bg-clip-text bg-gradient-to-r from-brand-teal to-brand-emerald font-black tracking-tight"
           style={{ fontSize: 'calc(var(--cvw)*12)' }}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ ...SPRING_SNAPPY, delay: 0.6 }}
+          transition={{ ...SPRING_SNAPPY, delay: 1.4 }}
         >
           BioMinute
-        </motion.h1>
-
-        {/* Divider */}
-        <motion.div
-          className="w-[50%] h-[3px] rounded-full bg-gradient-to-r from-brand-teal to-brand-emerald mb-[calc(var(--cvh)*4)]"
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 0.6, delay: 1.0 }}
-        />
+        </motion.div>
 
         {/* CTA */}
         <motion.div
-          className="w-full text-center px-[calc(var(--cvw)*4)]"
-          initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ ...SPRING_SNAPPY, delay: 1.2 }}
+          className="mt-[calc(var(--cvh)*6)] bg-white/10 border border-white/20 rounded-2xl p-[calc(var(--cvw)*5)] text-center w-full"
+          initial={{ scale: 0.9, opacity: 0, y: 30 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ ...SPRING_SMOOTH, delay: 2.8 }}
         >
-          <p
-            className="text-white/90 font-medium leading-snug"
-            style={{ fontSize: 'calc(var(--cvw)*6.5)' }}
-          >
-            Do you walk after meals, or sit right down?
-          </p>
-          <p
-            className="text-brand-muted font-medium mt-[calc(var(--cvh)*2)]"
-            style={{ fontSize: 'calc(var(--cvw)*4.5)' }}
-          >
-            Drop your answer below 👇
-          </p>
+          <span className="text-brand-orange font-bold text-sm uppercase tracking-widest block mb-2">Join the discussion</span>
+          <span className="text-white font-bold leading-tight drop-shadow-md" style={{ fontSize: 'calc(var(--cvw)*6.5)' }}>
+            Do you reach for water or coffee first thing?
+          </span>
         </motion.div>
-
-        {/* Pulse burst at end */}
-        <motion.div
-          className="absolute w-[calc(var(--cvw)*8)] h-[calc(var(--cvw)*8)] bg-brand-teal rounded-full"
-          initial={{ scale: 0, opacity: 0.8 }}
-          animate={{ scale: 80, opacity: 0 }}
-          transition={{ duration: 1.8, delay: 5.0 }}
-        />
 
       </div>
     </motion.div>

@@ -18,8 +18,10 @@ interface AudioEngineProps {
 
 export function useAudioState() {
   const [muted, setMuted] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    return window.localStorage.getItem('biominute-audio-muted') !== 'false';
+    if (typeof window === 'undefined') return false;
+    // Default is UNMUTED — only mute if the user explicitly set it
+    const stored = window.localStorage.getItem('biominute-audio-muted');
+    return stored === 'true';
   });
 
   const toggleMuted = () => {
@@ -60,19 +62,27 @@ export function AudioEngine({
     sfx.preload = 'auto';
     sfxRef.current = sfx;
 
-    const unlock = () => {
+    const tryPlay = () => {
       setAudioCtxReady(true);
       if (bg.paused && !bg.muted) {
         bg.play().catch(() => {});
       }
     };
 
-    window.addEventListener('pointerdown', unlock, { once: true });
-    window.addEventListener('keydown', unlock, { once: true });
+    // Try to auto-play immediately (works when browser allows it)
+    bg.play().then(() => {
+      setAudioCtxReady(true);
+    }).catch(() => {
+      // Browser blocked autoplay — wait for first user gesture
+      window.addEventListener('pointerdown', tryPlay, { once: true });
+      window.addEventListener('keydown', tryPlay, { once: true });
+      window.addEventListener('touchstart', tryPlay, { once: true });
+    });
 
     return () => {
-      window.removeEventListener('pointerdown', unlock);
-      window.removeEventListener('keydown', unlock);
+      window.removeEventListener('pointerdown', tryPlay);
+      window.removeEventListener('keydown', tryPlay);
+      window.removeEventListener('touchstart', tryPlay);
       bg.pause();
       sfx.pause();
       bgRef.current = null;
