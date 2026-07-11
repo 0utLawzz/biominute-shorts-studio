@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { AudioEngine } from '@/lib/audio/AudioEngine';
-import { useVideoPlayer } from '@/lib/video';
+import { SCENE_DURATIONS, useVideoPlayer } from '@/lib/video';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { Scene0 } from './video_scenes/Scene0';
@@ -11,15 +11,7 @@ import { Scene4 } from './video_scenes/Scene4';
 import { Scene5 } from './video_scenes/Scene5';
 import { ThumbnailSlide } from './video_scenes/ThumbnailSlide';
 
-export const SCENE_DURATIONS = {
-  0: 4500,
-  1: 9000,
-  2: 8000,
-  3: 5500,
-  4: 7500,
-  5: 6000,
-  6: 4000,
-};
+export { SCENE_DURATIONS };
 
 const SCENE_COMPONENTS: Record<string, React.ComponentType> = {
   0: Scene0,

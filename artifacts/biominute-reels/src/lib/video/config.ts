@@ -15,3 +15,16 @@ export const CANVAS_STYLE = {
   width: VIDEO_WIDTH,
   height: VIDEO_HEIGHT,
 } as const;
+
+// Scene durations for the current episode. The video player uses these to
+// advance scenes automatically. Keep the total loop duration in sync with
+// the exported MP4 length so the record/export control captures the full video.
+export const SCENE_DURATIONS = {
+  0: 4500,
+  1: 9000,
+  2: 8000,
+  3: 5500,
+  4: 7500,
+  5: 6000,
+  6: 4000, // ThumbnailSlide end card
+} as const;

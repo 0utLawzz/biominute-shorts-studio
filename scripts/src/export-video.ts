@@ -101,14 +101,16 @@ async function main() {
 
     if (bgMusicExists) {
       console.log('Mixing background music from:', BG_MUSIC_PATH);
+      // Force 60fps CFR output so the MP4 stays in sync with the looped audio track.
       execSync(
-        `ffmpeg -y -i "${videoPath}" -stream_loop -1 -i "${BG_MUSIC_PATH}" -vf "scale=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:force_original_aspect_ratio=decrease,pad=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:(ow-iw)/2:(oh-ih)/2,format=yuv420p" -c:v libx264 -preset fast -crf 23 -movflags +faststart -c:a aac -b:a 128k -shortest "${mp4Path}"`,
+        `ffmpeg -y -i "${videoPath}" -stream_loop -1 -i "${BG_MUSIC_PATH}" -vf "scale=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:force_original_aspect_ratio=decrease,pad=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:(ow-iw)/2:(oh-ih)/2,format=yuv420p" -r 60 -vsync cfr -c:v libx264 -preset fast -crf 23 -movflags +faststart -c:a aac -b:a 128k -shortest "${mp4Path}"`,
         { stdio: 'inherit' }
       );
     } else {
       console.warn('Background music not found at:', BG_MUSIC_PATH, '— exporting video-only');
+      // Force 60fps CFR output to avoid variable-frame-rate drift.
       execSync(
-        `ffmpeg -y -i "${videoPath}" -vf "scale=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:force_original_aspect_ratio=decrease,pad=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:(ow-iw)/2:(oh-ih)/2,format=yuv420p" -c:v libx264 -preset fast -crf 23 -movflags +faststart "${mp4Path}"`,
+        `ffmpeg -y -i "${videoPath}" -vf "scale=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:force_original_aspect_ratio=decrease,pad=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:(ow-iw)/2:(oh-ih)/2,format=yuv420p" -r 60 -vsync cfr -c:v libx264 -preset fast -crf 23 -movflags +faststart "${mp4Path}"`,
         { stdio: 'inherit' }
       );
     }

@@ -10,9 +10,6 @@
     "export-video": "tsx ./src/export-video.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
-  "dependencies": {
-    "xlsx": "^0.18.5"
-  },
   "devDependencies": {
     "@types/node": "catalog:",
     "playwright-chromium": "^1.61.1",

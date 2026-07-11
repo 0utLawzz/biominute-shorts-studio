@@ -26,23 +26,27 @@ function parseProductionLog(): Episode[] {
     if (!trimmed.startsWith('|') || trimmed.includes('Episode #') || trimmed.startsWith('|---')) {
       continue;
     }
-    const parts = trimmed.split('|').map((s) => s.trim()).filter(Boolean);
-    if (parts.length < 5) continue;
 
-    const [numStr, title, status, dateCompleted, folderRaw, ...notesParts] = parts;
+    // Match the table row pattern exactly: | num | title | status | date | `folder` | notes |
+    // This is more robust than splitting on every pipe because notes may contain pipes.
+    const match = trimmed.match(
+      /^\|\s*(\d+)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*`([^`]+)`\s*\|\s*(.+?)\s*\|$/
+    );
+    if (!match) continue;
+
+    const [, numStr, title, status, dateCompleted, folderRaw, notes] = match;
     const number = parseInt(numStr, 10);
     if (Number.isNaN(number)) continue;
 
-    const folder = folderRaw.replace(/^`+|`+$/g, '').replace(/\/$/, '');
-    const notes = notesParts.join(' | ');
+    const folder = folderRaw.replace(/\/$/, '');
 
     episodes.push({
       number,
-      title,
-      status: status as EpisodeStatus,
-      dateCompleted: dateCompleted === '—' || dateCompleted === '-' ? null : dateCompleted,
+      title: title.trim(),
+      status: status.trim() as EpisodeStatus,
+      dateCompleted: dateCompleted.trim() === '—' || dateCompleted.trim() === '-' ? null : dateCompleted.trim(),
       folder,
-      notes,
+      notes: notes.trim(),
     });
   }
 
