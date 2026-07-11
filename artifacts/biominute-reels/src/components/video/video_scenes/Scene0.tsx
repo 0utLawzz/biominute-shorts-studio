@@ -13,56 +13,68 @@ export function Scene0() {
       exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }}
       transition={{ duration: 0.8 }}
     >
-      <div className="absolute inset-0 w-full h-full p-[8%] flex flex-col items-center justify-center">
-        {/* Visual Element */}
-        <motion.div 
-          className="relative w-[70%] aspect-square mb-[calc(var(--cvh)*5)]"
-          initial={{ scale: 0, rotate: -10 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ ...SPRING_SMOOTH, delay: 0.2 }}
+      <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center p-[8%]">
+
+        {/* Plate image */}
+        <motion.div
+          className="relative w-[72%] aspect-square mb-[calc(var(--cvh)*5)]"
+          initial={{ scale: 0.6, opacity: 0, y: 30 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ ...SPRING_SMOOTH, delay: 0.15 }}
         >
-           <div className="absolute inset-0 bg-brand-orange/20 blur-[60px] rounded-full" />
-           <img 
-              src={`${BASE_URL}images/sunrise-bg.png`} 
-              alt="Sunrise"
-              className="absolute inset-0 w-full h-full object-cover rounded-full opacity-60 mix-blend-screen"
-           />
-           <img 
-              src={`${BASE_URL}images/character-waking.png`} 
-              alt="Character Waking"
-              className="w-full h-full object-contain relative z-10 drop-shadow-[0_20px_40px_rgba(249,115,22,0.4)]"
-           />
+          <div className="absolute inset-0 bg-brand-orange/20 blur-[80px] rounded-full" />
+          <img
+            src={`${BASE_URL}images/plate-overhead.png`}
+            alt="Meal"
+            className="w-full h-full object-contain relative z-10 drop-shadow-[0_20px_50px_rgba(249,115,22,0.3)]"
+          />
+          {/* Pulse ring */}
+          <motion.div
+            className="absolute inset-[-12%] rounded-full border-[3px] border-brand-orange/40"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: [1, 1.06, 1], opacity: [0.6, 0.3, 0.6] }}
+            transition={{ duration: 2.5, repeat: Infinity, delay: 0.8 }}
+          />
         </motion.div>
 
-        {/* Text */}
-        <motion.div className="flex flex-col items-center text-center">
-           <motion.span 
-             className="text-white font-bold leading-none tracking-tight"
-             style={{ fontSize: 'calc(var(--cvw)*12)' }}
-             initial={{ y: 50, opacity: 0 }}
-             animate={{ y: 0, opacity: 1 }}
-             transition={{ ...SPRING_SNAPPY, delay: 0.5 }}
-           >
-             Drink Water
-           </motion.span>
-           <motion.span 
-             className="text-white font-bold leading-none tracking-tight mt-[calc(var(--cvh)*1)]"
-             style={{ fontSize: 'calc(var(--cvw)*10)' }}
-             initial={{ y: 50, opacity: 0 }}
-             animate={{ y: 0, opacity: 1 }}
-             transition={{ ...SPRING_SNAPPY, delay: 0.6 }}
-           >
-             Before Your
-           </motion.span>
-           <motion.span 
-             className="text-gradient-emerald-teal font-extrabold leading-tight tracking-tight mt-[calc(var(--cvh)*1)]"
-             style={{ fontSize: 'calc(var(--cvw)*12)' }}
-             initial={{ y: 50, opacity: 0 }}
-             animate={{ y: 0, opacity: 1 }}
-             transition={{ ...SPRING_SNAPPY, delay: 0.7 }}
-           >
-             Morning Coffee
-           </motion.span>
+        {/* Hook text */}
+        <motion.div className="flex flex-col items-center text-center gap-[calc(var(--cvh)*1.5)]">
+          <motion.span
+            className="text-brand-muted font-medium uppercase tracking-widest"
+            style={{ fontSize: 'calc(var(--cvw)*4)' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SPRING_SNAPPY, delay: 0.4 }}
+          >
+            Did you know?
+          </motion.span>
+
+          <motion.span
+            className="text-white font-extrabold leading-tight tracking-tight"
+            style={{ fontSize: 'calc(var(--cvw)*11)' }}
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ ...SPRING_SNAPPY, delay: 0.6 }}
+          >
+            What happens{'\n'}right after{'\n'}you eat?
+          </motion.span>
+
+          <motion.div
+            className="w-[60%] h-[3px] rounded-full bg-gradient-to-r from-brand-orange to-brand-teal"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.6, delay: 1.2 }}
+          />
+
+          <motion.span
+            className="text-brand-orange font-bold"
+            style={{ fontSize: 'calc(var(--cvw)*6.5)' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SPRING_SNAPPY, delay: 1.5 }}
+          >
+            Your blood sugar spikes.
+          </motion.span>
         </motion.div>
       </div>
     </motion.div>

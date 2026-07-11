@@ -8,7 +8,7 @@ Persistent tracker for all BioMinute reel/short episodes. **Read this file befor
 
 | Episode # | Title | Status | Date Completed | Export Folder | Notes |
 |---|---|---|---|---|---|
-| 1 | Walk After Meals | Uncomplete | — | `exports/Episode-01-Walk-After-Meals/` | Reset 2026-07-11: rebuilding from scratch with confirmed 9:16 fix + thumbnail end slide. |
+| 1 | Walk After Meals | Built — awaiting export | — | `exports/Episode-01-Walk-After-Meals/` | Rebuilt 2026-07-11: all 6 scenes fresh for 9:16. ThumbnailSlide added as Scene 6. Durations: 4500/9000/8000/5500/7500/6000/4000ms. CTA: "Do you walk after meals, or sit right down?" |
 | 2 | Drink Water Before Your Morning Coffee | Uncomplete | — | `exports/Episode-02-drink-water-before-your-morning/` | Reset 2026-07-11: queued for rebuild after EP1. |
 | 3 | Are You Eating Protein at the Wrong Time? | Uncomplete | — | `exports/Episode-03-are-you-eating-protein-at/` | Queued for rebuild. |
 | 4 | Is 10,000 Steps Actually a Myth? | Uncomplete | — | `exports/Episode-04-is-10-000-steps-actually/` | Queued for rebuild. |

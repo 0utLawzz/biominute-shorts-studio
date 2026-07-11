@@ -13,10 +13,10 @@ import { ThumbnailSlide } from './video_scenes/ThumbnailSlide';
 
 export const SCENE_DURATIONS = {
   0: 4500,
-  1: 8500,
+  1: 9000,
   2: 8000,
-  3: 7500,
-  4: 9000,
+  3: 5500,
+  4: 7500,
   5: 6000,
   6: 4000,
 };

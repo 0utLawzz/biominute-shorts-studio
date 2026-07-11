@@ -13,85 +13,94 @@ export function Scene2() {
       exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }}
       transition={{ duration: 0.8 }}
     >
-      <div className="absolute inset-0 w-full h-full p-[8%] flex flex-col items-center justify-center">
-        
-        {/* Kitchen background element */}
-        <motion.img 
-            src={`${BASE_URL}images/kitchen-elements.png`}
-            className="absolute top-[10%] w-[150%] opacity-10 object-cover max-w-none mix-blend-screen pointer-events-none"
-            initial={{ x: "0%" }}
-            animate={{ x: "-10%" }}
-            transition={{ duration: 15, ease: "linear" }}
-        />
+      <div className="absolute inset-0 w-full h-full flex flex-col justify-center p-[8%] gap-[calc(var(--cvh)*3)]">
 
-        {/* Icons side by side */}
-        <div className="relative w-full flex flex-row items-center justify-center gap-[calc(var(--cvw)*4)] mb-[calc(var(--cvh)*6)]">
-          
-          {/* Water Glass container */}
-          <motion.div 
-             className="relative w-[40%] aspect-square flex items-center justify-center bg-brand-emerald/10 rounded-[calc(var(--cvw)*6)] border-2 border-brand-emerald/30 shadow-[0_0_40px_rgba(16,185,129,0.2)]"
-             initial={{ scale: 0, x: -50 }}
-             animate={{ scale: 1, x: 0 }}
-             transition={{ ...SPRING_SMOOTH, delay: 0.4 }}
+        {/* Headline */}
+        <motion.div
+          className="flex flex-col gap-[calc(var(--cvh)*1.5)]"
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ ...SPRING_SMOOTH, delay: 0.1 }}
+        >
+          <span className="text-brand-muted font-medium uppercase tracking-widest"
+            style={{ fontSize: 'calc(var(--cvw)*3.8)' }}>How It Works</span>
+          <span className="text-white font-extrabold leading-tight tracking-tight"
+            style={{ fontSize: 'calc(var(--cvw)*10.5)' }}>
+            Your muscles act like a{' '}
+            <span className="text-brand-emerald">glucose sponge</span>
+          </span>
+        </motion.div>
+
+        {/* Visual: muscle absorption diagram */}
+        <motion.div
+          className="w-full flex flex-col items-center gap-[calc(var(--cvh)*2)] bg-white/5 rounded-[calc(var(--cvw)*3)] border border-white/10 p-[calc(var(--cvw)*5)] py-[calc(var(--cvh)*3)]"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ ...SPRING_SMOOTH, delay: 0.3 }}
+        >
+          {/* Glucose dots flowing */}
+          <div className="w-full flex items-center justify-between px-[calc(var(--cvw)*2)] relative"
+            style={{ height: 'calc(var(--cvh)*6)' }}>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <motion.div
+                key={i}
+                className="w-[calc(var(--cvw)*6)] h-[calc(var(--cvw)*6)] rounded-full bg-brand-orange"
+                style={{ boxShadow: '0 0 16px rgba(249,115,22,0.6)' }}
+                initial={{ x: 0, opacity: 0 }}
+                animate={{ x: [0, 0, 60], opacity: [0, 1, 0], scale: [1, 1, 0.5] }}
+                transition={{ duration: 2, delay: 0.6 + i * 0.25, repeat: Infinity, repeatDelay: 1.5 }}
+              />
+            ))}
+            <motion.div
+              className="absolute right-0 w-[35%] h-full rounded-[calc(var(--cvw)*3)] bg-brand-emerald/20 border-2 border-brand-emerald/50 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <span className="text-brand-emerald font-bold text-center"
+                style={{ fontSize: 'calc(var(--cvw)*4)' }}>Muscle</span>
+            </motion.div>
+          </div>
+
+          <motion.div
+            className="text-center text-brand-emerald font-bold"
+            style={{ fontSize: 'calc(var(--cvw)*5.5)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.0 }}
           >
-             <motion.img 
-                src={`${BASE_URL}images/water-glass.png`}
-                className="w-[70%] h-[70%] object-contain relative z-10"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ ...SPRING_SNAPPY, delay: 0.8 }}
-             />
-             {/* Droplet animation */}
-             <motion.div 
-                className="absolute top-[-20%] w-[calc(var(--cvw)*8)] h-[calc(var(--cvw)*8)] bg-brand-teal rounded-full shadow-[0_0_20px_rgba(20,184,166,0.6)]"
-                style={{ borderRadius: '50% 50% 50% 0', transform: 'rotate(-45deg)' }}
-                initial={{ y: -50, opacity: 0 }}
-                animate={{ y: 20, opacity: [0, 1, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, delay: 1.5 }}
-             />
-             <motion.div 
-                className="absolute bottom-[10%] w-[80%] h-[10%] bg-brand-emerald/30 blur-md rounded-full z-0"
-             />
+            Glucose absorbed ✓
           </motion.div>
+        </motion.div>
 
-          {/* Coffee Cup container */}
-          <motion.div 
-             className="relative w-[40%] aspect-square flex items-center justify-center bg-white/5 rounded-[calc(var(--cvw)*6)] border-2 border-white/10"
-             initial={{ scale: 0, x: 50 }}
-             animate={{ scale: 1, x: 0 }}
-             transition={{ ...SPRING_SMOOTH, delay: 0.6 }}
-          >
-             <motion.img 
-                src={`${BASE_URL}images/coffee-cup.png`}
-                className="w-[70%] h-[70%] object-contain relative z-10 grayscale opacity-40"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 0.4 }}
-                transition={{ ...SPRING_SNAPPY, delay: 1.0 }}
-             />
-          </motion.div>
+        {/* Explanation text */}
+        <motion.span
+          className="text-white/90 font-medium leading-snug"
+          style={{ fontSize: 'calc(var(--cvw)*5.5)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...SPRING_SNAPPY, delay: 1.4 }}
+        >
+          When you walk, muscles activate{' '}
+          <span className="text-brand-teal font-bold">GLUT-4 transporters</span> — pulling glucose out of your blood without insulin.
+        </motion.span>
 
-        </div>
-
-        {/* Text */}
-        <motion.div className="flex flex-col items-center text-center gap-[calc(var(--cvh)*2)] w-full relative z-20">
-           <motion.p 
-             className="text-white/90 font-medium tracking-wide"
-             style={{ fontSize: 'calc(var(--cvw)*6.5)' }}
-             initial={{ y: 30, opacity: 0 }}
-             animate={{ y: 0, opacity: 1 }}
-             transition={{ ...SPRING_SNAPPY, delay: 1.2 }}
-           >
-             Swap the order
-           </motion.p>
-           <motion.p 
-             className="text-brand-emerald font-bold leading-tight"
-             style={{ fontSize: 'calc(var(--cvw)*9)' }}
-             initial={{ y: 30, opacity: 0 }}
-             animate={{ y: 0, opacity: 1 }}
-             transition={{ ...SPRING_SNAPPY, delay: 1.4 }}
-           >
-             Drink a glass of water before your first coffee
-           </motion.p>
+        {/* Walking shoes image */}
+        <motion.div
+          className="flex items-center gap-[calc(var(--cvw)*4)]"
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ ...SPRING_SNAPPY, delay: 2.0 }}
+        >
+          <img
+            src={`${BASE_URL}images/walking-shoes-3d.png`}
+            alt="Walking"
+            className="w-[25%] h-auto object-contain drop-shadow-[0_8px_20px_rgba(20,184,166,0.4)]"
+          />
+          <span className="text-brand-teal font-bold leading-tight"
+            style={{ fontSize: 'calc(var(--cvw)*6)' }}>
+            Walking is one of the best post-meal habits
+          </span>
         </motion.div>
 
       </div>

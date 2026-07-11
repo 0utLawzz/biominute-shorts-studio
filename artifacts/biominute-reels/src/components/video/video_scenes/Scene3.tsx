@@ -1,8 +1,14 @@
 import { motion } from 'framer-motion';
 
-const BASE_URL = import.meta.env.BASE_URL ?? '/';
 const SPRING_SNAPPY = { type: 'spring' as const, stiffness: 400, damping: 30 };
 const SPRING_SMOOTH = { type: 'spring' as const, stiffness: 120, damping: 25 };
+
+const BENEFITS = [
+  { emoji: '🫀', label: 'Steadier blood sugar', color: '#10b981', delay: 0.5 },
+  { emoji: '🍽️', label: 'Improved digestion', color: '#14b8a6', delay: 0.9 },
+  { emoji: '⚡', label: 'Less post-meal slump', color: '#2F6FED', delay: 1.3 },
+  { emoji: '🔥', label: 'Gentle calorie burn', color: '#f97316', delay: 1.7 },
+];
 
 export function Scene3() {
   return (
@@ -13,60 +19,72 @@ export function Scene3() {
       exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }}
       transition={{ duration: 0.8 }}
     >
-      <div className="absolute inset-0 w-full h-full p-[8%] flex flex-col items-center justify-center">
-        
-        {/* Coffee brightens */}
-        <motion.div 
-           className="relative w-[60%] aspect-square flex items-center justify-center rounded-[calc(var(--cvw)*8)] border-[calc(var(--cvw)*1)] border-brand-teal shadow-[0_0_80px_rgba(20,184,166,0.4)] mb-[calc(var(--cvh)*6)]"
-           initial={{ scale: 0.8, backgroundColor: 'rgba(255,255,255,0.05)' }}
-           animate={{ scale: 1, backgroundColor: 'rgba(16,185,129,0.1)' }}
-           transition={{ ...SPRING_SMOOTH, delay: 0.2 }}
-           style={{ overflow: 'hidden' }}
+      <div className="absolute inset-0 w-full h-full flex flex-col justify-center p-[8%] gap-[calc(var(--cvh)*3)]">
+
+        {/* Headline */}
+        <motion.div
+          className="flex flex-col gap-[calc(var(--cvh)*1.5)]"
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ ...SPRING_SMOOTH, delay: 0.1 }}
         >
-           <motion.div 
-              className="absolute inset-0 opacity-50"
-              style={{ background: 'linear-gradient(135deg, rgba(47,111,237,0.5), rgba(16,185,129,0.5))' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              transition={{ duration: 1, delay: 0.8 }}
-           />
-           <motion.img 
-              src={`${BASE_URL}images/coffee-cup.png`}
-              className="w-[70%] h-[70%] object-contain relative z-10"
-              initial={{ filter: 'grayscale(100%) blur(2px)', opacity: 0.5 }}
-              animate={{ filter: 'grayscale(0%) blur(0px)', opacity: 1 }}
-              transition={{ duration: 1.5, delay: 1.0 }}
-           />
-           {/* Steam */}
-           <motion.div
-             className="absolute top-[10%] w-[calc(var(--cvw)*10)] h-[calc(var(--cvw)*20)] bg-white/20 blur-xl rounded-full"
-             initial={{ y: 20, opacity: 0 }}
-             animate={{ y: -20, opacity: [0, 0.5, 0] }}
-             transition={{ duration: 2, repeat: Infinity, delay: 2.0 }}
-           />
+          <span className="text-brand-muted font-medium uppercase tracking-widest"
+            style={{ fontSize: 'calc(var(--cvw)*3.8)' }}>The Benefits</span>
+          <span className="text-white font-extrabold leading-tight tracking-tight"
+            style={{ fontSize: 'calc(var(--cvw)*11)' }}>
+            A short walk does more than you think
+          </span>
         </motion.div>
 
-        {/* Text */}
-        <motion.div className="flex flex-col items-center text-center gap-[calc(var(--cvh)*2)] w-full">
-           <motion.p 
-             className="text-white/90 font-medium tracking-wide"
-             style={{ fontSize: 'calc(var(--cvw)*6.5)' }}
-             initial={{ y: 30, opacity: 0 }}
-             animate={{ y: 0, opacity: 1 }}
-             transition={{ ...SPRING_SNAPPY, delay: 0.8 }}
-           >
-             Coffee has a mild diuretic effect
-           </motion.p>
-           <motion.p 
-             className="text-gradient-emerald-teal font-bold leading-tight"
-             style={{ fontSize: 'calc(var(--cvw)*9)' }}
-             initial={{ y: 30, opacity: 0 }}
-             animate={{ y: 0, opacity: 1 }}
-             transition={{ ...SPRING_SNAPPY, delay: 1.0 }}
-           >
-             Starting hydrated balances it out
-           </motion.p>
-        </motion.div>
+        {/* Benefit cards */}
+        <div className="flex flex-col gap-[calc(var(--cvh)*2)]">
+          {BENEFITS.map((b) => (
+            <motion.div
+              key={b.label}
+              className="flex items-center gap-[calc(var(--cvw)*4)] bg-white/5 border border-white/10 rounded-[calc(var(--cvw)*3)] px-[calc(var(--cvw)*5)] py-[calc(var(--cvh)*1.8)]"
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ ...SPRING_SNAPPY, delay: b.delay }}
+            >
+              <motion.span
+                style={{ fontSize: 'calc(var(--cvw)*9)' }}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ ...SPRING_SNAPPY, delay: b.delay + 0.1 }}
+              >
+                {b.emoji}
+              </motion.span>
+              <div className="flex flex-col">
+                <span
+                  className="font-bold leading-tight"
+                  style={{ fontSize: 'calc(var(--cvw)*6)', color: b.color }}
+                >
+                  {b.label}
+                </span>
+              </div>
+              <motion.div
+                className="ml-auto w-[calc(var(--cvw)*5)] h-[calc(var(--cvw)*5)] rounded-full flex items-center justify-center"
+                style={{ backgroundColor: b.color + '33', border: `2px solid ${b.color}` }}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ ...SPRING_SNAPPY, delay: b.delay + 0.2 }}
+              >
+                <span className="text-white font-bold" style={{ fontSize: 'calc(var(--cvw)*3)' }}>✓</span>
+              </motion.div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Citation appears late */}
+        <motion.p
+          className="text-white/35 font-body text-center"
+          style={{ fontSize: 'calc(var(--cvw)*3.2)' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 4.5 }}
+        >
+          Dipietro L et al. (2013), Diabetes Care
+        </motion.p>
 
       </div>
     </motion.div>
