@@ -32,16 +32,9 @@ A simple checklist for creating any BioMinute episode. Follow it every time.
 ## Export
 
 1. Use the preview's built-in **record/export control** to capture the MP4.
-2. Generate a 1080×1920 thumbnail matching the brand thumbnail spec:
-   - Dark slate background
-   - Bold white headline
-   - One keyword highlighted in emerald or orange
-   - One simple rounded flat icon
-   - Soft blue glow
-   - No stock photos
-3. Place both files in `exports/Episode-NN-slug/` as `episode.mp4` and `thumbnail.png`.
+2. The user uploads the 1080×1920 thumbnail separately. Place the MP4 in `exports/Episode-NN-slug/` as `episode.mp4` and the user-provided thumbnail as `thumbnail.png`.
 4. Update `exports/Episode-NN-slug/episode-notes.md` with build/export notes.
-5. Update `exports/production-log.md`: set status to `Complete`, set `Date Completed`, and note the exported files.
+5. Update `exports/production-log.md`: set status to `Complete`, set `Date Completed`, and note the exported MP4 and user-provided thumbnail.
 6. Regenerate the dashboard: `pnpm run dashboard:generate`.
 7. Push to GitHub:
    - Make sure `GITHUB_TOKEN` is set as a Replit Secret (classic PAT with `repo` scope).
@@ -57,4 +50,4 @@ A simple checklist for creating any BioMinute episode. Follow it every time.
 
 - `Uncomplete` — not yet built or exported.
 - `Built — awaiting export` — scenes are live in the artifact, waiting for MP4/thumbnail export.
-- `Complete` — `episode.mp4` and `thumbnail.png` are in the episode's `exports/` folder and committed to GitHub.
+- `Complete` — `episode.mp4` is in the episode's `exports/` folder and committed to GitHub; the user-provided `thumbnail.png` is also included.

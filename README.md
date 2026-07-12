@@ -7,7 +7,7 @@ A simple workspace for making short animated health-science videos (YouTube Shor
 - Builds 6-scene vertical videos (9:16, 1080×1920) inside `artifacts/biominute-reels`.
 - Tracks every episode in `exports/production-log.md`.
 - Keeps scripts, visual direction, and citations in `attached_assets/BioMinute-Episode-Master-Plan_1783643847514.xlsx`.
-- Exports the final MP4 + thumbnail to `exports/Episode-NN-slug/` and commits them to GitHub.
+- Exports the final MP4 to `exports/Episode-NN-slug/` and commits it to GitHub. The user uploads the thumbnail separately.
 
 ## Current state
 
@@ -24,9 +24,9 @@ A simple workspace for making short animated health-science videos (YouTube Shor
 2. Read that episode's row in the Excel master sheet (`Content_Master` tab).
 3. Follow `WORKFLOW.md` to build the scenes in `artifacts/biominute-reels`.
 4. Preview the running artifact, then use the **record/export control** to capture the MP4.
-5. Save the MP4 and thumbnail to `exports/Episode-NN-slug/`.
+5. Save the MP4 to `exports/Episode-NN-slug/`. The user provides the thumbnail separately.
 6. Update `exports/production-log.md` and run `pnpm run dashboard:generate`.
-7. Push everything to GitHub (see `scripts/push-to-github.sh` — requires `GITHUB_TOKEN` secret).
+7. Push the MP4 to GitHub (see `scripts/push-to-github.sh` — requires `GITHUB_TOKEN` secret).
 
 ## Useful commands
 

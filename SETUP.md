@@ -110,7 +110,7 @@ cross-env BIOMINUTE_EXPORT_DIR="exports/Episode-01-Walk-After-Meals" pnpm run ex
    This hides controls and forces audio unmuted.
 2. Resize the browser so the canvas fills the screen.
 3. Record the tab with QuickTime, OBS, Xbox Game Bar, or a browser extension.
-4. Stop after the thumbnail slide finishes.
+4. Stop after the final scene (Scene 5 / outro) finishes.
 5. Save the recording as `episode.mp4` inside the correct `exports/Episode-NN-slug/` folder.
 
 After exporting, run `pnpm verify-export exports/Episode-NN-slug/episode.mp4` to confirm the resolution is 1080×1920.
@@ -152,8 +152,7 @@ Health-Channel-Creator/
 │   │   │   │       ├── Scene2.tsx
 │   │   │   │       ├── Scene3.tsx
 │   │   │   │       ├── Scene4.tsx
-│   │   │   │       ├── Scene5.tsx  ← Outro / CTA
-│   │   │   │       └── ThumbnailSlide.tsx
+│   │   │   │       └── Scene5.tsx  ← Outro / CTA
 │   │   │   └── lib/video/config.ts  ← 1080×1920 constants
 │   │   └── public/
 │   │       ├── images/             ← Scene images
@@ -166,7 +165,7 @@ Health-Channel-Creator/
 │   ├── dashboard.html            ← Auto-generated dashboard
 │   └── Episode-01-Walk-After-Meals/  ← Episode 1 export folder
 │       ├── episode.mp4
-│       ├── thumbnail.png
+│       ├── thumbnail.png              ← User-provided 1080×1920 thumbnail
 │       └── episode-notes.md
 │
 ├── attached_assets/
@@ -215,14 +214,6 @@ Then open http://localhost:3456/.
 
 Make sure the dev server is running with `BASE_PATH=/` locally. Also confirm the image files exist in `artifacts/biominute-reels/public/images/`.
 
-### Thumbnail end slide is wrong
-
-The thumbnail slide reads `public/images/episode-thumbnail.png`. Copy the correct episode thumbnail there before exporting:
-
-```bash
-cp exports/Episode-02-drink-water-before-your-morning/thumbnail.png \
-   artifacts/biominute-reels/public/images/episode-thumbnail.png
-```
 
 ### `GITHUB_TOKEN` not set error
 

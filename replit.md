@@ -43,7 +43,7 @@ A workspace for producing short animated health-science YouTube Shorts/Reels for
 - `artifacts/biominute-reels/src/components/video/video_scenes/Scene0.tsx` through `Scene5.tsx` — the live episode
 - `artifacts/biominute-reels/public/audio/` — background music and SFX
 - `exports/production-log.md` — episode tracker (36 episodes, statuses, export folders)
-- `exports/Episode-NN-slug/` — per-episode export folder for MP4 + thumbnail + notes
+- `exports/Episode-NN-slug/` — per-episode export folder for MP4 + user-provided thumbnail + notes
 - `exports/dashboard.html` — generated production dashboard
 - `attached_assets/BioMinute-Episode-Master-Plan_1783643847514.xlsx` — master scripts, citations, visual directions, hashtags, CTAs
 - `WORKFLOW.md` — step-by-step production checklist
@@ -58,11 +58,11 @@ A workspace for producing short animated health-science YouTube Shorts/Reels for
 - Add background music and minor SFX to every new episode.
 - Update `exports/production-log.md` and per-episode `episode-notes.md` after each build/export.
 - Regenerate `exports/dashboard.html` after every production-log change.
-- Push `episode.mp4` and `thumbnail.png` to GitHub for each completed episode.
+- Push `episode.mp4` to GitHub for each completed episode; the user provides the thumbnail separately.
 
 ## Gotchas
 
 - The artifact holds **one episode at a time**. Building a new episode overwrites the previous scenes.
 - Preview starts muted by default (browser autoplay policy). Use the `?export` URL or unmute manually for export.
 - `exports/` is **not** in `.gitignore` — export folders, production log, and dashboard are tracked by design.
-- Finished `episode.mp4` and `thumbnail.png` files are committed per episode so the project stays portable across Replit accounts.
+- Finished `episode.mp4` files are committed per episode so the project stays portable across Replit accounts. The user-provided `thumbnail.png` is included when supplied.

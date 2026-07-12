@@ -25,7 +25,7 @@ This repository is a **template** for producing a series of short animated healt
 6. Keep the existing brand identity and **9:16 vertical** format.
 7. Add background music and SFX.
 8. Verify in the preview, then export via the record control.
-9. Save the MP4 + thumbnail to `exports/Episode-NN-slug/` and update `exports/production-log.md`.
+9. Save the MP4 to `exports/Episode-NN-slug/`. The user uploads the thumbnail separately. Update `exports/production-log.md`.
 10. Regenerate `exports/dashboard.html` and push to GitHub.
 
 ## Single-artifact constraint
