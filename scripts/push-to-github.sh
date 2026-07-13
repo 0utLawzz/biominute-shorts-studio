@@ -10,13 +10,14 @@ set -e
 
 MSG="${1:-"BioMinute: auto-push $(date '+%Y-%m-%d %H:%M')"}"
 
-if [ -z "$GITHUB_TOKEN" ]; then
-  echo "❌  GITHUB_TOKEN is not set."
+TOKEN="${GITHUB_TOKEN:-$GITHUB_ACCESS_TOKEN}"
+if [ -z "$TOKEN" ]; then
+  echo "❌  No GitHub token found."
   echo "    Add a GitHub Personal Access Token (classic, repo scope) as a Replit Secret named GITHUB_TOKEN."
   exit 1
 fi
 
-REMOTE_URL="https://${GITHUB_TOKEN}@github.com/0utLawzz/Health-Channel-Creator.git"
+REMOTE_URL="https://${TOKEN}@github.com/0utLawzz/Health-Channel-Creator.git"
 
 git add -A
 git commit -m "$MSG" || echo "Nothing new to commit."
