@@ -22,10 +22,10 @@ export const CANVAS_STYLE = {
 // advance scenes automatically. Keep the total loop duration in sync with
 // the exported MP4 length so the record/export control captures the full video.
 export const SCENE_DURATIONS = {
-  0: 4500, // Hook: "Do You Really Need 8 Glasses of Water a Day?"
-  1: 7000, // Hydration needs vary, no universal rule
-  2: 6500, // Activity, weather, diet, health all play a role
-  3: 6500, // Mild dehydration signs, thirst is a lagging signal
-  4: 7000, // CTA + citation (practical check)
+  0: 4500, // Hook: "Does Eating Late at Night Cause Weight Gain?"
+  1: 7000, // Eating late doesn't automatically cause weight gain
+  2: 6500, // Total calories, food quality, activity matter more
+  3: 6000, // Late-night snacking habits can increase intake
+  4: 6500, // CTA + citation
   5: 5000, // Thumbnail end card
 } as const;

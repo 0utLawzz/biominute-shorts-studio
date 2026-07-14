@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { BookOpen, MessageCircle, Droplets } from 'lucide-react';
+import { BookOpen, MessageCircle, Moon } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -42,8 +42,8 @@ export function Scene4() {
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.6, ...SPRING_SNAPPY }}
           >
-            <div className="w-24 h-24 rounded-full bg-[#2F6FED] flex items-center justify-center">
-              <Droplets size={48} color="#0F172A" strokeWidth={2} />
+            <div className="w-24 h-24 rounded-full bg-[#f97316] flex items-center justify-center">
+              <Moon size={48} color="#0F172A" strokeWidth={2} />
             </div>
           </motion.div>
 
@@ -53,9 +53,9 @@ export function Scene4() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.0, duration: 0.8 }}
           >
-            What's Your
-            <span className="text-[#2F6FED] block mt-2">Hydration Check</span>
-            <span className="text-[#10b981] block mt-2">Today? 😅</span>
+            Morning Eater
+            <span className="text-[#f97316] block mt-2">Or Late-Night</span>
+            <span className="text-[#10b981] block mt-2">Snacker?</span>
           </motion.h2>
 
           <motion.div
@@ -65,7 +65,7 @@ export function Scene4() {
             transition={{ delay: 2.0, duration: 1 }}
           >
             <MessageCircle size={28} color="#14b8a6" />
-            <span className="text-[#94a3b8] text-[24px] font-medium">Share below 👇</span>
+            <span className="text-[#94a3b8] text-[24px] font-medium">Which one are you? 👇</span>
           </motion.div>
         </motion.div>
       </div>
@@ -80,7 +80,7 @@ export function Scene4() {
         <div className="flex items-center gap-4 text-[#94a3b8] text-[22px] font-medium bg-[#0F172A]/90 px-6 py-4 rounded-xl backdrop-blur-sm border border-white/10 shadow-lg">
           <BookOpen className="shrink-0" size={28} />
           <p className="leading-relaxed text-left">
-            Source: Armstrong LE et al. (2012) — Hydration assessment techniques including urine color; general research on individual variability in hydration needs
+            Source: General research on meal timing, chrononutrition, and late-night eating behavior
           </p>
         </div>
       </motion.div>

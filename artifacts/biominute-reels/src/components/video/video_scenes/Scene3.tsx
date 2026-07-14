@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Battery, Zap, Brain, AlertCircle } from 'lucide-react';
+import { GitFork, Apple, Cookie } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -31,36 +31,59 @@ export function Scene3() {
       <div className="absolute top-[240px] flex flex-col items-center z-10 w-full">
         <div className="relative w-[340px] h-[340px] flex items-center justify-center">
           <motion.div
-            className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#2F6FED]/15 to-[#10b981]/10 blur-[40px]"
+            className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#10b981]/15 to-[#2F6FED]/10 blur-[40px]"
             animate={{ scale: [1, 1.05, 1], opacity: [0.5, 0.8, 0.5] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           />
 
+          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 340 340">
+            <motion.path
+              d="M 170 80 L 170 170 L 100 250"
+              fill="none"
+              stroke="#10b981"
+              strokeWidth="6"
+              strokeLinecap="round"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 1, delay: 0.3 }}
+            />
+            <motion.path
+              d="M 170 170 L 240 250"
+              fill="none"
+              stroke="#f97316"
+              strokeWidth="6"
+              strokeLinecap="round"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 1, delay: 0.6 }}
+            />
+          </svg>
+
           <motion.div
-            className="w-[240px] h-[240px] rounded-full bg-[#0F172A] border-8 border-[#2F6FED] flex items-center justify-center drop-shadow-[0_0_60px_rgba(47,111,237,0.35)]"
-            initial={{ scale: 0.6, opacity: 0 }}
+            className="absolute top-[20px] left-1/2 -translate-x-1/2 w-[100px] h-[100px] rounded-full bg-[#0F172A] border-4 border-[#f97316] flex items-center justify-center drop-shadow-[0_0_30px_rgba(249,115,22,0.35)]"
+            initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, ...SPRING_SMOOTH }}
           >
-            <Battery size={88} color="#2F6FED" strokeWidth={1.5} />
+            <GitFork size={48} color="#f97316" strokeWidth={1.5} />
           </motion.div>
 
           <motion.div
-            className="absolute top-0 left-0 w-20 h-20 rounded-full bg-[#f97316] flex items-center justify-center"
+            className="absolute bottom-[40px] left-[40px] w-[100px] h-[100px] rounded-full bg-[#0F172A] border-4 border-[#10b981] flex items-center justify-center drop-shadow-[0_0_30px_rgba(16,185,129,0.35)]"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.8, ...SPRING_SNAPPY }}
+            transition={{ delay: 0.8, ...SPRING_SMOOTH }}
           >
-            <Zap size={36} color="#0F172A" strokeWidth={2.5} />
+            <Apple size={48} color="#10b981" strokeWidth={1.5} />
           </motion.div>
 
           <motion.div
-            className="absolute bottom-0 right-0 w-20 h-20 rounded-full bg-[#f97316] flex items-center justify-center"
+            className="absolute bottom-[40px] right-[40px] w-[100px] h-[100px] rounded-full bg-[#0F172A] border-4 border-[#f97316] flex items-center justify-center drop-shadow-[0_0_30px_rgba(249,115,22,0.35)]"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 1.1, ...SPRING_SNAPPY }}
+            transition={{ delay: 1.1, ...SPRING_SMOOTH }}
           >
-            <Brain size={36} color="#0F172A" strokeWidth={2.5} />
+            <Cookie size={48} color="#f97316" strokeWidth={1.5} />
           </motion.div>
         </div>
 
@@ -70,7 +93,7 @@ export function Scene3() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.6, ...SPRING_SMOOTH }}
         >
-          <span className="text-[#f8fafc] font-display font-bold text-[22px] uppercase tracking-wider">Thirst Is a Lagging Signal</span>
+          <span className="text-[#f8fafc] font-display font-bold text-[22px] uppercase tracking-wider">It's the Habits, Not the Clock</span>
         </motion.div>
       </div>
 
@@ -84,14 +107,14 @@ export function Scene3() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
         >
-          Fatigue, Headache, Fog
+          Late Snacking Often Means
           <motion.span
             className="text-[#f97316] block mt-2 drop-shadow-md"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 1.8, ...SPRING_SNAPPY }}
           >
-            Can Be Subtle Signs
+            More and Less Nutritious Food
           </motion.span>
         </motion.h2>
       </div>

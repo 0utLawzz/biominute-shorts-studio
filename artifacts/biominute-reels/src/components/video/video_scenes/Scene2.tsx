@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Dumbbell, CloudSun, Salad, HeartPulse } from 'lucide-react';
+import { Flame, Apple, Dumbbell } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -19,9 +19,9 @@ export function Scene2() {
   }, []);
 
   const factors = [
-    { Icon: Dumbbell, label: 'Activity', color: '#10b981', delay: 0.2, angle: 0 },
-    { Icon: CloudSun, label: 'Weather', color: '#2F6FED', delay: 0.5, angle: 120 },
-    { Icon: Salad, label: 'Diet', color: '#f97316', delay: 0.8, angle: 240 },
+    { Icon: Flame, label: 'Calories', color: '#f97316', delay: 0.2, angle: 0 },
+    { Icon: Apple, label: 'Quality', color: '#10b981', delay: 0.5, angle: 120 },
+    { Icon: Dumbbell, label: 'Activity', color: '#2F6FED', delay: 0.8, angle: 240 },
   ];
 
   return (
@@ -37,7 +37,7 @@ export function Scene2() {
       <div className="absolute top-[240px] flex flex-col items-center z-10 w-full">
         <div className="relative w-[340px] h-[340px] flex items-center justify-center">
           <motion.div
-            className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#2F6FED]/15 to-[#10b981]/10 blur-[40px]"
+            className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#10b981]/15 to-[#2F6FED]/10 blur-[40px]"
             animate={{ scale: [1, 1.05, 1], opacity: [0.5, 0.8, 0.5] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           />
@@ -67,22 +67,22 @@ export function Scene2() {
           })}
 
           <motion.div
-            className="w-24 h-24 rounded-full bg-[#2F6FED] flex items-center justify-center z-10"
+            className="w-24 h-24 rounded-full bg-[#10b981] flex items-center justify-center z-10"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 1.2, ...SPRING_SNAPPY }}
           >
-            <HeartPulse size={48} color="#0F172A" strokeWidth={2} />
+            <span className="text-[#0F172A] font-display font-black text-[18px]">MORE<br/>MATTER</span>
           </motion.div>
         </div>
 
         <motion.div
-          className="mt-8 bg-[#2F6FED]/10 border border-[#2F6FED]/30 px-6 py-4 rounded-2xl text-center max-w-[80%]"
+          className="mt-8 bg-[#10b981]/10 border border-[#10b981]/30 px-6 py-4 rounded-2xl text-center max-w-[80%]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.6, ...SPRING_SMOOTH }}
         >
-          <span className="text-[#f8fafc] font-display font-bold text-[22px] uppercase tracking-wider">All of These Play a Role</span>
+          <span className="text-[#f8fafc] font-display font-bold text-[22px] uppercase tracking-wider">These Matter More Than Timing</span>
         </motion.div>
       </div>
 
@@ -96,14 +96,14 @@ export function Scene2() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
         >
-          Activity, Weather, Diet
+          Total Intake, Food Quality
           <motion.span
-            className="text-[#2F6FED] block mt-2 drop-shadow-md"
+            className="text-[#10b981] block mt-2 drop-shadow-md"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 1.8, ...SPRING_SNAPPY }}
           >
-            And Health All Matter
+            And Activity Levels
           </motion.span>
         </motion.h2>
       </div>
