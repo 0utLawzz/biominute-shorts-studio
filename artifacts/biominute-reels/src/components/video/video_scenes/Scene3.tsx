@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Utensils, Activity, Dumbbell, ArrowDown } from 'lucide-react';
+import { Banana, Milk, Wheat, Utensils } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -18,10 +18,10 @@ export function Scene3() {
     }
   }, []);
 
-  const factors = [
-    { Icon: Utensils, label: 'Nutrition', color: '#10b981', delay: 0.2, angle: 0 },
-    { Icon: Activity, label: 'Activity', color: '#2F6FED', delay: 0.5, angle: 120 },
-    { Icon: Dumbbell, label: 'Strength', color: '#f97316', delay: 0.8, angle: 240 },
+  const foods = [
+    { Icon: Banana, label: 'Banana', color: '#facc15', delay: 0.2, angle: 0 },
+    { Icon: Milk, label: 'Yogurt', color: '#2F6FED', delay: 0.5, angle: 120 },
+    { Icon: Wheat, label: 'Oatmeal', color: '#10b981', delay: 0.8, angle: 240 },
   ];
 
   return (
@@ -42,7 +42,7 @@ export function Scene3() {
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           />
 
-          {factors.map(({ Icon, label, color, delay, angle }) => {
+          {foods.map(({ Icon, label, color, delay, angle }) => {
             const rad = (angle * Math.PI) / 180;
             const x = Math.cos(rad) * 130;
             const y = Math.sin(rad) * 130;
@@ -72,17 +72,17 @@ export function Scene3() {
             animate={{ scale: 1 }}
             transition={{ delay: 1.2, ...SPRING_SNAPPY }}
           >
-            <ArrowDown size={48} color="#0F172A" strokeWidth={2.5} />
+            <Utensils size={48} color="#0F172A" strokeWidth={2} />
           </motion.div>
         </div>
 
         <motion.div
-          className="mt-8 bg-[#2F6FED]/10 border border-[#2F6FED]/30 px-6 py-4 rounded-2xl text-center max-w-[80%]"
+          className="mt-8 bg-[#10b981]/10 border border-[#10b981]/30 px-6 py-4 rounded-2xl text-center max-w-[80%]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.6, ...SPRING_SMOOTH }}
         >
-          <span className="text-[#f8fafc] font-display font-bold text-[22px] uppercase tracking-wider">Reveals Muscles Over Time</span>
+          <span className="text-[#f8fafc] font-display font-bold text-[22px] uppercase tracking-wider">Timing + Intensity + What Feels Good</span>
         </motion.div>
       </div>
 
@@ -96,14 +96,14 @@ export function Scene3() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
         >
-          Reduce Overall Body Fat
+          Simple Options, But the Best
           <motion.span
-            className="text-[#2F6FED] block mt-2 drop-shadow-md"
+            className="text-[#10b981] block mt-2 drop-shadow-md"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 1.8, ...SPRING_SNAPPY }}
           >
-            To See What's Underneath
+            Choice Depends on You
           </motion.span>
         </motion.h2>
       </div>

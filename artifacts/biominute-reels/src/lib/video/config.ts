@@ -22,10 +22,10 @@ export const CANVAS_STYLE = {
 // advance scenes automatically. Keep the total loop duration in sync with
 // the exported MP4 length so the record/export control captures the full video.
 export const SCENE_DURATIONS = {
-  0: 4500, // Hook: "Can You Lose Belly Fat with Ab Exercises?"
-  1: 7000, // Spot reduction is one of the biggest fitness myths
-  2: 6500, // Ab exercises strengthen muscles but don't selectively burn fat
-  3: 6000, // Overall body fat reduction reveals muscles
+  0: 4500, // Hook: "What's the Best Food to Eat Before a Workout?"
+  1: 7000, // Carbs for energy before exercise
+  2: 6500, // Protein if it's been a while
+  3: 6000, // Simple options depend on timing/intensity
   4: 6500, // CTA + citation
   5: 5000, // Thumbnail end card
 } as const;
