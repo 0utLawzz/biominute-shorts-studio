@@ -22,10 +22,10 @@ export const CANVAS_STYLE = {
 // advance scenes automatically. Keep the total loop duration in sync with
 // the exported MP4 length so the record/export control captures the full video.
 export const SCENE_DURATIONS = {
-  0: 2500, // Hook: "Can You Build Muscle Without Supplements?"
-  1: 4000, // Yes, for most people
-  2: 6500, // Core drivers: strength training, protein, sleep, progressive overload
-  3: 5000, // Supplements are a supplement, not a shortcut
-  4: 5000, // CTA: "Food first or protein shakes, which do you prefer?" + citation
+  0: 4500, // Hook: "Are Healthy Snacks Secretly Making You Gain Weight?"
+  1: 7000, // Healthy doesn't always mean low in calories
+  2: 6500, // Nuts, nut butter, dried fruit are nutritious but energy-dense
+  3: 6000, // Portions matter if your goal is weight loss
+  4: 6500, // CTA + citation
   5: 5000, // Thumbnail end card
 } as const;

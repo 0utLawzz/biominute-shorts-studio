@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { BookOpen, MessageCircle, Dumbbell } from 'lucide-react';
+import { BookOpen, MessageCircle, Apple } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -43,7 +43,7 @@ export function Scene4() {
             transition={{ delay: 0.6, ...SPRING_SNAPPY }}
           >
             <div className="w-24 h-24 rounded-full bg-[#10b981] flex items-center justify-center">
-              <Dumbbell size={48} color="#0F172A" strokeWidth={2} />
+              <Apple size={48} color="#0F172A" strokeWidth={2} />
             </div>
           </motion.div>
 
@@ -53,9 +53,8 @@ export function Scene4() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.0, duration: 0.8 }}
           >
-            Food First or
-            <span className="text-[#10b981] block mt-2">Protein Shakes?</span>
-            <span className="text-[#f97316] block mt-2">Which Do You Prefer?</span>
+            What's Your Favorite
+            <span className="text-[#10b981] block mt-2">Healthy Snack?</span>
           </motion.h2>
 
           <motion.div
@@ -65,7 +64,7 @@ export function Scene4() {
             transition={{ delay: 2.0, duration: 1 }}
           >
             <MessageCircle size={28} color="#14b8a6" />
-            <span className="text-[#94a3b8] text-[24px] font-medium">Drop your answer below 👇</span>
+            <span className="text-[#94a3b8] text-[24px] font-medium">Drop it below 👇</span>
           </motion.div>
         </motion.div>
       </div>
@@ -80,7 +79,7 @@ export function Scene4() {
         <div className="flex items-center gap-4 text-[#94a3b8] text-[22px] font-medium bg-[#0F172A]/90 px-6 py-4 rounded-xl backdrop-blur-sm border border-white/10 shadow-lg">
           <BookOpen className="shrink-0" size={28} />
           <p className="leading-relaxed text-left">
-            Source: General resistance-training and nutrition research on muscle protein synthesis and hypertrophy
+            Source: General nutrition/energy-density research on portion control and weight management
           </p>
         </div>
       </motion.div>

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Dumbbell, Drumstick, Moon, TrendingUp } from 'lucide-react';
+import { Bean, Cookie, Cherry } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -17,6 +17,12 @@ export function Scene2() {
       audioRef.current.play().catch(() => {});
     }
   }, []);
+
+  const foods = [
+    { Icon: Bean, label: 'Nuts', color: '#10b981', delay: 0.2 },
+    { Icon: Cookie, label: 'Nut Butter', color: '#f97316', delay: 0.5 },
+    { Icon: Cherry, label: 'Dried Fruit', color: '#2F6FED', delay: 0.8 },
+  ];
 
   return (
     <motion.div
@@ -36,11 +42,8 @@ export function Scene2() {
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           />
 
-          {[
-            { Icon: Dumbbell, color: '#10b981', label: 'Training', delay: 0.2, angle: 0 },
-            { Icon: Drumstick, color: '#f97316', label: 'Protein', delay: 0.5, angle: 120 },
-            { Icon: Moon, color: '#2F6FED', label: 'Sleep', delay: 0.8, angle: 240 },
-          ].map(({ Icon, color, label, delay, angle }) => {
+          {foods.map(({ Icon, label, color, delay }, i) => {
+            const angle = i * 120;
             const rad = (angle * Math.PI) / 180;
             const x = Math.cos(rad) * 130;
             const y = Math.sin(rad) * 130;
@@ -65,22 +68,22 @@ export function Scene2() {
           })}
 
           <motion.div
-            className="w-24 h-24 rounded-full bg-[#10b981] flex items-center justify-center z-10"
+            className="w-24 h-24 rounded-full bg-[#f97316] flex items-center justify-center z-10"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 1.2, ...SPRING_SNAPPY }}
           >
-            <TrendingUp size={48} color="#0F172A" strokeWidth={2} />
+            <span className="text-[#0F172A] font-display font-black text-[20px]">ENERGY<br/>DENSE</span>
           </motion.div>
         </div>
 
         <motion.div
-          className="mt-8 bg-[#10b981]/10 border border-[#10b981]/30 px-6 py-4 rounded-2xl"
+          className="mt-8 bg-[#10b981]/10 border border-[#10b981]/30 px-6 py-4 rounded-2xl max-w-[80%] text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.8, ...SPRING_SMOOTH }}
         >
-          <span className="text-[#f8fafc] font-display font-bold text-[22px] uppercase tracking-wider">Progressive Overload</span>
+          <span className="text-[#f8fafc] font-display font-bold text-[22px] uppercase tracking-wider">Nutritious, But Energy-Dense</span>
         </motion.div>
       </div>
 
@@ -94,14 +97,14 @@ export function Scene2() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
         >
-          The Biggest Drivers
+          These Foods Are Healthy
           <motion.span
-            className="text-[#10b981] block mt-2 drop-shadow-md"
+            className="text-[#f97316] block mt-2 drop-shadow-md"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 1.8, ...SPRING_SNAPPY }}
           >
-            Are Training, Protein & Sleep
+            But the Calories Add Up Fast
           </motion.span>
         </motion.h2>
       </div>

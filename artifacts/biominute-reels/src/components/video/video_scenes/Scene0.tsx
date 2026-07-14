@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Dumbbell } from 'lucide-react';
+import { Apple } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -41,9 +41,9 @@ export function Scene0() {
           animate={{ scale: 1, opacity: 1, y: 0 }}
           transition={{ delay: 0.2, ...SPRING_SMOOTH }}
         >
-          <Dumbbell size={140} color="#10b981" strokeWidth={1.5} />
+          <Apple size={140} color="#10b981" strokeWidth={1.5} />
           <motion.div
-            className="absolute -bottom-4 -right-4 w-24 h-24 rounded-full bg-[#2F6FED] flex items-center justify-center"
+            className="absolute -bottom-4 -right-4 w-24 h-24 rounded-full bg-[#f97316] flex items-center justify-center"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.8, ...SPRING_SNAPPY }}
@@ -63,14 +63,14 @@ export function Scene0() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          Can You Build Muscle
+          Are Healthy Snacks
           <motion.span
             className="text-[#10b981] block mt-3 drop-shadow-md"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 1.2, ...SPRING_SNAPPY }}
           >
-            Without Supplements?
+            Secretly Making You Gain Weight?
           </motion.span>
         </motion.h1>
       </div>
