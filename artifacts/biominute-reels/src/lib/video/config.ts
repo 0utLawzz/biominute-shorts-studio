@@ -22,10 +22,10 @@ export const CANVAS_STYLE = {
 // advance scenes automatically. Keep the total loop duration in sync with
 // the exported MP4 length so the record/export control captures the full video.
 export const SCENE_DURATIONS = {
-  0: 4500, // Hook: "How Much Protein Do You Really Need?"
-  1: 7000, // Protein needs depend on goals and activity
-  2: 6500, // Most adults need less than social posts suggest
-  3: 6000, // Higher for muscle/active, extremes unnecessary
+  0: 4500, // Hook: "Does Lifting Weights Make Women Bulky?"
+  1: 7000, // Strength training doesn't automatically make women bulky
+  2: 6500, // Building muscle takes years, genetics, nutrition
+  3: 6000, // Lifting improves strength, bone health, body composition
   4: 6500, // CTA + citation
   5: 5000, // Thumbnail end card
 } as const;

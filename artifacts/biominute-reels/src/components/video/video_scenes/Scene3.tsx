@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Dumbbell, TrendingUp, Ban } from 'lucide-react';
+import { Dumbbell, Bone, Activity } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -17,6 +17,12 @@ export function Scene3() {
       audioRef.current.play().catch(() => {});
     }
   }, []);
+
+  const benefits = [
+    { Icon: Dumbbell, label: 'Strength', color: '#10b981', delay: 0.2, angle: 0 },
+    { Icon: Bone, label: 'Bone Health', color: '#2F6FED', delay: 0.5, angle: 120 },
+    { Icon: Activity, label: 'Body Comp', color: '#f97316', delay: 0.8, angle: 240 },
+  ];
 
   return (
     <motion.div
@@ -36,41 +42,47 @@ export function Scene3() {
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           />
 
-          <motion.div
-            className="w-[240px] h-[240px] rounded-full bg-[#0F172A] border-8 border-[#2F6FED] flex items-center justify-center drop-shadow-[0_0_60px_rgba(47,111,237,0.35)]"
-            initial={{ scale: 0.6, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, ...SPRING_SMOOTH }}
-          >
-            <Dumbbell size={88} color="#2F6FED" strokeWidth={1.5} />
-          </motion.div>
+          {benefits.map(({ Icon, label, color, delay, angle }) => {
+            const rad = (angle * Math.PI) / 180;
+            const x = Math.cos(rad) * 130;
+            const y = Math.sin(rad) * 130;
+            return (
+              <motion.div
+                key={label}
+                className="absolute flex flex-col items-center gap-2"
+                style={{ left: '50%', top: '50%', marginLeft: -44, marginTop: -44 }}
+                initial={{ x: 0, y: 0, opacity: 0, scale: 0.5 }}
+                animate={{ x, y, opacity: 1, scale: 1 }}
+                transition={{ delay, ...SPRING_SMOOTH }}
+              >
+                <div
+                  className="w-[88px] h-[88px] rounded-full bg-[#0F172A] border-4 flex items-center justify-center"
+                  style={{ borderColor: color, boxShadow: `0 0 30px ${color}40` }}
+                >
+                  <Icon size={40} color={color} strokeWidth={2} />
+                </div>
+                <span className="font-display font-bold text-[14px] uppercase tracking-wider" style={{ color }}>{label}</span>
+              </motion.div>
+            );
+          })}
 
           <motion.div
-            className="absolute top-0 right-0 w-20 h-20 rounded-full bg-[#10b981] flex items-center justify-center"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.8, ...SPRING_SNAPPY }}
+            className="w-24 h-24 rounded-full bg-[#10b981] flex items-center justify-center z-10"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 1.2, ...SPRING_SNAPPY }}
           >
-            <TrendingUp size={40} color="#0F172A" strokeWidth={2.5} />
-          </motion.div>
-
-          <motion.div
-            className="absolute bottom-0 left-0 w-20 h-20 rounded-full bg-[#f97316] flex items-center justify-center"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 1.1, ...SPRING_SNAPPY }}
-          >
-            <Ban size={40} color="#0F172A" strokeWidth={2.5} />
+            <Activity size={48} color="#0F172A" strokeWidth={2} />
           </motion.div>
         </div>
 
         <motion.div
-          className="mt-8 bg-[#2F6FED]/10 border border-[#2F6FED]/30 px-6 py-4 rounded-2xl text-center max-w-[80%]"
+          className="mt-8 bg-[#10b981]/10 border border-[#10b981]/30 px-6 py-4 rounded-2xl text-center max-w-[80%]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.6, ...SPRING_SMOOTH }}
         >
-          <span className="text-[#f8fafc] font-display font-bold text-[22px] uppercase tracking-wider">Higher Can Help, Extremes Don't</span>
+          <span className="text-[#f8fafc] font-display font-bold text-[22px] uppercase tracking-wider">The Real Benefits of Lifting</span>
         </motion.div>
       </div>
 
@@ -84,14 +96,14 @@ export function Scene3() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
         >
-          Building Muscle or Active?
+          For Most Women, Lifting Improves
           <motion.span
-            className="text-[#2F6FED] block mt-2 drop-shadow-md"
+            className="text-[#10b981] block mt-2 drop-shadow-md"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 1.8, ...SPRING_SNAPPY }}
           >
-            More Helps, But Don't Overdo It
+            Strength, Bones & Body Composition
           </motion.span>
         </motion.h2>
       </div>

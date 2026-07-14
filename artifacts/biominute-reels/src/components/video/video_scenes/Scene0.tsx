@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Beef } from 'lucide-react';
+import { Dumbbell } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -41,14 +41,14 @@ export function Scene0() {
           animate={{ scale: 1, opacity: 1, y: 0 }}
           transition={{ delay: 0.2, ...SPRING_SMOOTH }}
         >
-          <Beef size={140} color="#10b981" strokeWidth={1.5} />
+          <Dumbbell size={140} color="#10b981" strokeWidth={1.5} />
           <motion.div
             className="absolute -bottom-4 -right-4 w-24 h-24 rounded-full bg-[#f97316] flex items-center justify-center"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.8, ...SPRING_SNAPPY }}
           >
-            <span className="text-[#0F172A] font-display font-black text-[20px]">1.6g</span>
+            <span className="text-[#0F172A] font-display font-black text-[18px]">MYTH</span>
           </motion.div>
         </motion.div>
       </div>
@@ -63,14 +63,14 @@ export function Scene0() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          How Much Protein
+          Does Lifting Weights
           <motion.span
             className="text-[#10b981] block mt-3 drop-shadow-md"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 1.2, ...SPRING_SNAPPY }}
           >
-            Do You Really Need?
+            Make Women Bulky?
           </motion.span>
         </motion.h1>
       </div>

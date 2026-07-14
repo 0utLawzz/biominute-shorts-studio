@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { BookOpen, MessageCircle, Beef } from 'lucide-react';
+import { BookOpen, MessageCircle, Dumbbell } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -43,7 +43,7 @@ export function Scene4() {
             transition={{ delay: 0.6, ...SPRING_SNAPPY }}
           >
             <div className="w-24 h-24 rounded-full bg-[#10b981] flex items-center justify-center">
-              <Beef size={48} color="#0F172A" strokeWidth={2} />
+              <Dumbbell size={48} color="#0F172A" strokeWidth={2} />
             </div>
           </motion.div>
 
@@ -53,9 +53,9 @@ export function Scene4() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.0, duration: 0.8 }}
           >
-            What's Your Favorite
-            <span className="text-[#10b981] block mt-2">Protein</span>
-            <span className="text-[#f97316] block mt-2">Source?</span>
+            Do You Enjoy
+            <span className="text-[#10b981] block mt-2">Strength</span>
+            <span className="text-[#f97316] block mt-2">Training?</span>
           </motion.h2>
 
           <motion.div
@@ -80,7 +80,7 @@ export function Scene4() {
         <div className="flex items-center gap-4 text-[#94a3b8] text-[22px] font-medium bg-[#0F172A]/90 px-6 py-4 rounded-xl backdrop-blur-sm border border-white/10 shadow-lg">
           <BookOpen className="shrink-0" size={28} />
           <p className="leading-relaxed text-left">
-            Source: Dietary Reference Intakes; Phillips SM et al. — protein requirement reviews for active adults (~1.6-2.2g/kg)
+            Source: General endocrinology/exercise science research on sex differences in testosterone and hypertrophy rates
           </p>
         </div>
       </motion.div>
