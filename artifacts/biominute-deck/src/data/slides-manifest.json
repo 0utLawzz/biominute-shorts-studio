@@ -1,0 +1,82 @@
+[
+  {
+    "id": "bm000001-0000-0000-0000-000000000001",
+    "position": 1,
+    "filepath": "src/pages/slides/Slide01Title.tsx",
+    "title": "BioMinute Shorts Studio",
+    "description": "Title slide — pipeline overview with KPIs",
+    "speakerNotes": ""
+  },
+  {
+    "id": "bm000002-0000-0000-0000-000000000002",
+    "position": 2,
+    "filepath": "src/pages/slides/Slide02Opportunity.tsx",
+    "title": "The Opportunity",
+    "description": "Market context — YouTube Shorts growth data",
+    "speakerNotes": ""
+  },
+  {
+    "id": "bm000003-0000-0000-0000-000000000003",
+    "position": 3,
+    "filepath": "src/pages/slides/Slide03WhatIs.tsx",
+    "title": "What BioMinute Is",
+    "description": "Product overview — 3-second hook, 30-second fact, 10-second CTA",
+    "speakerNotes": ""
+  },
+  {
+    "id": "bm000004-0000-0000-0000-000000000004",
+    "position": 4,
+    "filepath": "src/pages/slides/Slide04Seasons.tsx",
+    "title": "36 Episodes. 6 Seasons. 10 Weeks.",
+    "description": "Content strategy — season grid and timeline",
+    "speakerNotes": ""
+  },
+  {
+    "id": "bm000005-0000-0000-0000-000000000005",
+    "position": 5,
+    "filepath": "src/pages/slides/Slide05Pipeline.tsx",
+    "title": "The Production Pipeline",
+    "description": "5-step automated workflow from XLSX to YouTube",
+    "speakerNotes": ""
+  },
+  {
+    "id": "bm000006-0000-0000-0000-000000000006",
+    "position": 6,
+    "filepath": "src/pages/slides/Slide06Dashboard.tsx",
+    "title": "Publishing Dashboard",
+    "description": "Real-time control center with dashboard mockup",
+    "speakerNotes": ""
+  },
+  {
+    "id": "bm000007-0000-0000-0000-000000000007",
+    "position": 7,
+    "filepath": "src/pages/slides/Slide07TechStack.tsx",
+    "title": "Tech Stack",
+    "description": "pnpm monorepo architecture — 6-layer tech grid",
+    "speakerNotes": ""
+  },
+  {
+    "id": "bm000008-0000-0000-0000-000000000008",
+    "position": 8,
+    "filepath": "src/pages/slides/Slide08Calendar.tsx",
+    "title": "Content Calendar",
+    "description": "Publishing rhythm — Gantt-style season timeline",
+    "speakerNotes": ""
+  },
+  {
+    "id": "bm000009-0000-0000-0000-000000000009",
+    "position": 9,
+    "filepath": "src/pages/slides/Slide09Status.tsx",
+    "title": "Current Status",
+    "description": "Progress checklist and system status — 83% complete",
+    "speakerNotes": ""
+  },
+  {
+    "id": "bm000010-0000-0000-0000-000000000010",
+    "position": 10,
+    "filepath": "src/pages/slides/Slide10NextSteps.tsx",
+    "title": "Next Steps",
+    "description": "5-step roadmap and closing vision statement",
+    "speakerNotes": ""
+  }
+]

@@ -1,0 +1,27 @@
+kind = "slides"
+previewPath = "/biominute-deck/"
+title = "BioMinute Shorts Studio — Investor Deck"
+version = "1.0.0"
+id = "artifacts/biominute-deck"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/biominute-deck/" ]
+localPort = 22186
+
+[services.development]
+run = "pnpm --filter @workspace/biominute-deck run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/biominute-deck", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/biominute-deck/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22186"
+BASE_PATH = "/biominute-deck/"
