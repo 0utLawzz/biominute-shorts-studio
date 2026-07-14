@@ -22,10 +22,10 @@ export const CANVAS_STYLE = {
 // advance scenes automatically. Keep the total loop duration in sync with
 // the exported MP4 length so the record/export control captures the full video.
 export const SCENE_DURATIONS = {
-  0: 4500, // Hook: "What's the Best Food to Eat Before a Workout?"
-  1: 7000, // Carbs for energy before exercise
-  2: 6500, // Protein if it's been a while
-  3: 6000, // Simple options depend on timing/intensity
+  0: 4500, // Hook: "Does More Sweat Mean More Fat Burned?"
+  1: 7000, // Sweat is your body's cooling system
+  2: 6500, // Sweat more due to heat, humidity, genetics
+  3: 6000, // Fat loss comes from calorie balance
   4: 6500, // CTA + citation
   5: 5000, // Thumbnail end card
 } as const;

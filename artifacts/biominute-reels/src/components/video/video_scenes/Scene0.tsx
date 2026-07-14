@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Apple } from 'lucide-react';
+import { Droplets } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -29,26 +29,26 @@ export function Scene0() {
       <audio ref={audioRef} src={`${BASE_URL}audio/sfx-whoosh.mp3`} preload="auto" />
 
       <motion.div
-        className="absolute top-[20%] w-[550px] h-[550px] bg-gradient-to-tr from-[#10b981]/20 to-[#2F6FED]/10 rounded-full blur-[120px]"
+        className="absolute top-[20%] w-[550px] h-[550px] bg-gradient-to-tr from-[#2F6FED]/20 to-[#10b981]/10 rounded-full blur-[120px]"
         animate={{ scale: [1, 1.08, 1], opacity: [0.4, 0.6, 0.4] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <div className="absolute top-[260px] flex items-center justify-center z-10 w-full">
         <motion.div
-          className="relative w-[300px] h-[300px] rounded-full bg-[#0F172A] border-8 border-[#10b981] flex items-center justify-center drop-shadow-[0_0_60px_rgba(16,185,129,0.35)]"
+          className="relative w-[300px] h-[300px] rounded-full bg-[#0F172A] border-8 border-[#2F6FED] flex items-center justify-center drop-shadow-[0_0_60px_rgba(47,111,237,0.35)]"
           initial={{ scale: 0.6, opacity: 0, y: 30 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           transition={{ delay: 0.2, ...SPRING_SMOOTH }}
         >
-          <Apple size={140} color="#10b981" strokeWidth={1.5} />
+          <Droplets size={140} color="#2F6FED" strokeWidth={1.5} />
           <motion.div
             className="absolute -bottom-4 -right-4 w-24 h-24 rounded-full bg-[#f97316] flex items-center justify-center"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.8, ...SPRING_SNAPPY }}
           >
-            <span className="text-[#0F172A] font-display font-black text-[18px]">FUEL</span>
+            <span className="text-[#0F172A] font-display font-black text-[18px]">FAT?</span>
           </motion.div>
         </motion.div>
       </div>
@@ -63,14 +63,14 @@ export function Scene0() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          What's the Best Food
+          Does More Sweat Mean
           <motion.span
-            className="text-[#10b981] block mt-3 drop-shadow-md"
+            className="text-[#2F6FED] block mt-3 drop-shadow-md"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 1.2, ...SPRING_SNAPPY }}
           >
-            Before a Workout?
+            More Fat Burned?
           </motion.span>
         </motion.h1>
       </div>
