@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Moon } from 'lucide-react';
+import { Dumbbell } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -29,7 +29,7 @@ export function Scene0() {
       <audio ref={audioRef} src={`${BASE_URL}audio/sfx-whoosh.mp3`} preload="auto" />
 
       <motion.div
-        className="absolute top-[20%] w-[550px] h-[550px] bg-gradient-to-tr from-[#10b981]/20 to-[#2F6FED]/10 rounded-full blur-[120px]"
+        className="absolute top-[20%] w-[550px] h-[550px] bg-gradient-to-tr from-[#f97316]/20 to-[#2F6FED]/10 rounded-full blur-[120px]"
         animate={{ scale: [1, 1.08, 1], opacity: [0.4, 0.6, 0.4] }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -41,14 +41,14 @@ export function Scene0() {
           animate={{ scale: 1, opacity: 1, y: 0 }}
           transition={{ delay: 0.2, ...SPRING_SMOOTH }}
         >
-          <Moon size={140} color="#f97316" strokeWidth={1.5} />
+          <Dumbbell size={140} color="#f97316" strokeWidth={1.5} />
           <motion.div
             className="absolute -bottom-4 -right-4 w-24 h-24 rounded-full bg-[#10b981] flex items-center justify-center"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.8, ...SPRING_SNAPPY }}
           >
-            <span className="text-[#0F172A] font-display font-black text-[22px]">10PM</span>
+            <span className="text-[#0F172A] font-display font-black text-[18px]">ABS</span>
           </motion.div>
         </motion.div>
       </div>
@@ -63,14 +63,14 @@ export function Scene0() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          Does Eating Late at Night
+          Can You Lose Belly Fat
           <motion.span
             className="text-[#f97316] block mt-3 drop-shadow-md"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 1.2, ...SPRING_SNAPPY }}
           >
-            Cause Weight Gain?
+            With Ab Exercises?
           </motion.span>
         </motion.h1>
       </div>
