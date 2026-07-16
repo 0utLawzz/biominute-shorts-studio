@@ -28,6 +28,10 @@ export interface Episode {
   /** @nullable */
   youtubeVideoId?: string | null;
   /** @nullable */
+  buildStage?: string | null;
+  /** @nullable */
+  buildNote?: string | null;
+  /** @nullable */
   scheduledPublishAt?: string | null;
   /** @nullable */
   approvedAt?: string | null;

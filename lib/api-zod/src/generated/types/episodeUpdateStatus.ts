@@ -16,4 +16,6 @@ export const EpisodeUpdateStatus = {
   approved: 'approved',
   scheduled: 'scheduled',
   published: 'published',
+  building: 'building',
+  rejected: 'rejected',
 } as const;

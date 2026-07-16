@@ -20,14 +20,20 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  BuildStatus,
+  CreateEpisodeBody,
   Episode,
   EpisodeStats,
   EpisodeUpdate,
   ErrorResponse,
+  GenerateScriptBody,
+  GenerateScriptResult,
   HealthStatus,
   ListEpisodesParams,
   PublishRequest,
   PublishResult,
+  RejectEpisodeBody,
+  RunProductionResult,
   YouTubeAuthUrl,
   YouTubeStatus
 } from './api.schemas';
@@ -820,3 +826,167 @@ export const usePublishToYouTube = <TError = ErrorType<ErrorResponse>,
       return useMutation(getPublishToYouTubeMutationOptions(options));
     }
 
+
+
+// ── New Build Pipeline Hooks ───────────────────────────────────────────────────
+
+export const getCreateEpisodeUrl = () => `/api/episodes`
+
+export const createEpisode = async (createEpisodeBody: CreateEpisodeBody, options?: RequestInit): Promise<Episode> => {
+  return customFetch<Episode>(getCreateEpisodeUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createEpisodeBody)
+  });
+}
+
+export const getCreateEpisodeMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof createEpisode>>, TError, { data: BodyType<CreateEpisodeBody> }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationOptions<Awaited<ReturnType<typeof createEpisode>>, TError, { data: BodyType<CreateEpisodeBody> }, TContext> => {
+  const mutationKey = ['createEpisode'];
+  const { mutation: mutationOptions, request: requestOptions } = options ?
+    options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createEpisode>>, { data: BodyType<CreateEpisodeBody> }> = (props) => {
+    const { data } = props ?? {};
+    return createEpisode(data, requestOptions);
+  };
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateEpisodeMutationResult = NonNullable<Awaited<ReturnType<typeof createEpisode>>>
+export type CreateEpisodeMutationBody = BodyType<CreateEpisodeBody>
+export type CreateEpisodeMutationError = ErrorType<unknown>
+
+export const useCreateEpisode = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof createEpisode>>, TError, { data: BodyType<CreateEpisodeBody> }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof createEpisode>>, TError, { data: BodyType<CreateEpisodeBody> }, TContext> => {
+  return useMutation(getCreateEpisodeMutationOptions(options));
+};
+
+
+export const getGenerateScriptUrl = () => `/api/episodes/generate-script`
+
+export const generateScript = async (generateScriptBody: GenerateScriptBody, options?: RequestInit): Promise<GenerateScriptResult> => {
+  return customFetch<GenerateScriptResult>(getGenerateScriptUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(generateScriptBody)
+  });
+}
+
+export const getGenerateScriptMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof generateScript>>, TError, { data: BodyType<GenerateScriptBody> }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationOptions<Awaited<ReturnType<typeof generateScript>>, TError, { data: BodyType<GenerateScriptBody> }, TContext> => {
+  const mutationKey = ['generateScript'];
+  const { mutation: mutationOptions, request: requestOptions } = options ?
+    options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateScript>>, { data: BodyType<GenerateScriptBody> }> = (props) => {
+    const { data } = props ?? {};
+    return generateScript(data, requestOptions);
+  };
+  return { mutationFn, ...mutationOptions };
+};
+
+export const useGenerateScript = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof generateScript>>, TError, { data: BodyType<GenerateScriptBody> }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof generateScript>>, TError, { data: BodyType<GenerateScriptBody> }, TContext> => {
+  return useMutation(getGenerateScriptMutationOptions(options));
+};
+
+
+export const getGetBuildStatusUrl = (id: number) => `/api/episodes/${id}/build-status`
+
+export const getBuildStatus = async (id: number, options?: RequestInit): Promise<BuildStatus> => {
+  return customFetch<BuildStatus>(getGetBuildStatusUrl(id), { ...options, method: 'GET' });
+}
+
+export const getGetBuildStatusQueryKey = (id: number) => [`/api/episodes/${id}/build-status`] as const;
+
+export const getGetBuildStatusQueryOptions = <TData = Awaited<ReturnType<typeof getBuildStatus>>, TError = ErrorType<unknown>>(
+  id: number,
+  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof getBuildStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getGetBuildStatusQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getBuildStatus>>> = ({ signal }) => getBuildStatus(id, { signal, ...requestOptions });
+  return { queryKey, queryFn, enabled: Boolean(id), ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getBuildStatus>>, TError, TData> & { queryKey: QueryKey };
+};
+
+export const useGetBuildStatus = <TData = Awaited<ReturnType<typeof getBuildStatus>>, TError = ErrorType<unknown>>(
+  id: number,
+  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof getBuildStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = getGetBuildStatusQueryOptions(id, options);
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  return withQueryKey(query, queryOptions.queryKey);
+};
+
+
+export const getRunProductionUrl = (id: number) => `/api/episodes/${id}/run-production`
+
+export const runProduction = async (id: number, options?: RequestInit): Promise<RunProductionResult> => {
+  return customFetch<RunProductionResult>(getRunProductionUrl(id), { ...options, method: 'POST' });
+}
+
+export const getRunProductionMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof runProduction>>, TError, { id: number }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationOptions<Awaited<ReturnType<typeof runProduction>>, TError, { id: number }, TContext> => {
+  const mutationKey = ['runProduction'];
+  const { mutation: mutationOptions, request: requestOptions } = options ?
+    options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof runProduction>>, { id: number }> = (props) => {
+    const { id } = props ?? {};
+    return runProduction(id, requestOptions);
+  };
+  return { mutationFn, ...mutationOptions };
+};
+
+export const useRunProduction = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof runProduction>>, TError, { id: number }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof runProduction>>, TError, { id: number }, TContext> => {
+  return useMutation(getRunProductionMutationOptions(options));
+};
+
+
+export const getRejectEpisodeUrl = (id: number) => `/api/episodes/${id}/reject`
+
+export const rejectEpisode = async (id: number, rejectEpisodeBody?: RejectEpisodeBody, options?: RequestInit): Promise<Episode> => {
+  return customFetch<Episode>(getRejectEpisodeUrl(id), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(rejectEpisodeBody ?? {})
+  });
+}
+
+export const getRejectEpisodeMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof rejectEpisode>>, TError, { id: number; data?: BodyType<RejectEpisodeBody> }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationOptions<Awaited<ReturnType<typeof rejectEpisode>>, TError, { id: number; data?: BodyType<RejectEpisodeBody> }, TContext> => {
+  const mutationKey = ['rejectEpisode'];
+  const { mutation: mutationOptions, request: requestOptions } = options ?
+    options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof rejectEpisode>>, { id: number; data?: BodyType<RejectEpisodeBody> }> = (props) => {
+    const { id, data } = props ?? {};
+    return rejectEpisode(id, data, requestOptions);
+  };
+  return { mutationFn, ...mutationOptions };
+};
+
+export const useRejectEpisode = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof rejectEpisode>>, TError, { id: number; data?: BodyType<RejectEpisodeBody> }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof rejectEpisode>>, TError, { id: number; data?: BodyType<RejectEpisodeBody> }, TContext> => {
+  return useMutation(getRejectEpisodeMutationOptions(options));
+};
+
+/** Returns the direct URL to stream an episode's exported mp4 */
+export const getEpisodeVideoUrl = (id: number) => `/api/episodes/${id}/video`;

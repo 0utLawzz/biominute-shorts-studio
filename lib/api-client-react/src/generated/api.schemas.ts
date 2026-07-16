@@ -23,6 +23,8 @@ export const EpisodeStatus = {
   approved: 'approved',
   scheduled: 'scheduled',
   published: 'published',
+  building: 'building',
+  rejected: 'rejected',
 } as const;
 
 export interface Episode {
@@ -46,6 +48,10 @@ export interface Episode {
   /** @nullable */
   youtubeVideoId?: string | null;
   /** @nullable */
+  buildStage?: string | null;
+  /** @nullable */
+  buildNote?: string | null;
+  /** @nullable */
   scheduledPublishAt?: string | null;
   /** @nullable */
   approvedAt?: string | null;
@@ -65,6 +71,8 @@ export const EpisodeUpdateStatus = {
   approved: 'approved',
   scheduled: 'scheduled',
   published: 'published',
+  building: 'building',
+  rejected: 'rejected',
 } as const;
 
 export interface EpisodeUpdate {
@@ -73,6 +81,8 @@ export interface EpisodeUpdate {
   citationCta?: string;
   hashtags?: string;
   scheduledPublishAt?: string;
+  buildStage?: string;
+  buildNote?: string;
 }
 
 export type EpisodeStatsByStatus = {
@@ -82,6 +92,8 @@ export type EpisodeStatsByStatus = {
   approved: number;
   scheduled: number;
   published: number;
+  building: number;
+  rejected: number;
 };
 
 export interface EpisodeStats {
@@ -148,5 +160,58 @@ export const ListEpisodesStatus = {
   approved: 'approved',
   scheduled: 'scheduled',
   published: 'published',
+  building: 'building',
+  rejected: 'rejected',
 } as const;
 
+export interface CreateEpisodeBody {
+  epNumber: number;
+  postDate: string;
+  season: string;
+  duration: string;
+  hookTitle: string;
+  youtubeTitle: string;
+  voScript: string;
+  visualDirection: string;
+  bgSound: string;
+  thumbnailPrompt: string;
+  citationCta: string;
+  hashtags: string;
+  aspectRatio?: string;
+}
+
+export interface GenerateScriptBody {
+  topic: string;
+  season?: string;
+}
+
+export interface GenerateScriptResult {
+  hookTitle: string;
+  youtubeTitle: string;
+  voScript: string;
+  visualDirection: string;
+  thumbnailPrompt: string;
+  citationCta: string;
+  hashtags: string;
+}
+
+export interface BuildStatus {
+  id: number;
+  status: string;
+  /** @nullable */
+  buildStage?: string | null;
+  /** @nullable */
+  buildNote?: string | null;
+  videoExists: boolean;
+  /** @nullable */
+  videoPath?: string | null;
+}
+
+export interface RunProductionResult {
+  success: boolean;
+  message: string;
+}
+
+export interface RejectEpisodeBody {
+  buildNote?: string;
+}

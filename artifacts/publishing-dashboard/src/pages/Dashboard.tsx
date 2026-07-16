@@ -9,7 +9,8 @@ import { EpisodeCard } from "../components/EpisodeCard";
 import { Navbar } from "../components/Navbar";
 import { YouTubeBanner } from "../components/YouTubeBanner";
 import { format, differenceInDays } from "date-fns";
-import { Loader2 } from "lucide-react";
+import { Loader2, PlusCircle } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Dashboard() {
   const [activeSeason, setActiveSeason] = useState<string>("all");
@@ -24,6 +25,10 @@ export default function Dashboard() {
     { key: "S5: Nutrition & Myths", label: "S5" },
     { key: "S6: Healthy Aging & Longevity", label: "S6" },
   ];
+
+  const STATUS_FILTERS = [
+    "all", "draft", "review", "approved", "scheduled", "published", "building", "rejected"
+  ] as const;
 
   const { data: stats, isLoading: statsLoading } = useGetEpisodeStats();
   const { data: upcoming, isLoading: upcomingLoading } = useGetUpcomingEpisodes();
@@ -45,16 +50,25 @@ export default function Dashboard() {
             <h1 className="font-display text-6xl text-[#0C0C0C] leading-none uppercase tracking-wide">
               Overview
             </h1>
-            <div className="bg-[#D4A800] text-[#0C0C0C] font-display text-xl px-4 py-1 border-[3px] border-[#0C0C0C] shadow-[4px_4px_0_#0C0C0C] rotate-1">
-              STATUS REPORT
+            <div className="flex items-center gap-3">
+              <div className="bg-[#D4A800] text-[#0C0C0C] font-display text-xl px-4 py-1 border-[3px] border-[#0C0C0C] shadow-[4px_4px_0_#0C0C0C] rotate-1">
+                STATUS REPORT
+              </div>
+              <Link href="/new">
+                <span className="flex items-center gap-2 bg-[#0C0C0C] text-[#FAF7EE] font-mono font-bold text-xs px-4 py-2 border-[2px] border-[#0C0C0C] shadow-[3px_3px_0_#C9A800] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer uppercase">
+                  <PlusCircle size={14} />
+                  New Episode
+                </span>
+              </Link>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <StatCard label="Total Episodes" value={stats?.total} loading={statsLoading} color="bg-[#FAF7EE]" />
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <StatCard label="Total" value={stats?.total} loading={statsLoading} color="bg-[#FAF7EE]" />
             <StatCard label="Published" value={stats?.byStatus.published} loading={statsLoading} color="bg-[#FAF7EE]" textColor="text-[#8B2FC9]" />
             <StatCard label="Approved" value={stats?.byStatus.approved} loading={statsLoading} color="bg-[#FAF7EE]" textColor="text-[#0A6B52]" />
-            <StatCard label="Drafts/Review" value={(stats?.byStatus.draft || 0) + (stats?.byStatus.review || 0)} loading={statsLoading} color="bg-[#FAF7EE]" />
+            <StatCard label="Building" value={stats?.byStatus.building} loading={statsLoading} color="bg-[#FAF7EE]" textColor="text-[#C9A800]" href="/building" />
+            <StatCard label="Scheduled" value={stats?.byStatus.scheduled} loading={statsLoading} color="bg-[#FAF7EE]" textColor="text-[#0A6B52]" href="/scheduled" />
           </div>
         </section>
 
@@ -122,7 +136,7 @@ export default function Dashboard() {
 
               {/* Status Toggles */}
               <div className="flex flex-wrap gap-2">
-                {(["all", "draft", "review", "approved", "scheduled", "published"] as const).map((status) => (
+                {STATUS_FILTERS.map((status) => (
                   <button
                     key={status}
                     onClick={() => setActiveStatus(status as any)}
@@ -160,9 +174,11 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ label, value, loading, color, textColor = "text-[#0C0C0C]" }: { label: string, value?: number | string, loading: boolean, color: string, textColor?: string }) {
-  return (
-    <div className={`${color} border-[3px] border-[#0C0C0C] p-5 shadow-[4px_4px_0_#0C0C0C]`}>
+function StatCard({ label, value, loading, color, textColor = "text-[#0C0C0C]", href }: { 
+  label: string; value?: number | string; loading: boolean; color: string; textColor?: string; href?: string;
+}) {
+  const content = (
+    <div className={`${color} border-[3px] border-[#0C0C0C] p-5 shadow-[4px_4px_0_#0C0C0C] ${href ? "hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_#0C0C0C] transition-all cursor-pointer" : ""}`}>
       <p className="font-mono text-xs font-bold uppercase text-[#555] mb-1">{label}</p>
       {loading ? (
          <div className="h-10 flex items-center"><Loader2 className="w-5 h-5 animate-spin" /></div>
@@ -171,4 +187,7 @@ function StatCard({ label, value, loading, color, textColor = "text-[#0C0C0C]" }
       )}
     </div>
   );
+
+  if (href) return <Link href={href}>{content}</Link>;
+  return content;
 }

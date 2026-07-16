@@ -13,4 +13,6 @@ export type EpisodeStatsByStatus = {
   approved: number;
   scheduled: number;
   published: number;
+  building: number;
+  rejected: number;
 };

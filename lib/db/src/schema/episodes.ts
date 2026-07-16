@@ -9,6 +9,8 @@ export const episodeStatusEnum = pgEnum("episode_status", [
   "approved",
   "scheduled",
   "published",
+  "building",
+  "rejected",
 ]);
 
 export const episodesTable = pgTable("episodes", {
@@ -29,6 +31,8 @@ export const episodesTable = pgTable("episodes", {
   citationCta: text("citation_cta").notNull(),
   hashtags: text("hashtags").notNull(),
   youtubeVideoId: text("youtube_video_id"),
+  buildStage: text("build_stage"),
+  buildNote: text("build_note"),
   scheduledPublishAt: timestamp("scheduled_publish_at"),
   approvedAt: timestamp("approved_at"),
   publishedAt: timestamp("published_at"),
