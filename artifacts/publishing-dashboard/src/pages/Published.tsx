@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { Loader2, ExternalLink } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { useListEpisodes, useGetEpisodeStats } from "@workspace/api-client-react";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 
 const SEASONS = [
   { key: "all", label: "All" },
@@ -16,6 +16,7 @@ const SEASONS = [
 ];
 
 export default function Published() {
+  const [, navigate] = useLocation();
   const [activeSeason, setActiveSeason] = useState("all");
   const { data: episodes, isLoading } = useListEpisodes({
     status: "published",
@@ -69,8 +70,11 @@ export default function Published() {
             {episodes
               .sort((a, b) => (b.epNumber ?? 0) - (a.epNumber ?? 0))
               .map((ep) => (
-                <Link key={ep.id} href={`/episodes/${ep.id}`}>
-                  <div className="flex items-center gap-0 bg-[#FAF7EE] border-[3px] border-[#0C0C0C] shadow-[3px_3px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_#0C0C0C] transition-all cursor-pointer">
+                <div
+                  key={ep.id}
+                  onClick={() => navigate(`/episodes/${ep.id}`)}
+                  className="flex items-center gap-0 bg-[#FAF7EE] border-[3px] border-[#0C0C0C] shadow-[3px_3px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0_#0C0C0C] transition-all cursor-pointer"
+                >
                     {/* Episode number */}
                     <div className="w-20 shrink-0 bg-[#8B2FC9] flex items-center justify-center py-4 border-r-[3px] border-[#0C0C0C]">
                       <span className="font-display text-3xl text-white">{String(ep.epNumber).padStart(2, "0")}</span>
@@ -108,11 +112,19 @@ export default function Published() {
                           YouTube
                         </a>
                       ) : (
-                        <span className="font-mono text-xs text-[#999]">No video ID</span>
+                        <a
+                          href="https://www.youtube.com/@BioMinutesh"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-1.5 font-mono text-xs font-bold text-[#C94A00] border-[2px] border-[#C94A00] px-3 py-1.5 hover:bg-[#C94A00] hover:text-white transition-colors"
+                        >
+                          <ExternalLink size={11} />
+                          Channel
+                        </a>
                       )}
                     </div>
                   </div>
-                </Link>
               ))}
           </div>
         )}

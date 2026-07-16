@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, CheckCircle, XCircle, Calendar } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { useListEpisodes, useApproveEpisode, useUpdateEpisode } from "@workspace/api-client-react";
 import type { Episode } from "@workspace/api-client-react";
@@ -12,6 +12,8 @@ export default function PreviewQueue() {
   const updateMutation = useUpdateEpisode();
   const [selected, setSelected] = useState<Episode | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [schedulingId, setSchedulingId] = useState<number | null>(null);
+  const [scheduledAt, setScheduledAt] = useState<string>("");
 
   // Only show preview_ready episodes
   const episodes = allBuilding?.filter((ep) => ep.buildStage === "preview_ready") ?? [];
@@ -21,14 +23,43 @@ export default function PreviewQueue() {
     setTimeout(() => setToastMsg(null), 3000);
   }
 
+  function openScheduler(id: number) {
+    setSchedulingId(id);
+    setScheduledAt("");
+  }
+
+  function cancelScheduler() {
+    setSchedulingId(null);
+    setScheduledAt("");
+  }
+
   function handleApprove(id: number) {
+    const scheduleIso = scheduledAt ? new Date(scheduledAt).toISOString() : undefined;
+
     approveMutation.mutate(
       { id },
       {
         onSuccess: () => {
-          showToast("Episode approved and moved to queue ✓");
-          queryClient.invalidateQueries({ queryKey: ["/api/episodes"] });
-          setSelected(null);
+          // If a date was picked, also save scheduledPublishAt
+          if (scheduleIso) {
+            updateMutation.mutate(
+              { id, data: { scheduledPublishAt: scheduleIso } as any },
+              {
+                onSuccess: () => {
+                  showToast("Episode approved & scheduled ✓");
+                  queryClient.invalidateQueries({ queryKey: ["/api/episodes"] });
+                  setSelected(null);
+                  setSchedulingId(null);
+                },
+                onError: (e: any) => showToast(e?.message ?? "Approved, but schedule failed to save"),
+              }
+            );
+          } else {
+            showToast("Episode approved and moved to queue ✓");
+            queryClient.invalidateQueries({ queryKey: ["/api/episodes"] });
+            setSelected(null);
+            setSchedulingId(null);
+          }
         },
         onError: (e: any) => showToast(e?.message ?? "Failed to approve"),
       }
@@ -44,6 +75,7 @@ export default function PreviewQueue() {
           showToast("Episode sent back to rejected");
           queryClient.invalidateQueries({ queryKey: ["/api/episodes"] });
           setSelected(null);
+          setSchedulingId(null);
         },
       }
     );
@@ -84,7 +116,7 @@ export default function PreviewQueue() {
               episodes.map((ep) => (
                 <button
                   key={ep.id}
-                  onClick={() => setSelected(ep)}
+                  onClick={() => { setSelected(ep); setSchedulingId(null); }}
                   className={`w-full text-left p-4 border-[3px] shadow-[3px_3px_0_#0C0C0C] transition-all ${
                     selected?.id === ep.id
                       ? "bg-[#8B2FC9] border-[#8B2FC9] text-white"
@@ -137,23 +169,55 @@ export default function PreviewQueue() {
                   </pre>
                 </div>
 
-                {/* Actions */}
-                <div className="p-6 flex gap-4">
-                  <button
-                    onClick={() => handleApprove(selected.id)}
-                    disabled={approveMutation.isPending}
-                    className="flex items-center gap-2 font-mono font-bold text-sm px-6 py-3 border-[2px] border-[#0C0C0C] bg-[#0D9970] text-white shadow-[3px_3px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase disabled:opacity-50"
-                  >
-                    {approveMutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => handleReject(selected.id)}
-                    className="flex items-center gap-2 font-mono font-bold text-sm px-6 py-3 border-[2px] border-[#0C0C0C] bg-[#FAF7EE] text-[#C94A00] shadow-[3px_3px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase"
-                  >
-                    <XCircle size={14} />
-                    Reject
-                  </button>
+                {/* Scheduler + Actions */}
+                <div className="p-6 border-b-[3px] border-[#0C0C0C]">
+                  {schedulingId === selected.id ? (
+                    <div className="bg-[#E2DDD0] border-[2px] border-[#0C0C0C] p-4 shadow-[3px_3px_0_#0C0C0C]">
+                      <p className="font-mono text-xs font-bold uppercase text-[#0C0C0C] mb-2">
+                        <Calendar size={12} className="inline-block mr-1" />
+                        Pick publish date & time (optional)
+                      </p>
+                      <input
+                        type="datetime-local"
+                        value={scheduledAt}
+                        onChange={(e) => setScheduledAt(e.target.value)}
+                        className="w-full bg-white border-[2px] border-[#0C0C0C] font-mono text-sm px-3 py-2 focus:border-[#C9A800] outline-none mb-3"
+                      />
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => handleApprove(selected.id)}
+                          disabled={approveMutation.isPending}
+                          className="flex items-center gap-2 font-mono font-bold text-xs px-4 py-2 border-[2px] border-[#0C0C0C] bg-[#0D9970] text-white shadow-[3px_3px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase disabled:opacity-50"
+                        >
+                          {approveMutation.isPending ? <Loader2 size={13} className="animate-spin" /> : <CheckCircle size={13} />}
+                          {scheduledAt ? "Approve & Schedule" : "Approve Now"}
+                        </button>
+                        <button
+                          onClick={cancelScheduler}
+                          className="font-mono font-bold text-xs px-4 py-2 border-[2px] border-[#0C0C0C] bg-[#FAF7EE] text-[#0C0C0C] shadow-[3px_3px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => openScheduler(selected.id)}
+                        className="flex items-center gap-2 font-mono font-bold text-sm px-6 py-3 border-[2px] border-[#0C0C0C] bg-[#0D9970] text-white shadow-[3px_3px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase"
+                      >
+                        <CheckCircle size={14} />
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleReject(selected.id)}
+                        className="flex items-center gap-2 font-mono font-bold text-sm px-6 py-3 border-[2px] border-[#0C0C0C] bg-[#FAF7EE] text-[#C94A00] shadow-[3px_3px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase"
+                      >
+                        <XCircle size={14} />
+                        Reject
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (

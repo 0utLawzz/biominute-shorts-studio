@@ -3,9 +3,10 @@ import { format, differenceInDays, differenceInHours } from "date-fns";
 import { Loader2, Clock, Calendar } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { useListEpisodes } from "@workspace/api-client-react";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 
 export default function Scheduled() {
+  const [, navigate] = useLocation();
   const { data: episodes, isLoading } = useListEpisodes({ status: "scheduled" });
 
   return (
@@ -48,8 +49,11 @@ export default function Scheduled() {
                 const isSoon = days !== null && days <= 3 && days > 0;
 
                 return (
-                  <Link key={ep.id} href={`/episodes/${ep.id}`}>
-                    <div className="flex items-center gap-0 bg-[#FAF7EE] border-[3px] border-[#0C0C0C] shadow-[4px_4px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_#0C0C0C] transition-all cursor-pointer">
+                  <div
+                    key={ep.id}
+                    onClick={() => navigate(`/episodes/${ep.id}`)}
+                    className="flex items-center gap-0 bg-[#FAF7EE] border-[3px] border-[#0C0C0C] shadow-[4px_4px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_#0C0C0C] transition-all cursor-pointer"
+                  >
                       {/* Countdown badge */}
                       <div className={`w-28 shrink-0 flex flex-col items-center justify-center py-6 border-r-[3px] border-[#0C0C0C] ${
                         isPast ? "bg-[#C94A00]" : isToday ? "bg-[#C9A800]" : isSoon ? "bg-[#0A6B52]" : "bg-[#0C0C0C]"
@@ -115,8 +119,7 @@ export default function Scheduled() {
                           <span className="font-mono text-xs text-[#999] font-bold">Not uploaded</span>
                         )}
                       </div>
-                    </div>
-                  </Link>
+                  </div>
                 );
               })}
           </div>
