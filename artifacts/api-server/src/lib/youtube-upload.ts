@@ -5,9 +5,34 @@ import { logger } from "./logger";
 
 // ---------------------------------------------------------------------------
 // Season → playlist env-var mapping
+// Seasons are stored as either short codes ("S1") or full labels
+// ("S1: Morning Habits"). getPlaylistId normalizes both formats by extracting
+// the short code prefix before the colon, so "S1: Morning Habits" and "S1"
+// both resolve to YOUTUBE_PLAYLIST_S1.
 // Set YOUTUBE_PLAYLIST_S1 … YOUTUBE_PLAYLIST_S6 in Replit Secrets.
 // ---------------------------------------------------------------------------
+
+/** Derives the env-var name for a season regardless of format. */
+export function seasonEnvKey(season: string): string {
+  // "S1: Morning Habits" → "S1" | "S1" → "S1"
+  const shortCode = season.split(":")[0].trim().toUpperCase();
+  return `YOUTUBE_PLAYLIST_${shortCode}`;
+}
+
+/** Returns the YouTube playlist ID for a season, or null if not configured. */
+export function getPlaylistId(season: string): string | null {
+  return process.env[seasonEnvKey(season)] ?? null;
+}
+
+// Kept for external consumers that reference this map by name.
+// Keys cover both short-code and full-label formats.
 export const SEASON_PLAYLIST_ENV: Record<string, string> = {
+  S1:                              "YOUTUBE_PLAYLIST_S1",
+  S2:                              "YOUTUBE_PLAYLIST_S2",
+  S3:                              "YOUTUBE_PLAYLIST_S3",
+  S4:                              "YOUTUBE_PLAYLIST_S4",
+  S5:                              "YOUTUBE_PLAYLIST_S5",
+  S6:                              "YOUTUBE_PLAYLIST_S6",
   "S1: Morning Habits":            "YOUTUBE_PLAYLIST_S1",
   "S2: Movement & Body":           "YOUTUBE_PLAYLIST_S2",
   "S3: Sleep & Recovery":          "YOUTUBE_PLAYLIST_S3",
@@ -15,13 +40,6 @@ export const SEASON_PLAYLIST_ENV: Record<string, string> = {
   "S5: Nutrition & Myths":         "YOUTUBE_PLAYLIST_S5",
   "S6: Healthy Aging & Longevity": "YOUTUBE_PLAYLIST_S6",
 };
-
-/** Returns the YouTube playlist ID for a season, or null if not configured. */
-export function getPlaylistId(season: string): string | null {
-  const envKey = SEASON_PLAYLIST_ENV[season];
-  if (!envKey) return null;
-  return process.env[envKey] ?? null;
-}
 
 // ---------------------------------------------------------------------------
 // Shared OAuth2 client factory
@@ -171,7 +189,7 @@ export async function addVideoToPlaylist(
     logger.warn(
       {
         season: params.season,
-        envVar: SEASON_PLAYLIST_ENV[params.season] ?? "unknown",
+        envVar: seasonEnvKey(params.season),
       },
       "No playlist ID configured for season — skipping playlist insert",
     );

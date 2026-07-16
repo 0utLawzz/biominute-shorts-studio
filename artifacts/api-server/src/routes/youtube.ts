@@ -7,7 +7,7 @@ import {
   uploadEpisodeVideo,
   addVideoToPlaylist,
   repairVideoOnYouTube,
-  SEASON_PLAYLIST_ENV,
+  seasonEnvKey,
 } from "../lib/youtube-upload";
 import { logger } from "../lib/logger";
 
@@ -192,7 +192,7 @@ router.post("/youtube/publish/:id", async (req, res): Promise<void> => {
     try {
       playlistResult = await addVideoToPlaylist({ youtubeVideoId, season: episode.season });
       if (!playlistResult) {
-        const envVar = SEASON_PLAYLIST_ENV[episode.season] ?? "YOUTUBE_PLAYLIST_S?";
+        const envVar = seasonEnvKey(episode.season);
         playlistWarning = `No playlist ID set for season "${episode.season}". Add ${envVar} in Replit Secrets.`;
       }
     } catch (err) {
