@@ -1,25 +1,26 @@
 /**
  * youtube-reauth.ts — Re-authorize YouTube with full `youtube` management scope.
  *
- * WHY: The existing refresh token only has `youtube.upload` scope. Adding a
- * video to a playlist requires the broader `youtube` scope. This script
- * generates a new token that covers both.
+ * Uses the loopback redirect flow (OOB is blocked by Google since Jan 2023).
  *
- * USAGE (two steps):
+ * BEFORE FIRST RUN — add this URI to Google Cloud Console once:
+ *   Console → APIs & Services → Credentials → your OAuth 2.0 Client ID
+ *   → Authorized redirect URIs → Add URI:
  *
- *   Step 1 — Get the consent URL:
- *     npx tsx scripts/src/youtube-reauth.ts
- *     → Opens (prints) the URL. Open it in your browser, click "Allow".
- *       Google will show you a code — copy it.
+ *     http://localhost:4080/oauth/callback
  *
- *   Step 2 — Exchange the code for a refresh token:
- *     npx tsx scripts/src/youtube-reauth.ts <paste-code-here>
- *     → Prints your new YOUTUBE_REFRESH_TOKEN value.
- *       Paste that into Replit Secrets → YOUTUBE_REFRESH_TOKEN.
+ * USAGE:
+ *   npx tsx scripts/src/youtube-reauth.ts
+ *
+ *   1. Script prints a consent URL — open it in your browser.
+ *   2. Click "Allow". Google redirects to the local server automatically.
+ *   3. Script catches the code, exchanges it, prints the new YOUTUBE_REFRESH_TOKEN.
+ *   4. Paste that token into Replit Secrets → YOUTUBE_REFRESH_TOKEN.
+ *   5. Restart the API Server workflow.
  */
 
+import http from "node:http";
 import { google } from "googleapis";
-import readline from "node:readline";
 
 const CLIENT_ID = process.env.YOUTUBE_CLIENT_ID;
 const CLIENT_SECRET = process.env.YOUTUBE_CLIENT_SECRET;
@@ -31,64 +32,108 @@ if (!CLIENT_ID || !CLIENT_SECRET) {
   process.exit(1);
 }
 
-// Out-of-band redirect — no web server needed; Google shows the code on screen.
-const REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
+const PORT = 4080;
+const REDIRECT_URI = `http://localhost:${PORT}/oauth/callback`;
 
 const SCOPES = [
-  "https://www.googleapis.com/auth/youtube",         // playlist management, video updates
-  "https://www.googleapis.com/auth/youtube.upload",  // video upload (keep existing)
+  "https://www.googleapis.com/auth/youtube",        // playlist management, video updates
+  "https://www.googleapis.com/auth/youtube.upload", // video upload (keep existing)
 ];
 
 const oauth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 
-// ─── Step 2: exchange code ────────────────────────────────────────────────────
-const authCode = process.argv[2];
+const authUrl = oauth2Client.generateAuthUrl({
+  access_type: "offline",
+  scope: SCOPES,
+  prompt: "consent", // forces Google to issue a fresh refresh_token even if previously authorized
+});
 
-if (authCode) {
-  console.log("\n🔄  Exchanging authorization code for tokens…\n");
+// ─── Local callback server ────────────────────────────────────────────────────
+
+const server = http.createServer(async (req, res) => {
+  if (!req.url?.startsWith("/oauth/callback")) {
+    res.writeHead(404);
+    res.end("Not found");
+    return;
+  }
+
+  const url = new URL(req.url, `http://localhost:${PORT}`);
+  const code = url.searchParams.get("code");
+  const error = url.searchParams.get("error");
+
+  if (error) {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.end(`<h2>❌ Authorization denied: ${error}</h2><p>You can close this tab.</p>`);
+    console.error(`\n❌  Authorization denied by user: ${error}\n`);
+    server.close();
+    process.exit(1);
+  }
+
+  if (!code) {
+    res.writeHead(400, { "Content-Type": "text/html" });
+    res.end(`<h2>Bad request — no code in callback.</h2>`);
+    server.close();
+    process.exit(1);
+  }
+
+  // Exchange code for tokens
+  res.writeHead(200, { "Content-Type": "text/html" });
+  res.end(`
+    <html><body style="font-family:sans-serif;padding:40px;background:#0f172a;color:#e2e8f0">
+      <h2 style="color:#10b981">✅ Authorization successful!</h2>
+      <p>Code received. Exchanging for refresh token — check your terminal for the result.</p>
+      <p style="color:#64748b">You can close this tab.</p>
+    </body></html>
+  `);
+
+  server.close();
+
+  console.log("\n🔄  Code received — exchanging for tokens…\n");
+
   try {
-    const { tokens } = await oauth2Client.getToken(authCode.trim());
+    const { tokens } = await oauth2Client.getToken(code);
 
     if (!tokens.refresh_token) {
       console.error(
         "❌  No refresh_token in response.\n" +
-          "    This usually means the account has already granted consent to this\n" +
-          "    app — Google only issues refresh_tokens on the first consent.\n\n" +
-          "    Fix: go to https://myaccount.google.com/permissions, revoke access\n" +
-          "    for your app, then run Step 1 again.\n",
+          "    Google only issues refresh_tokens on the FIRST consent.\n\n" +
+          "    Fix: go to https://myaccount.google.com/permissions\n" +
+          "    Revoke access for your OAuth app, then run this script again.\n",
       );
       process.exit(1);
     }
 
-    console.log("✅  SUCCESS! Your new refresh token:\n");
-    console.log("    " + tokens.refresh_token + "\n");
-    console.log("Next steps:");
-    console.log("  1. Open Replit Secrets (lock icon in the sidebar).");
-    console.log("  2. Find YOUTUBE_REFRESH_TOKEN and replace its value with the token above.");
-    console.log("  3. Restart the API Server workflow so it picks up the new token.");
-    console.log("  4. The next publish will automatically add the video to its season playlist.\n");
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    console.log("✅  SUCCESS — New YOUTUBE_REFRESH_TOKEN:");
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+    console.log(tokens.refresh_token);
+    console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    console.log("\nNext steps:");
+    console.log("  1. Open Replit Secrets (lock icon in sidebar).");
+    console.log("  2. Find YOUTUBE_REFRESH_TOKEN → replace value with token above.");
+    console.log("  3. Restart workflow: artifacts/api-server: API Server");
+    console.log("  4. Next publish will automatically add videos to season playlists.\n");
   } catch (err) {
     console.error("❌  Token exchange failed:", err instanceof Error ? err.message : err);
     process.exit(1);
   }
+});
 
-// ─── Step 1: print consent URL ───────────────────────────────────────────────
-} else {
-  const url = oauth2Client.generateAuthUrl({
-    access_type: "offline",
-    scope: SCOPES,
-    prompt: "consent", // force Google to issue a new refresh_token even if previously authorized
-  });
-
+server.listen(PORT, "localhost", () => {
   console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log("  YouTube Re-Authorization — Full Scope");
+  console.log("  YouTube Re-Authorization — Full Scope (loopback flow)");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-  console.log("STEP 1 of 2 — Open this URL in your browser and click \"Allow\":\n");
-  console.log(url);
-  console.log("\n────────────────────────────────────────────────────────────");
-  console.log("STEP 2 of 2 — Paste the code Google shows you:\n");
-  console.log(
-    "  npx tsx scripts/src/youtube-reauth.ts  <YOUR_CODE_HERE>\n",
-  );
-  console.log("  (Run that command in the Replit Shell tab)\n");
-}
+  console.log("Listening on http://localhost:4080/oauth/callback\n");
+  console.log("Open this URL in your browser and click Allow:\n");
+  console.log(authUrl);
+  console.log("\n(Script will exchange the code automatically once you approve)\n");
+});
+
+server.on("error", (err: NodeJS.ErrnoException) => {
+  if (err.code === "EADDRINUSE") {
+    console.error(`\n❌  Port ${PORT} is already in use. Kill the other process and retry.\n`);
+  } else {
+    console.error("❌  Server error:", err.message);
+  }
+  process.exit(1);
+});
