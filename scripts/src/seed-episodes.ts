@@ -12,7 +12,7 @@ import { eq } from "drizzle-orm";
 const PROJECT_ROOT = path.resolve(import.meta.dirname, "../..");
 const MASTER_WORKBOOK = path.join(
   PROJECT_ROOT,
-  "attached_assets/instructions_1784313986424/BioMinute-Master-Workbook.xlsx",
+  "attached_assets/BioMinute-Master-Workbook_1784483704921.xlsx",
 );
 const EXPORTS_DIR = path.join(PROJECT_ROOT, "exports");
 
