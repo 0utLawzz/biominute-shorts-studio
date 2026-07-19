@@ -218,29 +218,35 @@ async function main() {
   // -------------------------------------------------------------------------
   // Upsert: preserve existing publish/schedule state for real episodes
   // -------------------------------------------------------------------------
-  const existing = await db.select({ epNumber: episodesTable.epNumber }).from(episodesTable);
-  const existingSet = new Set(existing.map((e) => e.epNumber));
+  const existing = await db
+    .select({ epNumber: episodesTable.epNumber, status: episodesTable.status })
+    .from(episodesTable);
+  const existingMap = new Map(existing.map((e) => [e.epNumber, e.status]));
 
-  const toInsert = rows.filter((r) => !existingSet.has(r.epNumber));
-  const toUpdate = rows.filter((r) => existingSet.has(r.epNumber) && r.epNumber <= 50);
+  const toInsert = rows.filter((r) => !existingMap.has(r.epNumber));
+  const toUpdate = rows.filter((r) => existingMap.has(r.epNumber) && r.epNumber <= 50);
 
   if (toInsert.length > 0) {
     await db.insert(episodesTable).values(toInsert);
     console.log(`Inserted ${toInsert.length} new episodes.`);
   }
 
+  // Statuses that are already in the live pipeline — never downgrade these.
+  const LOCKED_STATUSES = new Set<string>(["published", "scheduled"]);
+
   for (const row of toUpdate) {
-    // For existing real episodes, update metadata fields from the workbook.
-    // Never overwrite status, youtubeVideoId, or publishedAt.
-    // scheduledPublishAt IS recomputed from postDate + 09:00 UTC for scheduled
-    // episodes — this is the fix for cumulative-drift bugs where the time was
-    // previously derived from the previous episode's scheduled slot instead of
-    // each episode's own postDate.
+    // scheduledPublishAt is recomputed from postDate + 09:00 UTC whenever
+    // a postDate is present (fixes cumulative-drift bugs).
     let scheduledPublishAt: Date | null | undefined = undefined; // undefined = leave unchanged
     if (row.postDate) {
       const d = new Date(`${row.postDate}T09:00:00Z`);
       if (!Number.isNaN(d.getTime())) scheduledPublishAt = d;
     }
+
+    const currentStatus = existingMap.get(row.epNumber)!;
+    // Only overwrite status when the episode is NOT already live (published/scheduled).
+    // draft, scripted, review, approved, complete — all accept workbook-derived status.
+    const statusOverride = LOCKED_STATUSES.has(currentStatus) ? {} : { status: row.status };
 
     await db
       .update(episodesTable)
@@ -256,6 +262,7 @@ async function main() {
         citationCta: row.citationCta,
         hashtags: row.hashtags,
         updatedAt: new Date(),
+        ...statusOverride,
         // Only write scheduledPublishAt if we have a valid postDate to derive from
         ...(scheduledPublishAt !== undefined ? { scheduledPublishAt } : {}),
       })
