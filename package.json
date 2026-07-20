@@ -7,7 +7,7 @@
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "dashboard:generate": "pnpm --filter @workspace/scripts generate-dashboard",
-    "export-video": "cross-env BIOMINUTE_EXPORT_URL=http://localhost:5173/ pnpm --filter @workspace/scripts export-video",
+    "export-video": "cross-env BIOMINUTE_EXPORT_URL=http://localhost:25078/biominute-reels/ pnpm --filter @workspace/scripts export-video",
     "verify-export": "pnpm --filter @workspace/scripts verify-export"
   },
   "private": true,

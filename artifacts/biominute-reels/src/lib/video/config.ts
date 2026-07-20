@@ -21,11 +21,12 @@ export const CANVAS_STYLE = {
 // Scene durations for the current episode. The video player uses these to
 // advance scenes automatically. Keep the total loop duration in sync with
 // the exported MP4 length so the record/export control captures the full video.
+// EP 37 — "Does Intermittent Fasting Actually Work?" (S5: Nutrition & Myths)
 export const SCENE_DURATIONS = {
-  0: 4500, // Hook: "What's the #1 Habit That Improves Your Health?" (milestone icon montage)
-  1: 7000, // No single magic fix -- cycling through basics icons
-  2: 6500, // The basics that work: movement, strength, whole foods, sleep/stress
-  3: 6000, // The reality: small habits, repeated over time, consistency
-  4: 6500, // CTA: "Which healthy habit are you working on this month?" + citation + milestone note
+  0: 4500, // Hook: "Does Intermittent Fasting Actually Work?" (clock split eating/fasting)
+  1: 6500, // Not magic — just timing; structures when you eat
+  2: 7000, // Eating window (bright emerald) vs fasting window (dimmed blue) + calorie ticker
+  3: 6000, // Balance scale: IF vs traditional at equal height — same results
+  4: 6500, // CTA: "Have you tried intermittent fasting?" + Varady et al. citation
   5: 5000, // Thumbnail end card
 } as const;
