@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Smartphone, Brain, Moon } from 'lucide-react';
+import { Moon, Activity, BrainCircuit } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
-const SPRING_SNAPPY = { type: 'spring', stiffness: 400, damping: 30 } as const;
 const SPRING_SMOOTH = { type: 'spring', stiffness: 120, damping: 25 } as const;
+const SPRING_SNAPPY = { type: 'spring', stiffness: 400, damping: 30 } as const;
 
 export function Scene1() {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -16,14 +16,14 @@ export function Scene1() {
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }} transition={{ duration: 0.8 }}>
       <audio ref={audioRef} src={`${BASE_URL}audio/sfx-pop.mp3`} preload="auto" />
       <div className="absolute top-[160px] flex flex-col items-center gap-5 z-10 w-full px-10">
-        <motion.div className="bg-[#2F6FED]/10 border border-[#2F6FED]/30 px-8 py-4 rounded-2xl"
+        <motion.div className="bg-[#7c3aed]/10 border border-[#7c3aed]/30 px-8 py-4 rounded-2xl"
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ...SPRING_SMOOTH }}>
-          <span className="text-[#2F6FED] font-display font-bold text-[22px] uppercase tracking-wider">What Night Mode Actually Does</span>
+          <span className="text-[#7c3aed] font-display font-bold text-[22px] uppercase tracking-wider">Hours ≠ Quality</span>
         </motion.div>
         {[
-          { icon: Smartphone, color: '#2F6FED', title: 'Reduces blue light slightly', body: 'May help with melatonin production — but the effect is modest' },
-          { icon: Brain, color: '#f97316', title: 'Mental alertness stays high', body: 'Scrolling, videos, messages keep your brain fully engaged' },
-          { icon: Moon, color: '#10b981', title: 'Content matters more', body: 'Stimulating content disrupts sleep regardless of screen color' },
+          { icon: Moon, color: '#7c3aed', title: 'Fragmented sleep ruins rest', body: 'Waking briefly disrupts deep and REM cycles even if total time looks fine' },
+          { icon: Activity, color: '#2F6FED', title: 'Sleep apnea is often silent', body: 'Millions have undiagnosed apnea — oxygen dips every night destroy sleep quality' },
+          { icon: BrainCircuit, color: '#f97316', title: 'REM is when you recharge', body: 'Screens, alcohol, and irregular schedules all suppress this critical stage' },
         ].map((item, i) => {
           const Icon = item.icon;
           return (
@@ -43,11 +43,11 @@ export function Scene1() {
       </div>
       <div className="absolute w-full px-12 text-center z-20" style={{ bottom: BOTTOM_SAFE_ZONE_PX + 80 }}>
         <motion.h2 className="text-[#f8fafc] text-[46px] font-bold uppercase tracking-wider font-display leading-tight"
-          initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }}>
-          Filter Alone
-          <motion.span className="text-[#f97316] block mt-2 drop-shadow-md"
-            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1.6, ...SPRING_SNAPPY }}>
-            Isn't Enough
+          initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 1.8 }}>
+          Quality
+          <motion.span className="text-[#7c3aed] block mt-2 drop-shadow-md"
+            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 2.4, ...SPRING_SNAPPY }}>
+            Wins
           </motion.span>
         </motion.h2>
       </div>
