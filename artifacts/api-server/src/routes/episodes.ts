@@ -398,10 +398,16 @@ router.post("/episodes/:id/run-production", async (req, res): Promise<void> => {
     .where(eq(episodesTable.id, id));
 
   // Determine the biominute-reels URL and output dir
-  const reelsPort = process.env.BIOMINUTE_REELS_PORT || "5173";
-  const exportUrl = process.env.BIOMINUTE_EXPORT_URL || `http://localhost:${reelsPort}/`;
+  // Default to the actual Reels dev-server port/path used in this workspace.
+  const exportUrl =
+    process.env.BIOMINUTE_EXPORT_URL ||
+    `http://localhost:${process.env.BIOMINUTE_REELS_PORT || "25078"}/biominute-reels/`;
   const exportDir = buildExportDir(episode.epNumber);
   const scriptPath = path.join(WORKSPACE_ROOT, "scripts", "src", "export-video.ts");
+
+  // tsx lives in the scripts package's node_modules — use that path directly
+  // so the spawn doesn't depend on it being in PATH.
+  const tsxBin = path.join(WORKSPACE_ROOT, "scripts", "node_modules", ".bin", "tsx");
 
   // Ensure export dir exists so the log file can be opened before tsx starts.
   mkdirSync(exportDir, { recursive: true });
@@ -411,8 +417,8 @@ router.post("/episodes/:id/run-production", async (req, res): Promise<void> => {
   // Spawn the export script detached so it survives the HTTP response.
   // stdout + stderr both go to export.log — never silent-fail again.
   const child = spawn(
-    "npx",
-    ["tsx", scriptPath],
+    tsxBin,
+    [scriptPath],
     {
       detached: true,
       stdio: ["ignore", logFd, logFd],
