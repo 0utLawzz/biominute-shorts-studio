@@ -6,3 +6,4 @@
 - [BioMinute scheduled time drift](biominute-scheduled-time-drift.md) — seed-episodes resets DB publish times to 09:00 UTC; already-uploaded YouTube videos must be synced with reschedule.ts.
 - [batch-export-schedule WORKSPACE_ROOT fix](batch-export-workspace-root.md) — script needs `..` not `../..` to resolve workspace root when run via pnpm exec.
 - [Facebook publishing removed](facebook-removal.md) — all FB routes/hooks/UI removed; facebookVideoId DB column intentionally kept to avoid migration.
+- [run-production spawn fix](run-production-spawn.md) — tsx not in PATH; use scripts/node_modules/.bin/tsx directly. Default BIOMINUTE_EXPORT_URL must be port 25078 + /biominute-reels/.
