@@ -1,25 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Full sequential export for Episodes 25–30
+# Full sequential export for Episodes 56–60
 # Usage: bash scripts/export-all-episodes.sh
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
 
-EXPORT_URL="http://localhost:5173/"
-VITE_PORT=5173
+EXPORT_URL="http://localhost:25078/biominute-reels/"
+VITE_PORT=25078
 SCENES_DIR="artifacts/biominute-reels/src/components/video/video_scenes"
 CONFIG_FILE="artifacts/biominute-reels/src/lib/video/config.ts"
 
 # ─── Episode definitions ───────────────────────────────────────────────
 # Format: "ep_num|scene_prefix|export_dir|config_comment_scene0"
 EPISODES=(
-  "25|ep25|exports/Episode-25-can-you-turn-fat-into|Hook: \"Can You Turn Fat Into Muscle?\""
-  "26|ep26|exports/Episode-26-should-you-work-out-every|Hook: \"Should You Work Out Every Day?\""
-  "27|ep27|exports/Episode-27-why-does-your-weight-change|Hook: \"Why Does Your Weight Change Overnight?\""
-  "28|ep28|exports/Episode-28-can-your-metabolism-be-broken|Hook: \"Can Your Metabolism Be 'Broken'?\""
-  "29|ep29|exports/Episode-29-are-eggs-actually-bad-for|Hook: \"Are Eggs Actually Bad for Your Heart?\""
-  "30|ep30|exports/Episode-30-do-detox-drinks-really-clean|Hook: \"Do Detox Drinks Really Clean Your Body?\""
+  "56|ep56|exports/Episode-56-why-are-you-always-tired|Hook: \"Why Are You Always Tired Even After 8 Hours of Sleep?\""
+  "57|ep57|exports/Episode-57-why-cant-you-lose-weight|Hook: \"Why Can't You Lose Weight Even When You're Doing Everything Right?\""
+  "58|ep58|exports/Episode-58-whats-actually-causing-your-bloating|Hook: \"What's Actually Causing Your Bloating?\""
+  "59|ep59|exports/Episode-59-does-cracking-your-knuckles|Hook: \"Does Cracking Your Knuckles Cause Arthritis?\""
+  "60|ep60|exports/Episode-60-can-you-catch-up-on-sleep-debt|Hook: \"Can You Actually Catch Up on Sleep Debt on Weekends?\""
 )
 
 # ─── Start Vite dev server ─────────────────────────────────────────────
@@ -59,8 +58,6 @@ for ep_def in "${EPISODES[@]}"; do
   done
 
   # Update config.ts scene 0 comment only (durations are the same for all)
-  # The file already has the right durations; just update the comment line
-  # Use a temp sed to update line with "Hook:" comment
   sed -i "s|0: 4500, // Hook:.*|0: 4500, // ${comment}|" "$CONFIG_FILE"
 
   echo "   Scenes swapped. Exporting MP4..."
@@ -73,7 +70,7 @@ for ep_def in "${EPISODES[@]}"; do
 
   BIOMINUTE_EXPORT_URL="$EXPORT_URL" \
   BIOMINUTE_EXPORT_DIR="$TMP_DIR" \
-    pnpm --filter @workspace/scripts exec tsx src/export-video.ts "$MP4_PATH"
+    pnpm --filter @workspace/scripts exec node_modules/.bin/tsx src/export-video.ts "$MP4_PATH"
 
   echo "   ✅ EP${ep_num} exported → $out_dir/episode.mp4"
 
@@ -83,15 +80,12 @@ done
 
 echo ""
 echo "══════════════════════════════════════════"
-echo "  All 6 episodes exported. Pushing to GitHub..."
+echo "  All 5 episodes exported. Pushing to GitHub..."
 echo "══════════════════════════════════════════"
 
-# Update production log statuses for all 6 episodes are already "Built — awaiting export"
-# (they're already set in the log) — just commit everything
-
 git add -A
-git commit -m "ep25-30: export 6 episodes (Can Fat Into Muscle → Detox Drinks)" || true
+git commit -m "ep56-60: export 5 episodes (Tired After Sleep → Weekend Sleep Debt)" || true
 git push origin "$(git branch --show-current)"
 
 echo ""
-echo "🎉 Done! Episodes 25–30 exported and pushed to GitHub."
+echo "🎉 Done! Episodes 56–60 exported and pushed to GitHub."
