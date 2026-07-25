@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Full sequential export for Episodes 56–60
+# Full sequential export for Episodes 61–65
 # Usage: bash scripts/export-all-episodes.sh
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
@@ -14,11 +14,11 @@ CONFIG_FILE="artifacts/biominute-reels/src/lib/video/config.ts"
 # ─── Episode definitions ───────────────────────────────────────────────
 # Format: "ep_num|scene_prefix|export_dir|config_comment_scene0"
 EPISODES=(
-  "56|ep56|exports/Episode-56-why-are-you-always-tired|Hook: \"Why Are You Always Tired Even After 8 Hours of Sleep?\""
-  "57|ep57|exports/Episode-57-why-cant-you-lose-weight|Hook: \"Why Can't You Lose Weight Even When You're Doing Everything Right?\""
-  "58|ep58|exports/Episode-58-whats-actually-causing-your-bloating|Hook: \"What's Actually Causing Your Bloating?\""
-  "59|ep59|exports/Episode-59-does-cracking-your-knuckles|Hook: \"Does Cracking Your Knuckles Cause Arthritis?\""
-  "60|ep60|exports/Episode-60-can-you-catch-up-on-sleep-debt|Hook: \"Can You Actually Catch Up on Sleep Debt on Weekends?\""
+  "61|ep61|exports/Episode-61-is-decaf-coffee-actually-caffeine|Hook: \"Is Decaf Coffee Actually Caffeine-Free?\""
+  "62|ep62|exports/Episode-62-does-sugar-really-cause-hyperactivity|Hook: \"Does Sugar Really Cause Hyperactivity in Kids?\""
+  "63|ep63|exports/Episode-63-can-apple-cider-vinegar-really-help|Hook: \"Can Apple Cider Vinegar Really Help You Lose Weight?\""
+  "64|ep64|exports/Episode-64-is-it-bad-to-work-out-on-an-empty|Hook: \"Is It Bad to Work Out on an Empty Stomach?\""
+  "65|ep65|exports/Episode-65-does-napping-during-the-day-ruin|Hook: \"Does Napping During the Day Ruin Your Night Sleep?\""
 )
 
 # ─── Start Vite dev server ─────────────────────────────────────────────
@@ -84,8 +84,8 @@ echo "  All 5 episodes exported. Pushing to GitHub..."
 echo "══════════════════════════════════════════"
 
 git add -A
-git commit -m "ep56-60: export 5 episodes (Tired After Sleep → Weekend Sleep Debt)" || true
+git commit -m "ep61-65: export 5 episodes (Decaf Coffee → Napping)" || true
 git push origin "$(git branch --show-current)"
 
 echo ""
-echo "🎉 Done! Episodes 56–60 exported and pushed to GitHub."
+echo "🎉 Done! Episodes 61–65 exported and pushed to GitHub."
