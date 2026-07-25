@@ -21,9 +21,9 @@ export const CANVAS_STYLE = {
 // Scene durations for the current episode. The video player uses these to
 // advance scenes automatically. Keep the total loop duration in sync with
 // the exported MP4 length so the record/export control captures the full video.
-// EP 51 — "Does Washing Your Hair Every Day Cause Baldness?"
+// EP 55 — "Does Washing Your Hair Every Day Cause Baldness?"
 export const SCENE_DURATIONS = {
-  0: 4500, // Hook: "Why Are You Always Tired Even After 8 Hours of Sleep?"
+  0: 4500, // Hook: hair washing + genetics icons
   1: 6500, // Evidence: 3 fact cards (shedding/genetics/scalp)
   2: 6500, // Mechanism: what washing does vs doesn't do
   3: 5500, // Takeaway: genes not shower
