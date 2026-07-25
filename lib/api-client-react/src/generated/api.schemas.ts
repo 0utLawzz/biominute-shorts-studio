@@ -135,33 +135,6 @@ export interface PublishResult {
   message: string;
 }
 
-export interface FacebookStatus {
-  connected: boolean;
-  /** @nullable */
-  pageId?: string | null;
-}
-
-export interface FacebookPublishRequest {
-  /**
-     * ISO datetime to schedule. Null = publish immediately.
-     * @nullable
-     */
-  scheduleAt?: string | null;
-  /** Whether the video should be published immediately or saved as draft. */
-  published?: boolean;
-}
-
-export interface FacebookPublishResult {
-  success: boolean;
-  /** @nullable */
-  facebookVideoId?: string | null;
-  /** @nullable */
-  facebookUrl?: string | null;
-  /** @nullable */
-  scheduledAt?: string | null;
-  message: string;
-}
-
 export interface CreateEpisodeBody {
   epNumber: number;
   postDate: string;

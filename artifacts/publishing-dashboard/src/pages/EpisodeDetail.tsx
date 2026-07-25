@@ -7,15 +7,13 @@ import {
   usePublishToYouTube,
   useGetYouTubeStatus,
   useRunProduction,
-  useGetFacebookStatus,
-  usePublishToFacebook,
   Episode,
   EpisodeUpdate
 } from "@workspace/api-client-react";
 import { Navbar } from "../components/Navbar";
 import { YouTubeBanner } from "../components/YouTubeBanner";
 import { StatusBadge } from "../components/StatusBadge";
-import { ArrowLeft, CheckCircle, Youtube, Facebook, Loader2, Save, Clapperboard, RefreshCw } from "lucide-react";
+import { ArrowLeft, CheckCircle, Youtube, Loader2, Save, Clapperboard, RefreshCw } from "lucide-react";
 import { formatPKT } from "../lib/date";
 import { useToast } from "@/hooks/use-toast";
 
@@ -27,12 +25,9 @@ export default function EpisodeDetail() {
 
   const { data: episode, isLoading, refetch } = useGetEpisode(id, { query: { enabled: !!id, queryKey: ["/api/episodes", id] } });
   const { data: ytStatus } = useGetYouTubeStatus();
-  const { data: fbStatus } = useGetFacebookStatus();
-  
   const updateMutation = useUpdateEpisode();
   const approveMutation = useApproveEpisode();
   const publishMutation = usePublishToYouTube();
-  const facebookMutation = usePublishToFacebook();
   const runProductionMutation = useRunProduction();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -162,31 +157,6 @@ export default function EpisodeDetail() {
     );
   };
 
-  const handlePublishToFacebook = () => {
-    facebookMutation.mutate(
-      {
-        id,
-        data: {
-          scheduleAt: editForm.scheduledPublishAt || null,
-          published: true,
-        }
-      },
-      {
-        onSuccess: (res) => {
-          refetch();
-          toast({ title: "Facebook", description: res.message, className: "bg-[#1877F2] text-white border-2 border-black rounded-none" });
-        },
-        onError: (err) => {
-          const description =
-            (err.data && typeof err.data === "object" && "error" in err.data
-              ? String((err.data as { error?: unknown }).error)
-              : undefined) || err.message || "Failed to publish to Facebook";
-          toast({ title: "Facebook Error", description, variant: "destructive" });
-        }
-      }
-    );
-  };
-
   return (
     <div className="min-h-screen bg-[#EDEAE0] pb-20">
       <Navbar />
@@ -242,17 +212,6 @@ export default function EpisodeDetail() {
               </button>
             )}
 
-            {(episode.status === "approved" || episode.status === "scheduled" || episode.status === "published") && (
-              <button 
-                onClick={handlePublishToFacebook}
-                disabled={facebookMutation.isPending || (!fbStatus?.connected)}
-                className="brutal-btn bg-[#1877F2] text-white border-[2.5px] border-[#0C0C0C] flex items-center justify-center gap-2 py-3 hover:bg-[#166fe5]"
-              >
-                {facebookMutation.isPending ? <Loader2 className="animate-spin w-5 h-5" /> : <Facebook className="w-5 h-5" />}
-                PUBLISH TO FACEBOOK
-              </button>
-            )}
-            
             {episode.youtubeVideoId && (
               <a 
                 href={`https://youtube.com/shorts/${episode.youtubeVideoId}`} 
@@ -261,17 +220,6 @@ export default function EpisodeDetail() {
               >
                 <Youtube className="w-5 h-5 text-[#C94A00]" />
                 VIEW ON YOUTUBE
-              </a>
-            )}
-
-            {episode.facebookVideoId && (
-              <a 
-                href={`https://facebook.com/${fbStatus?.pageId}/videos/${episode.facebookVideoId}`} 
-                target="_blank" rel="noreferrer"
-                className="brutal-btn brutal-btn-secondary flex items-center justify-center gap-2 py-3 bg-[#E2DDD0]"
-              >
-                <Facebook className="w-5 h-5 text-[#1877F2]" />
-                VIEW ON FACEBOOK
               </a>
             )}
 

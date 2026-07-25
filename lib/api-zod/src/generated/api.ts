@@ -350,35 +350,4 @@ export const PublishToYouTubeResponse = zod.object({
 })
 
 
-/**
- * @summary Check if Facebook page is connected
- */
-export const GetFacebookStatusResponse = zod.object({
-  "connected": zod.boolean(),
-  "pageId": zod.string().nullish()
-})
-
-
-/**
- * @summary Publish episode video to Facebook page
- */
-export const PublishToFacebookParams = zod.object({
-  "id": zod.coerce.number()
-})
-
-export const publishToFacebookBodyPublishedDefault = true;
-
-export const PublishToFacebookBody = zod.object({
-  "scheduleAt": zod.string().nullish().describe('ISO datetime to schedule. Null = publish immediately.'),
-  "published": zod.boolean().default(publishToFacebookBodyPublishedDefault).describe('Whether the video should be published immediately or saved as draft.')
-})
-
-export const PublishToFacebookResponse = zod.object({
-  "success": zod.boolean(),
-  "facebookVideoId": zod.string().nullish(),
-  "facebookUrl": zod.string().nullish(),
-  "scheduledAt": zod.string().nullish(),
-  "message": zod.string()
-})
-
 

@@ -13,8 +13,6 @@ tags:
     description: Episode management
   - name: youtube
     description: YouTube publishing operations
-  - name: facebook
-    description: Facebook page publishing operations
 paths:
   /healthz:
     get:
@@ -286,50 +284,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /facebook/status:
-    get:
-      operationId: getFacebookStatus
-      tags: [facebook]
-      summary: Check if Facebook page is connected
-      responses:
-        "200":
-          description: Connection status
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FacebookStatus"
-
-  /facebook/publish/{id}:
-    post:
-      operationId: publishToFacebook
-      tags: [facebook]
-      summary: Publish episode video to Facebook page
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FacebookPublishRequest"
-      responses:
-        "200":
-          description: Facebook publish result
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FacebookPublishResult"
-        "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-
 components:
   schemas:
     HealthStatus:
@@ -501,41 +455,6 @@ components:
           type: string
       required: [success, message]
 
-    FacebookStatus:
-      type: object
-      properties:
-        connected:
-          type: boolean
-        pageId:
-          type: ["string", "null"]
-      required: [connected]
-
-    FacebookPublishRequest:
-      type: object
-      properties:
-        scheduleAt:
-          type: ["string", "null"]
-          description: ISO datetime to schedule. Null = publish immediately.
-        published:
-          type: boolean
-          default: true
-          description: Whether the video should be published immediately or saved as draft.
-      required: []
-
-    FacebookPublishResult:
-      type: object
-      properties:
-        success:
-          type: boolean
-        facebookVideoId:
-          type: ["string", "null"]
-        facebookUrl:
-          type: ["string", "null"]
-        scheduledAt:
-          type: ["string", "null"]
-        message:
-          type: string
-      required: [success, message]
 
     CreateEpisodeBody:
       type: object
