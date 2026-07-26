@@ -7,3 +7,6 @@
 - [batch-export-schedule WORKSPACE_ROOT fix](batch-export-workspace-root.md) — script needs `..` not `../..` to resolve workspace root when run via pnpm exec.
 - [Facebook publishing removed](facebook-removal.md) — all FB routes/hooks/UI removed; facebookVideoId DB column intentionally kept to avoid migration.
 - [run-production spawn fix](run-production-spawn.md) — tsx not in PATH; use scripts/node_modules/.bin/tsx directly. Default BIOMINUTE_EXPORT_URL must be port 25078 + /biominute-reels/.
+- [Episode seeding status rules](episode-seeding-status-rules.md) — workbook 51–65 are approved, 66–100 are scripted; existing 1–50 published/scheduled status and post dates are preserved during re-seed.
+- [Dashboard pipeline status header](dashboard-pipeline-status.md) — Navbar shows live counts from /api/episodes/stats and a system-health readout that changes based on building/scheduled/approved/published state.
+- [Social platform setup guide](social-platforms-setup.md) — `docs/Social-Platforms-Setup.md` is the canonical reference for connecting YouTube, Facebook, TikTok, Instagram, X/Twitter, and LinkedIn; YouTube is the only fully integrated platform.
