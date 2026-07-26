@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { ShieldCheck, Clock, Moon } from 'lucide-react';
+import { ShieldCheck, Droplets, CheckCircle2 } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -18,17 +18,17 @@ export function Scene3() {
       <div className="absolute top-[150px] flex flex-col items-center gap-5 z-10 w-full px-10">
         <motion.div className="bg-[#10b981]/10 border border-[#10b981]/30 px-8 py-4 rounded-2xl"
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ...SPRING_SMOOTH }}>
-          <span className="text-[#10b981] font-display font-bold text-[22px] uppercase tracking-wider">Nap Smart</span>
+          <span className="text-[#10b981] font-display font-bold text-[22px] uppercase tracking-wider">The Scientific Consensus</span>
         </motion.div>
         {[
-          { icon: Clock, color: '#10b981', label: 'Keep it to 20–30 minutes', body: 'A short power nap boosts alertness without triggering deep sleep or grogginess' },
-          { icon: Moon, color: '#7c3aed', label: 'Nap before mid-afternoon', body: 'Early-day naps fit your circadian rhythm and preserve nighttime sleep pressure' },
-          { icon: ShieldCheck, color: '#2F6FED', label: 'Naps are not bad by default', body: 'Done right, napping can improve alertness and mood without harming sleep' },
+          { icon: ShieldCheck, color: '#10b981', label: 'CDC, WHO, ADA agree', body: 'Community water fluoridation is safe and effective for dental health' },
+          { icon: Droplets, color: '#2F6FED', label: 'Drink your tap water', body: 'At 0.7 mg/L, fluoride intake is well within safe limits globally' },
+          { icon: CheckCircle2, color: '#f97316', label: 'Concerns use extreme doses', body: 'High-dose studies don\'t apply to regulated water systems' },
         ].map((item, i) => {
           const Icon = item.icon;
           return (
             <motion.div key={i} className="bg-[#1e293b] border border-[#334155] rounded-[24px] px-7 py-5 flex items-center gap-5 w-full"
-              initial={{ x: -40, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.8 + i * 0.3, ...SPRING_SMOOTH }}>
+              initial={{ x: 40, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.8 + i * 0.3, ...SPRING_SMOOTH }}>
               <div className="w-[58px] h-[58px] rounded-full flex items-center justify-center shrink-0"
                 style={{ backgroundColor: `${item.color}20`, border: `3px solid ${item.color}40` }}>
                 <Icon size={28} color={item.color} strokeWidth={1.8} />
@@ -44,9 +44,9 @@ export function Scene3() {
       <div className="absolute w-full px-12 text-center z-20" style={{ bottom: BOTTOM_SAFE_ZONE_PX + 80 }}>
         <motion.h2 className="text-[#f8fafc] text-[46px] font-bold uppercase tracking-wider font-display leading-tight"
           initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 1.8 }}>
-          Short + Early
+          Drink Up,
           <motion.span className="text-[#10b981] block mt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.4, ...SPRING_SNAPPY }}>
-            = Safe
+            It's Safe
           </motion.span>
         </motion.h2>
       </div>

@@ -23,7 +23,7 @@ export const CANVAS_STYLE = {
 // the exported MP4 length so the record/export control captures the full video.
 // EP 55 — "Does Washing Your Hair Every Day Cause Baldness?"
 export const SCENE_DURATIONS = {
-  0: 4500, // Hook: napping duration/timing icons
+  0: 4500, // Hook: ep55 build template
   1: 6500, // Evidence: 3 fact cards (shedding/genetics/scalp)
   2: 6500, // Mechanism: what washing does vs doesn't do
   3: 5500, // Takeaway: genes not shower
