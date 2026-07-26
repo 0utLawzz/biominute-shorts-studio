@@ -64,10 +64,10 @@ Copy the template below and add it to the appropriate section.
 
 - **Type:** Bug / Documentation
 - **File(s):** `scripts/src/seed-episodes.ts`, `scripts/src/read-master-sheet.ts`, `exports/production-log.md`
-- **Status:** Fixed. The latest workbook is `attached_assets/BioMinute-Master-Workbook.xlsx` with sheet `Production`. All seed/read scripts point to the current workbook. Older `BioMinute-Episode-Master-Plan_*.xlsx` references should be considered deprecated.
-- **Description:** Older references call the sheet `Content_Master`, but the current master XLSX uses `Episode Master Plan`. Code has been updated to the new sheet name, but older docs, memory, and third-party tooling may still reference the old name.
+- **Status:** Fixed. The latest workbook is `attached_assets/BioMinute-Master-Workbook_1785093582748.xlsx` with sheets `Production`, `Social`, `Schedule`. All seed/read scripts point to the current workbook. Older workbook references should be considered deprecated.
+- **Description:** Older references used different file names or sheet names, which caused confusion.
 - **Impact:** Outdated references can cause confusion or silent failures if a tool reads the wrong sheet.
-- **Proposed fix:** Audit all references and align them to `Episode Master Plan`.
+- **Proposed fix:** Audit all references and align them to the current workbook and sheets.
 
 ### Export pipeline dependency on system libraries
 

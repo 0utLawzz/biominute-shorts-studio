@@ -6,7 +6,7 @@ Full production workflow: from a new episode row in the master plan to a publish
 
 ## 1. Plan the episode
 
-1. Open `attached_assets/BioMinute-Episode-Master-Plan_1783893698840.xlsx` (sheet `Episode Master Plan`).
+1. Open `attached_assets/BioMinute-Master-Workbook_1785093582748.xlsx` (sheets `Production`, `Social`, `Schedule`).
 2. Read the target episode's row for the exact script, citation, visual direction, CTA, hashtags, and thumbnail prompt.
 3. Confirm the post date, season, and episode number.
 
@@ -23,7 +23,7 @@ Full production workflow: from a new episode row in the master plan to a publish
 5. Run the reels dev server and review the animation:
 
    ```bash
-   pnpm --filter @workspace/biominute-reels run dev
+   BASE_PATH=/biominute-reels/ pnpm --filter @workspace/biominute-reels run dev
    ```
 
 6. Confirm the canvas is 1080×1920 and all text is inside the safe zones.
@@ -62,7 +62,7 @@ pnpm --filter @workspace/scripts exec tsx ./src/verify-export.ts exports/Episode
 
 1. Open `exports/production-log.md`.
 2. Set the episode's status to `Complete`, add the date, and write a short note.
-3. (Optional) Regenerate the static dashboard:
+3. Regenerate the static dashboard:
 
    ```bash
    pnpm run dashboard:generate
@@ -88,10 +88,28 @@ pnpm --filter @workspace/scripts exec tsx ./src/verify-export.ts exports/Episode
 
 ## 6. Publish to YouTube
 
+### Scheduled publish (recommended)
+
 1. Make sure the YouTube secrets (`YOUTUBE_CLIENT_ID`, `YOUTUBE_CLIENT_SECRET`, `YOUTUBE_REFRESH_TOKEN`) are set.
-2. On the approved episode detail page, click **Publish to YouTube**.
-3. The API server uploads the MP4 via the YouTube Data API v3.
-4. If a schedule date is set, the video is uploaded as private and YouTube flips it to public at the scheduled time.
+2. On the approved episode detail page, set a future `scheduledPublishAt` and click **Publish to YouTube**.
+3. The API server uploads the MP4 as private; YouTube flips it to public at the scheduled time.
+4. The DB status becomes `scheduled` and the `youtubeVideoId` is saved.
+
+### Immediate publish
+
+If you want an episode live right now, use the manual script:
+
+```bash
+pnpm --filter @workspace/scripts exec tsx ./src/upload-now.ts <EP_NUMBER>
+```
+
+### Regenerate a YouTube refresh token
+
+If the upload starts failing with `401 Invalid Credentials`, the refresh token may be expired. Run:
+
+```bash
+pnpm --filter @workspace/scripts exec tsx ./src/youtube-reauth.ts
+```
 
 ---
 
@@ -108,4 +126,4 @@ This stages, commits, and pushes the new `exports/Episode-NN-slug/` folder and u
 ## Audio policy
 
 - Background music and scene SFX are part of the **video reels** only.
-- The publishing dashboard, investor deck, and mockup sandbox do **not** play background music or sound effects.
+- The publishing dashboard does **not** play background music or sound effects.

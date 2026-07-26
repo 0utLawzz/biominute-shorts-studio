@@ -109,19 +109,50 @@ If you want episodes to land in season playlists, you need the playlist ID for e
 2. **Add the Pages API product**
    - In the app dashboard, add **Facebook Login for Business** and **Pages API**.
 
-3. **Get a Page access token**
+3. **Get a short-lived User access token**
    - Use the Graph API Explorer (https://developers.facebook.com/tools/explorer/).
    - Select your app, get a User access token with `pages_manage_posts` and `pages_read_engagement` permissions.
-   - Exchange it for a Page access token for the page you want to post to.
-   - Page access tokens expire after ~60 days unless you use a System User token from a Business Manager.
 
-4. **Store the token**
+4. **Extend the User token to long-lived (60 days)**
+   Facebook short-lived User tokens expire in ~1 hour. Exchange it for a long-lived token:
+
+   ```bash
+   curl -X GET "https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=YOUR_APP_ID&client_secret=YOUR_APP_SECRET&fb_exchange_token=SHORT_LIVED_USER_TOKEN"
+   ```
+
+   The response contains an `access_token` that lasts **60 days**.
+
+5. **Exchange the long-lived User token for a Page access token**
+
+   ```bash
+   curl -X GET "https://graph.facebook.com/v19.0/me/accounts?access_token=LONG_LIVED_USER_TOKEN"
+   ```
+
+   Find the target page in the response and copy its `access_token` field. This is your Page access token.
+
+6. **(Optional) Get a never-expiring System User token**
+   For a production pipeline that never expires, create a **System User** in Meta Business Manager:
+   - Business Manager → Settings → System Users → Add.
+   - Assign the System User to the app and page.
+   - Generate a token with `pages_manage_posts` and `pages_read_engagement`.
+   - This token does not expire unless revoked.
+
+7. **Store the token**
    - Add a new Replit Secret, e.g., `FACEBOOK_PAGE_ACCESS_TOKEN`.
    - Update the API server to read it and add a `POST /episodes/:id/publish-facebook` route.
 
-5. **Known limitations**
+8. **Known limitations**
    - Facebook Reels uploads via API are restricted; most integrations fall back to regular video uploads.
    - Vertical video will still display as a Reel-ish format in-feed, but it may not enter the Reels tab automatically.
+
+### Token lifetimes at a glance
+
+| Token type | Default lifetime | How to renew |
+|------------|------------------|--------------|
+| Short-lived User token | ~1 hour | Re-authorize in Graph API Explorer |
+| Long-lived User token | 60 days | Re-run the `fb_exchange_token` call |
+| Page access token | 60 days (if from long-lived User token) | Re-run `me/accounts` with a fresh long-lived User token |
+| System User token | Never expires (until revoked) | Regenerate in Business Manager |
 
 ---
 

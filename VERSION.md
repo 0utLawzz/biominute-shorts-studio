@@ -2,6 +2,26 @@
 
 Project follows [Semantic Versioning](https://semver.org/).
 
+## v0.2.0 — 2026-07-26
+
+### Added
+- Expanded episode master workbook from 50 to 100 regular episodes + 2 test slots.
+- Seed rules for episodes 51–65 (`approved`) and 66–100 (`scripted`) while preserving live state for 1–50.
+- Live pipeline status header in the publishing dashboard Navbar (`/api/episodes/stats` + system-health readout).
+- Social platform connection guide (`docs/Social-Platforms-Setup.md`) covering YouTube, Facebook, TikTok, Instagram, X/Twitter, and LinkedIn.
+- Neon PR branch automation workflow (`.github/workflows/neon_workflow.yml`) that creates a database branch for every pull request and deletes it when the PR closes.
+- YouTube re-authorization script (`scripts/src/youtube-reauth.ts`) to generate a fresh `YOUTUBE_REFRESH_TOKEN`.
+
+### Changed
+- Updated project documentation (`README.md`, `docs/INSTALL.md`, `docs/RUN.md`, `docs/USAGE.md`, `docs/CONTRIBUTING.md`) to reflect the 100-episode pipeline and current commands.
+- Publishing dashboard is now the root website artifact (`previewPath = "/"`).
+- Renamed generic `Episode-51-build` … `Episode-55-build` export folders to descriptive slugs.
+- Cleaned up old/duplicate workbook files from `attached_assets/`.
+
+### Fixed
+- Database status for episodes 51–65 now matches their real YouTube state (`scheduled` after upload).
+- Facebook publishing references removed from the dashboard; column kept in the database for historical reference only.
+
 ## v0.1.0 — 2026-07-17
 
 Initial versioned release after production pipeline launch.

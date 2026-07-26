@@ -25,8 +25,8 @@ git --version
 ## 1. Clone the repository
 
 ```bash
-git clone https://github.com/0utLawzz/Health-Channel-Creator.git
-cd Health-Channel-Creator
+git clone https://github.com/0utLawzz/biominute-shorts-studio.git
+cd biominute-shorts-studio
 ```
 
 ---
@@ -60,13 +60,30 @@ All secrets are set through Replit's **Secrets** UI (or your deployment environm
 |--------|---------------|
 | `YOUTUBE_CLIENT_ID` | Google Cloud Console → OAuth 2.0 credentials → Web application. |
 | `YOUTUBE_CLIENT_SECRET` | Same as above. |
-| `YOUTUBE_REFRESH_TOKEN` | Run the OAuth flow once and store the refresh token. |
+| `YOUTUBE_REFRESH_TOKEN` | Run `pnpm --filter @workspace/scripts exec tsx ./src/youtube-reauth.ts` and follow the OAuth flow. |
+| `YOUTUBE_CHANNEL_ID` | https://www.youtube.com/account_advanced while signed in. |
+| `YOUTUBE_CHANNEL_NAME` | Your channel handle (e.g., `@BioMinutesh`). |
+
+### Required for season playlist uploads
+
+| Secret | How to get it |
+|--------|---------------|
+| `YOUTUBE_PLAYLIST_S1` … `YOUTUBE_PLAYLIST_S6` | YouTube Studio → Playlists → open a playlist → copy the `list=` value. |
 
 ### Required for auto-pushing exports to GitHub
 
 | Secret | How to get it |
 |--------|---------------|
 | `GITHUB_TOKEN` | GitHub Settings → Developer settings → Personal access tokens (classic) → `repo` scope. |
+
+### Required for Neon PR branch automation
+
+| Secret | How to get it |
+|--------|---------------|
+| `NEON_API_KEY` | Neon Console → Account → API Keys. |
+| `NEON_PROJECT_ID` | Neon Console → Project settings. Set this as a GitHub repository variable (`vars.NEON_PROJECT_ID`). |
+
+See [`docs/Social-Platforms-Setup.md`](Social-Platforms-Setup.md) for the full platform-specific setup guide.
 
 ---
 
@@ -99,11 +116,11 @@ Push the schema and seed the episodes table:
 # Push the Drizzle schema to PostgreSQL
 pnpm --filter @workspace/db push-force
 
-# Seed 36 episodes from the master XLSX
+# Seed 100 episodes + 2 test slots from the master XLSX
 pnpm --filter @workspace/scripts exec tsx ./src/seed-episodes.ts
 ```
 
-The seed script is idempotent: if the `episodes` table already has rows it skips re-inserting.
+The seed script is idempotent: existing episodes keep their live status and YouTube IDs, while metadata is refreshed from the workbook.
 
 ---
 
@@ -136,4 +153,14 @@ Install the missing system library (`libgbm`) via your package manager. Do not r
 
 ### Master sheet not found during seed
 
-The seed script reads `attached_assets/BioMinute-Episode-Master-Plan_1783893698840.xlsx` from the sheet named `Episode Master Plan`. If you replace the file, keep the same sheet name or update the script.
+The seed script reads `attached_assets/BioMinute-Master-Workbook_1785093582748.xlsx` from the sheets `Production`, `Social`, and `Schedule`. If you replace the file, keep the same sheet names or update the script.
+
+### YouTube upload fails with `401 Invalid Credentials`
+
+Your refresh token may be expired or revoked. Regenerate it with:
+
+```bash
+pnpm --filter @workspace/scripts exec tsx ./src/youtube-reauth.ts
+```
+
+Then paste the new token into Replit Secrets and restart the API server workflow.

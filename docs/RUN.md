@@ -17,39 +17,25 @@ pnpm --filter @workspace/api-server run dev
 - Serves the REST API on the port assigned by Replit (`$PORT`).
 - Required by the publishing dashboard.
 
-### Publishing Dashboard
+### Publishing Dashboard (main website)
 
 ```bash
 pnpm --filter @workspace/publishing-dashboard run dev
 ```
 
-- Browse to the Replit preview path for the dashboard.
+- Browse to the Replit preview path for the dashboard (root `/`).
 - The dashboard calls the API server for episode data and YouTube status.
 
 ### BioMinute Reels (video player)
 
 ```bash
-pnpm --filter @workspace/biominute-reels run dev
+BASE_PATH=/biominute-reels/ pnpm --filter @workspace/biominute-reels run dev
 ```
 
-- Opens a 9:16 vertical canvas.
+- Opens a 9:16 vertical canvas at `/biominute-reels/`.
 - The control bar lets you jump between scenes, loop a scene, and toggle audio.
 - Preview starts muted by default (browser autoplay policy). Use the audio button to unmute.
 - Add `?export` to the URL to hide controls and force audio on for recording/screen capture.
-
-### Investor Deck
-
-```bash
-pnpm --filter @workspace/biominute-deck run dev
-```
-
-- Opens the slide deck. Navigate with arrow keys or on-screen controls.
-
-### Mockup Sandbox (optional design preview)
-
-```bash
-pnpm --filter @workspace/mockup-sandbox run dev
-```
 
 ---
 
@@ -86,14 +72,10 @@ Make sure the reels dev server is running first, then:
 
 ```bash
 # Programmatic export (Playwright + ffmpeg)
-pnpm run export-video
+BIOMINUTE_EXPORT_DIR="exports/Episode-NN-<slug>" pnpm run export-video
 ```
 
-By default it writes to `/tmp/biominute-export/episode.mp4`. Set a custom output folder:
-
-```bash
-BIOMINUTE_EXPORT_DIR="exports/Episode-01-Walk-After-Meals" pnpm run export-video
-```
+By default it writes to `/tmp/biominute-export/episode.mp4`. Set a custom output folder to keep the export in the repo.
 
 ### Verify the export resolution
 
@@ -107,7 +89,29 @@ pnpm --filter @workspace/scripts exec tsx ./src/verify-export.ts exports/Episode
 pnpm run dashboard:generate
 ```
 
-This writes `exports/dashboard.html` from the current `exports/production-log.md`.
+This writes `exports/dashboard.html` from the current database state.
+
+### Upload an episode to YouTube immediately
+
+```bash
+pnpm --filter @workspace/scripts exec tsx ./src/upload-now.ts <EP_NUMBER>
+```
+
+### Upload an episode to YouTube as scheduled
+
+```bash
+pnpm --filter @workspace/scripts exec tsx ./src/schedule-upload.ts <EP_NUMBER>
+```
+
+The video is uploaded as private and YouTube flips it to public at the episode's `scheduledPublishAt`.
+
+### Generate a fresh YouTube refresh token
+
+```bash
+pnpm --filter @workspace/scripts exec tsx ./src/youtube-reauth.ts
+```
+
+Open the printed URL, approve, and paste the printed refresh token into Replit Secrets.
 
 ### Push exports to GitHub
 
