@@ -89,3 +89,4 @@ All required secrets are configured:
 - Use the canonical description template for every YouTube upload.
 - Never upload an episode twice; the upload guard blocks duplicates.
 - Regenerate the dashboard after every export so it stays current.
+- The BioMinute agent skill is at `.agents/skills/biominute/SKILL.md` — it is the source of truth for how a new Replit Agent session should discover the project, build episodes, run the export/publish pipeline, and invoke the security-review subagent.

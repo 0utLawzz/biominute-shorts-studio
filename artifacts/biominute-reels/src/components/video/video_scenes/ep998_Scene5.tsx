@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Clock, CheckCircle } from 'lucide-react';
+import { FlaskConical, CheckCircle } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -18,11 +18,11 @@ export function Scene5() {
       <div className="absolute top-[210px] z-10 w-[90%]">
         <motion.div className="bg-[#1e293b]/90 border border-[#334155] rounded-[40px] p-10 flex flex-col items-center text-center shadow-2xl relative overflow-hidden"
           initial={{ scale: 0.85, opacity: 0, y: 40 }} animate={{ scale: 1, opacity: 1, y: 0 }} transition={{ delay: 0.2, ...SPRING_SMOOTH }}>
-          <div className="absolute top-6 right-8 w-4 h-4 bg-[#10b981] rounded-full" />
-          <motion.div className="flex items-center gap-2 bg-[#10b981]/10 border border-[#10b981]/30 px-5 py-2 rounded-full mb-5"
+          <div className="absolute top-6 right-8 w-4 h-4 bg-[#f97316] rounded-full" />
+          <motion.div className="flex items-center gap-2 bg-[#f97316]/10 border border-[#f97316]/30 px-5 py-2 rounded-full mb-5"
             initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ...SPRING_SMOOTH }}>
-            <Clock size={18} color="#10b981" />
-            <span className="text-[#10b981] font-display font-bold text-[15px] uppercase tracking-wide">TEST-2 Scheduled</span>
+            <FlaskConical size={18} color="#f97316" />
+            <span className="text-[#f97316] font-display font-bold text-[15px] uppercase tracking-wide">TEST-1 Complete</span>
           </motion.div>
           <motion.div initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.6, ...SPRING_SNAPPY }}>
             <div className="w-24 h-24 rounded-full bg-[#10b981] flex items-center justify-center">
@@ -31,16 +31,16 @@ export function Scene5() {
           </motion.div>
           <motion.h2 className="text-[#f8fafc] text-[38px] font-bold uppercase tracking-wider font-display leading-tight mt-7"
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0, duration: 0.8 }}>
-            Scheduler
+            Pipeline
             <span className="text-[#10b981] block mt-2">Smoke Test</span>
-            <span className="text-[#f97316] block mt-1">Armed</span>
+            <span className="text-[#f97316] block mt-1">Passed</span>
           </motion.h2>
         </motion.div>
       </div>
       <motion.div className="absolute w-full px-12 z-30 flex justify-center" style={{ bottom: BOTTOM_SAFE_ZONE_PX + 60 }}
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8, duration: 1 }}>
         <div className="flex items-center gap-4 text-[#94a3b8] text-[20px] font-medium bg-[#0F172A]/90 px-6 py-4 rounded-xl backdrop-blur-sm border border-white/10 shadow-lg">
-          <span className="leading-relaxed text-left">BioMinute • Scheduled Publish Test</span>
+          <span className="leading-relaxed text-left">BioMinute • Immediate Publish Test</span>
         </div>
       </motion.div>
     </motion.div>

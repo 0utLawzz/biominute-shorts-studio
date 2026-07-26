@@ -166,11 +166,20 @@ function findVideoPath(epNumber: number): string {
   const exportsDir = path.resolve(scriptDir, "../../exports");
   const padded = String(epNumber).padStart(2, "0");
   const entries = fs.existsSync(exportsDir) ? fs.readdirSync(exportsDir) : [];
-  const match = entries.find((n) => n.startsWith(`Episode-${padded}-`));
-  if (!match) throw new Error(`No export folder for episode ${epNumber}`);
-  const p = path.join(exportsDir, match, "episode.mp4");
-  if (!fs.existsSync(p)) throw new Error(`episode.mp4 missing: ${p}`);
-  return p;
+  const matches = entries.filter((n) => n.startsWith(`Episode-${padded}-`));
+  if (!matches.length) throw new Error(`No export folder for episode ${epNumber}`);
+  // If multiple folders match, prefer the one whose episode.mp4 is largest
+  // (the real export) over stale placeholder or old build folders.
+  const scored = matches
+    .map((n) => {
+      const p = path.join(exportsDir, n, "episode.mp4");
+      const size = fs.existsSync(p) ? fs.statSync(p).size : 0;
+      return { n, p, size };
+    })
+    .sort((a, b) => b.size - a.size);
+  const best = scored[0];
+  if (!best.size) throw new Error(`episode.mp4 missing or empty for episode ${epNumber}`);
+  return best.p;
 }
 
 // ---------------------------------------------------------------------------
