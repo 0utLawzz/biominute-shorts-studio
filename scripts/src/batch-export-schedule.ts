@@ -38,6 +38,9 @@ const EXPORTS_DIR = path.join(WORKSPACE_ROOT, 'exports');
 const REELS_URL = process.env.BIOMINUTE_EXPORT_URL ?? 'http://localhost:25078/biominute-reels/';
 const EXPORT_SCRIPT = path.join(WORKSPACE_ROOT, 'scripts/src/export-video.ts');
 
+// Standard scene durations for newer episodes without a custom override.
+const DEFAULT_SCENE_DURATIONS = { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 };
+
 // Standard scene durations (matching eps 37-42)
 const SCENE_DURATIONS: Record<number, Record<number, number>> = {
   43: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
@@ -71,6 +74,17 @@ const EP_SLUGS: Record<number, string> = {
   54: 'animal-vs-plant-protein',
   55: 'fluoride-in-water',
 };
+
+function slugify(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 6)
+    .join('-')
+    .replace(/^-|-$/g, '') || 'episode';
+}
 
 // ---------------------------------------------------------------------------
 // Env validation
@@ -298,11 +312,8 @@ async function processEpisode(epNumber: number): Promise<void> {
     return;
   }
 
-  const durations = SCENE_DURATIONS[epNumber];
-  if (!durations) throw new Error(`No SCENE_DURATIONS defined for EP${epNumber}`);
-
-  const slug = EP_SLUGS[epNumber];
-  if (!slug) throw new Error(`No slug defined for EP${epNumber}`);
+  const durations = SCENE_DURATIONS[epNumber] ?? DEFAULT_SCENE_DURATIONS;
+  const slug = EP_SLUGS[epNumber] ?? slugify(ep.hookTitle);
 
   const padded = String(epNumber).padStart(2, '0');
   const exportFolder = path.join(EXPORTS_DIR, `Episode-${padded}-${slug}`);

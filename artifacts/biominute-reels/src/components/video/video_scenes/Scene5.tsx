@@ -22,7 +22,7 @@ export function Scene5() {
           <motion.div className="flex items-center gap-2 bg-[#10b981]/10 border border-[#10b981]/30 px-5 py-2 rounded-full mb-5"
             initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ...SPRING_SMOOTH }}>
             <Clock size={18} color="#10b981" />
-            <span className="text-[#10b981] font-display font-bold text-[15px] uppercase tracking-wide">TEST-2 Scheduled</span>
+            <span className="text-[#10b981] font-display font-bold text-[15px] uppercase tracking-wide">BioMinute</span>
           </motion.div>
           <motion.div initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.6, ...SPRING_SNAPPY }}>
             <div className="w-24 h-24 rounded-full bg-[#10b981] flex items-center justify-center">
@@ -31,16 +31,16 @@ export function Scene5() {
           </motion.div>
           <motion.h2 className="text-[#f8fafc] text-[38px] font-bold uppercase tracking-wider font-display leading-tight mt-7"
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0, duration: 0.8 }}>
-            Scheduler
-            <span className="text-[#10b981] block mt-2">Smoke Test</span>
-            <span className="text-[#f97316] block mt-1">Armed</span>
+            Daily
+            <span className="text-[#10b981] block mt-2">Evidence-Based</span>
+            <span className="text-[#f97316] block mt-1">Health Tips</span>
           </motion.h2>
         </motion.div>
       </div>
       <motion.div className="absolute w-full px-12 z-30 flex justify-center" style={{ bottom: BOTTOM_SAFE_ZONE_PX + 60 }}
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8, duration: 1 }}>
         <div className="flex items-center gap-4 text-[#94a3b8] text-[20px] font-medium bg-[#0F172A]/90 px-6 py-4 rounded-xl backdrop-blur-sm border border-white/10 shadow-lg">
-          <span className="leading-relaxed text-left">BioMinute • Scheduled Publish Test</span>
+          <span className="leading-relaxed text-left">🔔 Subscribe for more BioMinute Shorts</span>
         </div>
       </motion.div>
     </motion.div>
