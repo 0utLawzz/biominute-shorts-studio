@@ -10,3 +10,6 @@
 - [Episode seeding status rules](episode-seeding-status-rules.md) — workbook 51–65 are approved, 66–100 are scripted; existing 1–50 published/scheduled status and post dates are preserved during re-seed.
 - [Dashboard pipeline status header](dashboard-pipeline-status.md) — Navbar shows live counts from /api/episodes/stats and a system-health readout that changes based on building/scheduled/approved/published state.
 - [Social platform setup guide](social-platforms-setup.md) — `docs/Social-Platforms-Setup.md` is the canonical reference for connecting YouTube, Facebook, TikTok, Instagram, X/Twitter, and LinkedIn; YouTube is the only fully integrated platform.
+- [YouTube refresh token lifecycle](youtube-refresh-token-lifecycle.md) — `invalid_grant` means the refresh token is revoked or expired; run `scripts/src/youtube-reauth.ts` and update the Replit secret.
+- [Export folder naming convention](export-folder-naming-convention.md) — export folders must use descriptive slugs (`Episode-51-does-washing-your-hair...`), never generic names like `Episode-51-build`.
+- [Neon PR branch automation](neon-pr-branch-automation.md) — `.github/workflows/neon_workflow.yml` creates a Neon DB branch per PR and deletes it on close; requires `NEON_API_KEY` and `NEON_PROJECT_ID`.
