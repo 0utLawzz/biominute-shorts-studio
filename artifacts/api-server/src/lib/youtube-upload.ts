@@ -379,6 +379,43 @@ export interface RepairVideoResult {
   playlistWarning: string | null;
 }
 
+// ---------------------------------------------------------------------------
+// Token health check — used by GET /youtube/status
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns true if the error message indicates an invalid / revoked refresh token.
+ * Call this in catch blocks around any googleapis call to detect token expiry.
+ */
+export function isInvalidGrantError(err: unknown): boolean {
+  const msg = (err instanceof Error ? err.message : String(err)).toLowerCase();
+  return (
+    msg.includes("invalid_grant") ||
+    msg.includes("token has been expired") ||
+    msg.includes("token_revoked") ||
+    msg.includes("invalid credentials")
+  );
+}
+
+/**
+ * Probes the YouTube API with a minimal channels.list call to verify the
+ * refresh token is still valid. Returns:
+ *   "valid"   — token works
+ *   "expired" — token is revoked / expired (invalid_grant)
+ *   "error"   — some other API / network error (don't surface as expired)
+ */
+export async function checkYouTubeTokenHealth(): Promise<"valid" | "expired" | "error"> {
+  try {
+    const auth = getOAuth2Client();
+    const yt = google.youtube({ version: "v3", auth });
+    await yt.channels.list({ part: ["id"], mine: true, maxResults: 1 });
+    return "valid";
+  } catch (err) {
+    if (isInvalidGrantError(err)) return "expired";
+    return "error";
+  }
+}
+
 /**
  * Retroactively sets privacy status and adds an existing YouTube video to the
  * correct season playlist. Used to fix videos uploaded outside the pipeline.

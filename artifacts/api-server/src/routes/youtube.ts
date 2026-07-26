@@ -11,10 +11,34 @@ import {
   SEASON_PLAYLIST_ENV,
   buildYouTubeDescription,
   assertNotAlreadyPublished,
+  checkYouTubeTokenHealth,
+  isInvalidGrantError,
 } from "../lib/youtube-upload";
 import { logger } from "../lib/logger";
 
 const router = Router();
+
+// ---------------------------------------------------------------------------
+// In-process token health cache — probed once and cached for 10 minutes.
+// Invalidated immediately on any invalid_grant error so the next status
+// poll reflects the real state without waiting for the TTL.
+// ---------------------------------------------------------------------------
+type TokenHealth = "valid" | "expired" | "error";
+let tokenHealthCache: { status: TokenHealth; ts: number } | null = null;
+const TOKEN_HEALTH_TTL_MS = 10 * 60 * 1000;
+
+function invalidateTokenHealthCache() {
+  tokenHealthCache = null;
+}
+
+async function getTokenHealth(): Promise<TokenHealth> {
+  if (tokenHealthCache && Date.now() - tokenHealthCache.ts < TOKEN_HEALTH_TTL_MS) {
+    return tokenHealthCache.status;
+  }
+  const status = await checkYouTubeTokenHealth();
+  tokenHealthCache = { status, ts: Date.now() };
+  return status;
+}
 
 // ---------------------------------------------------------------------------
 // GET /youtube/status
@@ -32,11 +56,22 @@ router.get("/youtube/status", async (_req, res): Promise<void> => {
     playlists[season] = !!process.env[envKey];
   }
 
+  // Probe token health (cached — never adds more than one API call per 10 min)
+  let tokenHealth: TokenHealth | "no_credentials" = "no_credentials";
+  if (hasCredentials) {
+    try {
+      tokenHealth = await getTokenHealth();
+    } catch {
+      tokenHealth = "error";
+    }
+  }
+
   res.json({
     connected: hasCredentials,
     channelName: hasCredentials ? (process.env.YOUTUBE_CHANNEL_NAME ?? null) : null,
     channelId: hasCredentials ? (process.env.YOUTUBE_CHANNEL_ID ?? null) : null,
     playlists,
+    tokenHealth,
   });
 });
 
@@ -246,6 +281,15 @@ router.post("/youtube/publish/:id", async (req, res): Promise<void> => {
     });
   } catch (err) {
     logger.error({ err, episodeId: id }, "YouTube upload failed");
+    if (isInvalidGrantError(err)) {
+      invalidateTokenHealthCache();
+      res.status(502).json({
+        error:
+          "YouTube refresh token is invalid or expired. Run scripts/src/youtube-reauth.ts to generate a new token, then update the YOUTUBE_REFRESH_TOKEN secret.",
+        errorCode: "INVALID_GRANT",
+      });
+      return;
+    }
     res.status(502).json({
       error: err instanceof Error ? err.message : "YouTube upload failed",
     });
