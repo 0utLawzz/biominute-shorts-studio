@@ -3,7 +3,6 @@ import { useParams, useLocation, Link } from "wouter";
 import { 
   useGetEpisode, 
   useUpdateEpisode, 
-  useApproveEpisode, 
   usePublishToYouTube,
   useGetYouTubeStatus,
   useRunProduction,
@@ -26,13 +25,11 @@ export default function EpisodeDetail() {
   const { data: episode, isLoading, refetch } = useGetEpisode(id, { query: { enabled: !!id, queryKey: ["/api/episodes", id] } });
   const { data: ytStatus } = useGetYouTubeStatus();
   const updateMutation = useUpdateEpisode();
-  const approveMutation = useApproveEpisode();
   const publishMutation = usePublishToYouTube();
   const runProductionMutation = useRunProduction();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<Partial<EpisodeUpdate>>({});
-  const [confirmApprove, setConfirmApprove] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<string>("");
   const [fbStatus, setFbStatus] = useState<{ connected: boolean } | null>(null);
   const [fbIsPending, setFbIsPending] = useState(false);
@@ -92,23 +89,6 @@ export default function EpisodeDetail() {
         },
         onError: () => {
           toast({ title: "Error", description: "Failed to update metadata.", variant: "destructive" });
-        }
-      }
-    );
-  };
-
-  const handleApprove = () => {
-    if (!confirmApprove) {
-      setConfirmApprove(true);
-      return;
-    }
-    approveMutation.mutate(
-      { id },
-      {
-        onSuccess: () => {
-          setConfirmApprove(false);
-          refetch();
-          toast({ title: "Approved", description: "Episode is approved and ready for publishing.", className: "bg-[#0A6B52] text-white border-2 border-black rounded-none" });
         }
       }
     );
@@ -272,18 +252,7 @@ export default function EpisodeDetail() {
 
           {/* ACTION BUTTONS */}
           <div className="flex flex-col gap-3 min-w-[200px]">
-            {episode.status === "review" && (
-              <button 
-                onClick={handleApprove}
-                disabled={approveMutation.isPending}
-                className={`brutal-btn flex items-center justify-center gap-2 py-3 ${confirmApprove ? 'bg-[#0A6B52] text-white' : 'brutal-btn-primary'}`}
-              >
-                {approveMutation.isPending ? <Loader2 className="animate-spin w-5 h-5" /> : <CheckCircle className="w-5 h-5" />}
-                {confirmApprove ? "CONFIRM APPROVE?" : "APPROVE EPISODE"}
-              </button>
-            )}
-
-            {(episode.status === "approved" || episode.status === "scheduled") && (
+            {(episode.status === "complete" || episode.status === "scheduled") && (
               <button 
                 onClick={handlePublish}
                 disabled={publishMutation.isPending || (!ytStatus?.connected)}
@@ -317,7 +286,7 @@ export default function EpisodeDetail() {
             {/* Facebook publish — show when credentials are present and not yet posted */}
             {fbStatus?.connected &&
               !episode.facebookVideoId &&
-              ["approved", "building", "scheduled", "published"].includes(episode.status) && (
+              ["building", "scheduled", "published", "complete"].includes(episode.status) && (
               <button
                 onClick={handlePublishFacebook}
                 disabled={fbIsPending}
@@ -371,7 +340,7 @@ export default function EpisodeDetail() {
                   onChange={(e) => setPendingStatus(e.target.value)}
                   className="flex-1 font-mono text-xs border-[2px] border-[#0C0C0C] bg-[#FAF7EE] px-2 py-2 shadow-[2px_2px_0_#0C0C0C] focus:outline-none uppercase"
                 >
-                  {(["draft","scripted","review","approved","scheduled","published","building","rejected"] as const).map(s => (
+                  {(["draft","scripted","complete","scheduled","published","building"] as const).map(s => (
                     <option key={s} value={s}>{s.toUpperCase()}</option>
                   ))}
                 </select>
@@ -533,7 +502,7 @@ export default function EpisodeDetail() {
               <h2 className="font-display text-2xl mb-4">Timeline</h2>
               <div className="space-y-4 border-l-2 border-[#0C0C0C] ml-2 pl-4 relative">
                 <TimelineItem date={episode.createdAt} label="Created" color="bg-[#555]" />
-                {episode.approvedAt && <TimelineItem date={episode.approvedAt} label="Approved" color="bg-[#0A6B52]" />}
+                {episode.approvedAt && <TimelineItem date={episode.approvedAt} label="Completed" color="bg-[#0A6B52]" />}
                 {episode.publishedAt && <TimelineItem date={episode.publishedAt} label="Published" color="bg-[#8B2FC9]" />}
               </div>
             </div>

@@ -18,11 +18,11 @@ export type EpisodeStatus = typeof EpisodeStatus[keyof typeof EpisodeStatus];
 
 export const EpisodeStatus = {
   draft: 'draft',
+  scripted: 'scripted',
   complete: 'complete',
-  review: 'review',
-  approved: 'approved',
   scheduled: 'scheduled',
   published: 'published',
+  building: 'building',
 } as const;
 
 export interface Episode {
@@ -62,11 +62,11 @@ export type EpisodeUpdateStatus = typeof EpisodeUpdateStatus[keyof typeof Episod
 
 export const EpisodeUpdateStatus = {
   draft: 'draft',
+  scripted: 'scripted',
   complete: 'complete',
-  review: 'review',
-  approved: 'approved',
   scheduled: 'scheduled',
   published: 'published',
+  building: 'building',
 } as const;
 
 export interface EpisodeUpdate {
@@ -79,11 +79,11 @@ export interface EpisodeUpdate {
 
 export type EpisodeStatsByStatus = {
   draft: number;
+  scripted: number;
   complete: number;
-  review: number;
-  approved: number;
   scheduled: number;
   published: number;
+  building: number;
 };
 
 export interface EpisodeStats {
@@ -168,17 +168,6 @@ export interface RunProductionResult {
   message: string;
 }
 
-export interface RejectEpisodeBody {
-  buildNote?: string;
-}
-
-export interface RejectEpisodeResponse {
-  id: number;
-  status: string;
-  /** @nullable */
-  buildNote?: string | null;
-}
-
 export type ListEpisodesParams = {
 status?: ListEpisodesStatus;
 season?: string;
@@ -189,10 +178,10 @@ export type ListEpisodesStatus = typeof ListEpisodesStatus[keyof typeof ListEpis
 
 export const ListEpisodesStatus = {
   draft: 'draft',
+  scripted: 'scripted',
   complete: 'complete',
-  review: 'review',
-  approved: 'approved',
   scheduled: 'scheduled',
   published: 'published',
+  building: 'building',
 } as const;
 

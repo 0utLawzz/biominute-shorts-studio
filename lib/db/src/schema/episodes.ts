@@ -6,12 +6,9 @@ export const episodeStatusEnum = pgEnum("episode_status", [
   "draft",
   "scripted",
   "complete",
-  "review",
-  "approved",
   "scheduled",
   "published",
   "building",
-  "rejected",
 ]);
 
 export const episodesTable = pgTable("episodes", {

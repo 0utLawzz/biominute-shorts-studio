@@ -21,8 +21,6 @@ export * from './listEpisodesStatus';
 export * from './publishRequest';
 export * from './publishRequestPrivacyStatus';
 export * from './publishResult';
-export * from './rejectEpisodeBody';
-export * from './rejectEpisodeResponse';
 export * from './runProductionResult';
 export * from './youTubeAuthUrl';
 export * from './youTubeStatus';

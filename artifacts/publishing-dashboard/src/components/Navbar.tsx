@@ -14,7 +14,7 @@ const NAV_LINKS = [
 
 const STATUS_PILLS = [
   { key: "published", label: "Pub", icon: CheckCircle2, color: "#8B2FC9", href: "/published" },
-  { key: "approved", label: "Apr", icon: CalendarCheck, color: "#0A6B52", href: "/" },
+  { key: "complete", label: "Cmp", icon: CalendarCheck, color: "#0A6B52", href: "/" },
   { key: "building", label: "Bld", icon: Hammer, color: "#C9A800", href: "/building" },
   { key: "scheduled", label: "Sch", icon: Clock, color: "#0D9970", href: "/scheduled" },
 ];
@@ -27,7 +27,7 @@ export function Navbar() {
   const byStatus = stats?.byStatus;
   const total = stats?.total ?? 0;
   const published = byStatus?.published ?? 0;
-  const approved = byStatus?.approved ?? 0;
+  const complete = byStatus?.complete ?? 0;
   const building = byStatus?.building ?? 0;
   const scheduled = byStatus?.scheduled ?? 0;
 
@@ -38,7 +38,7 @@ export function Navbar() {
   let systemStatus = { text: "SYSTEM READY", color: "#0A6B52" };
   if (building > 0) systemStatus = { text: `${building} RENDERING`, color: "#C9A800" };
   else if (scheduled > 0) systemStatus = { text: `${scheduled} QUEUED`, color: "#0D9970" };
-  else if (approved > 0) systemStatus = { text: `${approved} NEED BUILD`, color: "#C94A00" };
+  else if (complete > 0) systemStatus = { text: `${complete} READY TO PUBLISH`, color: "#0A6B52" };
   else if (published === total && total > 0) systemStatus = { text: "ALL PUBLISHED", color: "#8B2FC9" };
 
   return (

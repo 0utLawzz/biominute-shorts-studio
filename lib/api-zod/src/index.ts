@@ -15,8 +15,8 @@ export {
   type PublishRequest,
   type PublishRequestPrivacyStatus,
   type PublishResult,
-  type RejectEpisodeBody,
-  type RejectEpisodeResponse,
+  // type RejectEpisodeBody, — removed with manual rejection
+  // type RejectEpisodeResponse, — removed with manual rejection
   type RunProductionResult,
   type YouTubeAuthUrl,
   type YouTubeStatus,

@@ -4,10 +4,9 @@ const STATUS_COLORS: Record<string, { border: string, text: string, bg: string }
   draft: { border: "rgba(12,12,12,0.40)", text: "#555555", bg: "rgba(12,12,12,0.05)" },
   scripted: { border: "#2563EB", text: "#1d4ed8", bg: "rgba(37,99,235,0.10)" },
   complete: { border: "#0D9970", text: "#0A6B52", bg: "rgba(13,153,112,0.12)" },
-  review: { border: "#C94A00", text: "#C94A00", bg: "rgba(201,74,0,0.12)" },
-  approved: { border: "#0A6B52", text: "#0A6B52", bg: "rgba(10,107,82,0.12)" },
   scheduled: { border: "#C9A800", text: "#8a6800", bg: "rgba(201,168,0,0.12)" },
   published: { border: "#8B2FC9", text: "#8B2FC9", bg: "rgba(139,47,201,0.12)" },
+  building: { border: "#C94A00", text: "#C94A00", bg: "rgba(201,74,0,0.12)" },
 };
 
 export function StatusBadge({ status, className = "" }: { status: string; className?: string }) {

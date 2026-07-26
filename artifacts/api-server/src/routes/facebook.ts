@@ -54,9 +54,9 @@ router.post("/facebook/publish/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  if (!["approved", "building", "scheduled", "published"].includes(episode.status)) {
+  if (!["building", "scheduled", "published", "complete"].includes(episode.status)) {
     res.status(400).json({
-      error: "Episode must be approved or later before posting to Facebook.",
+      error: "Episode must be building, complete, scheduled, or published before posting to Facebook.",
     });
     return;
   }

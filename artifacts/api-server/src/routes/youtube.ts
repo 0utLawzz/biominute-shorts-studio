@@ -151,8 +151,8 @@ router.post("/youtube/publish/:id", async (req, res): Promise<void> => {
       return;
     }
 
-    if (episode.status !== "approved") {
-      res.status(400).json({ error: "Episode must be approved before publishing" });
+    if (!["scheduled", "complete"].includes(episode.status)) {
+      res.status(400).json({ error: "Episode must be complete or scheduled before publishing" });
       return;
     }
 
@@ -188,8 +188,8 @@ router.post("/youtube/publish/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  if (episode.status !== "approved") {
-    res.status(400).json({ error: "Episode must be approved before publishing" });
+  if (!["scheduled", "complete"].includes(episode.status)) {
+    res.status(400).json({ error: "Episode must be complete or scheduled before publishing" });
     return;
   }
 

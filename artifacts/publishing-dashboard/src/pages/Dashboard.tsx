@@ -28,7 +28,7 @@ export default function Dashboard() {
   ];
 
   const STATUS_FILTERS = [
-    "all", "draft", "scripted", "review", "approved", "scheduled", "published", "building", "rejected"
+    "all", "draft", "scripted", "complete", "scheduled", "published", "building"
   ] as const;
 
   const [now, setNow] = useState(() => new Date());
@@ -84,7 +84,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <StatCard label="Total" value={stats?.total} loading={statsLoading} color="bg-[#FAF7EE]" />
             <StatCard label="Published" value={stats?.byStatus.published} loading={statsLoading} color="bg-[#FAF7EE]" textColor="text-[#8B2FC9]" />
-            <StatCard label="Approved" value={stats?.byStatus.approved} loading={statsLoading} color="bg-[#FAF7EE]" textColor="text-[#0A6B52]" />
+            <StatCard label="Complete" value={stats?.byStatus.complete} loading={statsLoading} color="bg-[#FAF7EE]" textColor="text-[#0A6B52]" />
             <StatCard label="Building" value={stats?.byStatus.building} loading={statsLoading} color="bg-[#FAF7EE]" textColor="text-[#C9A800]" href="/building" />
             <StatCard label="Scheduled" value={stats?.byStatus.scheduled} loading={statsLoading} color="bg-[#FAF7EE]" textColor="text-[#0A6B52]" href="/scheduled" />
           </div>

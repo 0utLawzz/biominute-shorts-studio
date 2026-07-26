@@ -42,8 +42,8 @@ export function EpisodeCard({ episode }: { episode: Episode }) {
               <Calendar className="w-4 h-4 text-[#0A6B52]" />
               {formatPKT(episode.postDate)}
             </div>
-            {episode.status === "approved" && (
-              <span className="text-[#C94A00] uppercase tracking-wider">Ready</span>
+            {episode.status === "complete" && (
+              <span className="text-[#0A6B52] uppercase tracking-wider">Complete</span>
             )}
           </div>
         </div>

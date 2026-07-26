@@ -43,7 +43,7 @@ function workbookStatusToDb(status: string): DbStatus {
   if (s.includes("published")) return "published";
   if (s.includes("complete") || s.includes("approved")) return "complete";
   if (s.includes("scripted")) return "scripted";
-  if (s.includes("test")) return "approved"; // test episodes are ready to publish
+  if (s.includes("test")) return "complete"; // test episodes are ready to schedule
   return "draft";
 }
 
@@ -149,8 +149,8 @@ async function main() {
     const dbStatus = workbookStatusToDb(p.status);
     let status: DbStatus = exported && dbStatus === "draft" ? "complete" : dbStatus;
 
-    // User directive: new batch 51–65 are approved, 66–100 are scripted.
-    if (epNumber >= 51 && epNumber <= 65) status = "approved";
+    // User directive: new batch 51–65 are complete, 66–100 are scripted.
+    if (epNumber >= 51 && epNumber <= 65) status = "complete";
     else if (epNumber >= 66 && epNumber <= 100) status = "scripted";
 
     const citationText = s.citation || p.citation || "";
@@ -182,7 +182,7 @@ async function main() {
   const testEpisodes: (typeof episodesTable.$inferInsert)[] = [
     {
       epNumber: 998,
-      status: "approved",
+      status: "complete",
       dateBuilt: null,
       postDate: "",
       season: "S1: Morning Habits",
@@ -199,7 +199,7 @@ async function main() {
     },
     {
       epNumber: 999,
-      status: "approved",
+      status: "complete",
       dateBuilt: null,
       postDate: "",
       season: "S1: Morning Habits",
@@ -245,24 +245,23 @@ async function main() {
     // AND keep their existing post/schedule dates so we don't wipe real history.
     const preserveLiveState = row.epNumber <= 50 && LOCKED_STATUSES.has(currentStatus);
 
-    // 51–65 are explicitly marked approved (not scheduled) per user request.
-    const markApproved = row.epNumber >= 51 && row.epNumber <= 65;
+    // 51–65 are explicitly marked complete per user request.
+    const markComplete = row.epNumber >= 51 && row.epNumber <= 65;
 
     // scheduledPublishAt is recomputed from postDate + 09:00 UTC whenever a postDate
-    // is present (fixes cumulative-drift bugs). For approved/scripted without a date, clear it.
+    // is present (fixes cumulative-drift bugs). For complete/scripted without a date, clear it.
     let scheduledPublishAt: Date | null | undefined = undefined; // undefined = leave unchanged
-    if (row.postDate && !preserveLiveState && !markApproved) {
+    if (row.postDate && !preserveLiveState) {
       const d = new Date(`${row.postDate}T09:00:00Z`);
       if (!Number.isNaN(d.getTime())) scheduledPublishAt = d;
     } else if (!row.postDate && !preserveLiveState) {
       scheduledPublishAt = null;
     }
 
-    // Only overwrite status when the episode is NOT already live (1–50 published/scheduled),
-    // OR when the user explicitly asked for the 51–65 batch to be approved.
+    // Only overwrite status when the episode is NOT already live (1–50 published/scheduled).
     let statusOverride: { status?: DbStatus } = {};
-    if (markApproved) {
-      statusOverride = { status: "approved" };
+    if (markComplete) {
+      statusOverride = { status: "complete" };
     } else if (!preserveLiveState) {
       statusOverride = { status: row.status };
     }

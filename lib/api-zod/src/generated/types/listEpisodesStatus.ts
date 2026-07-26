@@ -11,9 +11,9 @@ export type ListEpisodesStatus = typeof ListEpisodesStatus[keyof typeof ListEpis
 
 export const ListEpisodesStatus = {
   draft: 'draft',
+  scripted: 'scripted',
   complete: 'complete',
-  review: 'review',
-  approved: 'approved',
   scheduled: 'scheduled',
   published: 'published',
+  building: 'building',
 } as const;

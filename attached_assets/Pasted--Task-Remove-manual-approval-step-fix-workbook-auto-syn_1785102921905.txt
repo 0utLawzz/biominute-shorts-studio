@@ -1,0 +1,254 @@
+# Task: Remove manual approval step + fix workbook auto-sync + fix Dashboard category filters
+
+Repo: biominute-shorts-studio (this workspace)
+Context: The pipeline currently requires a human to click "Approve" on the Preview Queue
+page before an episode can be scheduled/published. We are removing that manual gate so
+the pipeline runs: **content ready → auto-scheduled → published**, with no human click.
+
+We also need the master workbook (`attached_assets/BioMinute-Master-Workbook_*.xlsx`) to
+sync into the Dashboard reliably, and the Season/Category tabs on the Dashboard to keep
+working after these changes.
+
+Do NOT change: video export logic (`export-video.ts`), YouTube upload logic
+(`youtube-upload.ts`), or the visual design/theme of any page. Only touch what's listed below.
+
+---
+
+## STEP 1 — Database schema: drop "review" / "approved" / "rejected" as separate states
+
+File: `lib/db/src/schema/episodes.ts`
+
+Change the `episodeStatusEnum` from:
+```ts
+export const episodeStatusEnum = pgEnum("episode_status", [
+  "draft", "scripted", "complete", "review", "approved", "scheduled", "published", "building", "rejected",
+]);
+```
+to:
+```ts
+export const episodeStatusEnum = pgEnum("episode_status", [
+  "draft", "scripted", "complete", "scheduled", "published", "building",
+]);
+```
+
+Rationale: "review" and "approved" were the manual gate; "rejected" was the manual reject
+outcome. None of these are needed once approval is automatic. An episode that is content-complete
+moves straight to "scheduled" once it has a post date, computed exactly the way the old
+`/episodes/:id/approve` endpoint did it (see Step 3).
+
+After editing the schema, run the migration:
+```
+cd lib/db && pnpm exec drizzle-kit push --force --config ./drizzle.config.ts
+```
+
+**Before running this**, write a one-off data-migration script `lib/db/src/migrate-remove-approval-states.ts`
+that runs first and remaps any existing rows so nothing gets stuck on a status value that
+no longer exists:
+- `review` → `complete`
+- `approved` → `scheduled` (and if `scheduledPublishAt` is null, compute it from `postDate` + `09:00:00Z`, same formula as the old approve endpoint)
+- `rejected` → `draft` (send it back to the top so it gets reworked)
+
+Run this script BEFORE `drizzle-kit push --force`, using raw SQL (since the enum values
+still exist in the DB until the push runs):
+```sql
+UPDATE episodes SET status = 'complete' WHERE status = 'review';
+UPDATE episodes SET status = 'scheduled', scheduled_publish_at = COALESCE(scheduled_publish_at, (post_date || 'T09:00:00Z')::timestamptz) WHERE status = 'approved' AND post_date IS NOT NULL AND post_date != '';
+UPDATE episodes SET status = 'complete' WHERE status = 'approved';
+UPDATE episodes SET status = 'draft' WHERE status = 'rejected';
+```
+
+---
+
+## STEP 2 — Zod/generated types
+
+File(s): `lib/api-zod/src/generated/types/episodeStatus.ts`,
+`lib/api-zod/src/generated/types/listEpisodesStatus.ts`,
+`lib/api-zod/src/generated/types/episodeUpdateStatus.ts`,
+`lib/api-zod/src/generated/api.ts`,
+`lib/api-client-react/src/generated/api.schemas.ts`
+
+These are generated from an OpenAPI spec (`lib/api-spec`). Find the spec source (likely
+`lib/api-spec/src/*.ts` or a `.yaml`/`.json` file defining the episode status enum) and
+remove `"review"`, `"approved"`, `"rejected"` from the enum there. Then regenerate:
+```
+pnpm --filter @workspace/api-spec run generate
+```
+(check `package.json` in `lib/api-spec` for the exact generate script name if different).
+Do NOT hand-edit the `generated/` files directly if a generate script exists — always
+regenerate from source so they don't drift again.
+
+---
+
+## STEP 3 — API server: auto-schedule instead of manual approve
+
+File: `artifacts/api-server/src/routes/episodes.ts`
+
+1. Remove the `POST /episodes/:id/approve` and `POST /episodes/:id/reject` routes entirely.
+2. In the `GET /episodes/:id/build-status` route (or wherever `buildStage` is set to
+   `"preview_ready"` / `"exported"` after a successful export), immediately apply the
+   same logic the old `/approve` route used to require a manual click for:
+   ```ts
+   // Auto-schedule: once an episode's build is confirmed exported, move it straight
+   // to "scheduled" (no human approval step). scheduledPublishAt is derived from
+   // postDate + 09:00 UTC, same formula the old manual approve endpoint used.
+   if (videoExists && episode.status !== "scheduled" && episode.status !== "published") {
+     let scheduledPublishAt: Date | null = null;
+     if (episode.postDate) {
+       const d = new Date(`${episode.postDate}T09:00:00Z`);
+       if (!Number.isNaN(d.getTime())) scheduledPublishAt = d;
+     }
+     await db.update(episodesTable).set({
+       status: "scheduled",
+       approvedAt: new Date(), // keep this column as an "auto-cleared-at" timestamp
+       updatedAt: new Date(),
+       ...(scheduledPublishAt ? { scheduledPublishAt } : {}),
+     }).where(eq(episodesTable.id, episode.id));
+   }
+   ```
+3. Update the `EpisodeStatusValue` type at the top of the file — remove `"review" | "approved" | "rejected"`.
+4. Update `GET /episodes/stats` — remove `review`, `approved`, `rejected` from the `byStatus` object.
+5. Search the rest of this file for any other reference to `"approved"` / `"review"` / `"rejected"` and remove.
+
+---
+
+## STEP 4 — Publishing Dashboard frontend
+
+### `artifacts/publishing-dashboard/src/pages/PreviewQueue.tsx`
+This whole page was the manual Approve/Deny screen. Since approval is now automatic:
+- Delete `handleApprove`, `handleReject`, the `useApproveEpisode` import/usage, and the
+  Approve/Reject buttons.
+- Repurpose this page as a **read-only "Recently Auto-Scheduled" log** — list episodes
+  with `status === "scheduled"` ordered by `updatedAt` descending, so Nadeem can still see
+  what the pipeline just did, but with no action buttons. Keep the existing visual style.
+- Update the header text from "Review & Approve" / "AWAITING REVIEW" to something like
+  "Auto-Scheduled Log" / "RECENTLY SCHEDULED".
+
+### `artifacts/publishing-dashboard/src/pages/Dashboard.tsx`
+- In `STATUS_FILTERS`, remove `"review"`, `"approved"`, `"rejected"`:
+  ```ts
+  const STATUS_FILTERS = [
+    "all", "draft", "scripted", "complete", "scheduled", "published", "building",
+  ] as const;
+  ```
+- In the stats grid (`StatCard` components), replace the "Approved" card with a
+  "Complete" card (`stats?.byStatus.complete`) since "approved" no longer exists.
+- Leave the `SEASONS` array (S1–S6) untouched — that part is correct already and not the bug.
+
+### `artifacts/publishing-dashboard/src/components/Navbar.tsx`
+- Remove the `{ key: "approved", label: "Apr", ... }` nav item and the `approved` stat reference.
+  Replace with a `complete` counter if a similar "needs attention" indicator is wanted.
+
+### `artifacts/publishing-dashboard/src/components/EpisodeCard.tsx` and
+### `artifacts/publishing-dashboard/src/pages/EpisodeDetail.tsx`
+- Search for `"review"`, `"approved"`, `"rejected"` (badge colors, labels, conditional
+  rendering) and remove/remap to the new status set. Use the same visual style already
+  used for `"complete"` / `"scheduled"`.
+
+### `artifacts/publishing-dashboard/src/components/StatusBadge.tsx`
+- Remove the color/label mapping entries for `review`, `approved`, `rejected`.
+
+---
+
+## STEP 5 — Facebook & YouTube routes
+
+Files: `artifacts/api-server/src/routes/facebook.ts`, `artifacts/api-server/src/routes/youtube.ts`
+
+Search both for any check like `if (episode.status !== "approved")` gating publish/upload
+actions. Change the gate to `if (episode.status !== "scheduled")` (or whatever the
+new equivalent "ready to publish" status is per this doc). Do not change the actual
+upload/posting logic itself.
+
+---
+
+## STEP 6 — Fix seed-episodes.ts (this is the root cause of "files don't update" + "category system wrong")
+
+File: `scripts/src/seed-episodes.ts`
+
+Problems today:
+- It has hardcoded logic (`if epNumber >= 51 && epNumber <= 65 → status = "approved"`,
+  `if epNumber >= 66 && epNumber <= 100 → status = "scripted"`) that was a one-time hack
+  and breaks for any future episode range.
+- It only runs when someone manually types the pnpm command — nothing triggers it
+  automatically when the workbook file changes.
+
+Fixes:
+1. **Delete the hardcoded range overrides** (the two lines starting with
+   `// User directive: new batch 51–65...`). Status should come purely from
+   `workbookStatusToDb(p.status)` reading the workbook's own "Status" column — that's
+   the single source of truth from now on, no hardcoded ep-number special cases.
+2. Update `workbookStatusToDb()` to map workbook status text to the new (Step 1) enum:
+   ```ts
+   function workbookStatusToDb(status: string): DbStatus {
+     const s = String(status ?? "").toLowerCase();
+     if (s.includes("published")) return "published";
+     if (s.includes("scheduled")) return "scheduled";
+     if (s.includes("complete") || s.includes("approved") || s.includes("test")) return "complete";
+     if (s.includes("scripted")) return "scripted";
+     return "draft";
+   }
+   ```
+3. Add a new npm script in the root `package.json`: `"sync-workbook": "pnpm --filter @workspace/scripts exec tsx ./src/seed-episodes.ts"`.
+4. **Add a "Sync Workbook" button to the Dashboard** so Nadeem never has to touch a
+   terminal:
+   - New API route `POST /api/episodes/sync-workbook` in `artifacts/api-server/src/routes/episodes.ts`
+     that shells out to run the seed script (`spawn`/`execSync` the same way
+     `export-video.ts` already shells out to ffmpeg elsewhere in this repo) and returns
+     `{ inserted, updated }` counts.
+   - New button on `Dashboard.tsx` near "New Episode": **"Sync Workbook"** — calls this
+     route, shows a toast with the inserted/updated counts, then refetches
+     `useListEpisodes` / `useGetEpisodeStats` so the page updates immediately without a
+     manual page reload.
+
+This directly fixes both "Files update nahi" (one click now re-syncs) and the Category
+system (season data will always be fresh after a sync, since season already comes
+correctly from the workbook — it just wasn't being re-read).
+
+---
+
+## STEP 7 — generate-dashboard.ts
+
+File: `scripts/src/generate-dashboard.ts`
+
+Search for `"review"`, `"approved"`, `"rejected"` and remove/remap the same way as Step 4,
+so the static `exports/dashboard.html` snapshot doesn't reference dead statuses.
+
+---
+
+## STEP 8 — Verify
+
+Run in this order:
+```
+pnpm run typecheck
+pnpm run sync-workbook
+```
+Then open the Publishing Dashboard and confirm:
+- [ ] Season tabs (S1–S6) filter episodes correctly
+- [ ] Status filters show only: all, draft, scripted, complete, scheduled, published, building
+- [ ] "Sync Workbook" button works and updates counts live without a manual refresh
+- [ ] Preview Queue page shows a read-only auto-scheduled log, no Approve/Reject buttons
+- [ ] An episode with a completed build and a postDate automatically becomes "scheduled"
+      with the correct `scheduledPublishAt` (postDate + 09:00 UTC) — no manual click needed
+
+---
+
+## STEP 9 — Git commit
+
+Once everything above passes, commit with:
+```
+git add -A
+git commit -m "Remove manual approval step; auto-schedule on export complete; fix workbook sync + add Sync Workbook button; remove hardcoded episode-range logic from seed script"
+git push origin main
+```
+
+Also update:
+- `README.md` — remove any mention of a manual approve/reject step in the workflow description.
+- `VERSION.md` — bump the version and add a changelog line describing this change.
+
+---
+
+### Summary for Nadeem (do not skip)
+At the end, reply with a short plain-English summary of:
+1. Exactly which files were changed
+2. What the new status flow is
+3. How the "Sync Workbook" button works
+4. Confirmation that Category (Season) tabs were tested and work

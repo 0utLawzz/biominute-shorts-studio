@@ -37,7 +37,7 @@ paths:
           in: query
           schema:
             type: string
-            enum: [draft, complete, review, approved, scheduled, published]
+            enum: [draft, scripted, complete, scheduled, published, building]
         - name: season
           in: query
           schema:
@@ -145,25 +145,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/Episode"
 
-  /episodes/{id}/approve:
-    post:
-      operationId: approveEpisode
-      tags: [episodes]
-      summary: Approve an episode for publishing
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Approved episode
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Episode"
-
   /episodes/{id}/build-status:
     get:
       operationId: getBuildStatus
@@ -201,31 +182,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RunProductionResult"
-
-  /episodes/{id}/reject:
-    post:
-      operationId: rejectEpisode
-      tags: [episodes]
-      summary: Reject a building episode
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RejectEpisodeBody"
-      responses:
-        "200":
-          description: Rejected episode
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RejectEpisodeResponse"
 
   /youtube/auth-url:
     get:
@@ -309,7 +265,7 @@ components:
           type: integer
         status:
           type: string
-          enum: [draft, complete, review, approved, scheduled, published]
+          enum: [draft, scripted, complete, scheduled, published, building]
         dateBuilt:
           type: ["string", "null"]
         postDate:
@@ -373,7 +329,7 @@ components:
       properties:
         status:
           type: string
-          enum: [draft, complete, review, approved, scheduled, published]
+          enum: [draft, scripted, complete, scheduled, published, building]
         youtubeTitle:
           type: string
         citationCta:
@@ -393,17 +349,17 @@ components:
           properties:
             draft:
               type: integer
+            scripted:
+              type: integer
             complete:
-              type: integer
-            review:
-              type: integer
-            approved:
               type: integer
             scheduled:
               type: integer
             published:
               type: integer
-          required: [draft, complete, review, approved, scheduled, published]
+            building:
+              type: integer
+          required: [draft, scripted, complete, scheduled, published, building]
         nextPostDate:
           type: ["string", "null"]
         publishedThisMonth:
@@ -529,21 +485,4 @@ components:
           type: string
       required: [success, message]
 
-    RejectEpisodeBody:
-      type: object
-      properties:
-        buildNote:
-          type: string
-
-    RejectEpisodeResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-        status:
-          type: string
-        buildNote:
-          type: ["string", "null"]
-      required:
-        - id
-        - status
+    # REMOVED: RejectEpisodeBody, RejectEpisodeResponse — manual rejection workflow eliminated

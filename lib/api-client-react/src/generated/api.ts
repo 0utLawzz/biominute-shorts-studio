@@ -30,8 +30,6 @@ import type {
   ListEpisodesParams,
   PublishRequest,
   PublishResult,
-  RejectEpisodeBody,
-  RejectEpisodeResponse,
   RunProductionResult,
   YouTubeAuthUrl,
   YouTubeStatus
@@ -599,77 +597,6 @@ export const useUpdateEpisode = <TError = ErrorType<unknown>,
       return useMutation(getUpdateEpisodeMutationOptions(options));
     }
 
-export const getApproveEpisodeUrl = (id: number,) => {
-
-
-
-
-  return `/api/episodes/${id}/approve`
-}
-
-/**
- * @summary Approve an episode for publishing
- */
-export const approveEpisode = async (id: number, options?: RequestInit): Promise<Episode> => {
-
-  return customFetch<Episode>(getApproveEpisodeUrl(id),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-
-
-
-export const getApproveEpisodeMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveEpisode>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof approveEpisode>>, TError,{id: number}, TContext> => {
-
-const mutationKey = ['approveEpisode'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof approveEpisode>>, {id: number}> = (props) => {
-          const {id} = props ?? {};
-
-          return  approveEpisode(id,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ApproveEpisodeMutationResult = NonNullable<Awaited<ReturnType<typeof approveEpisode>>>
-
-    export type ApproveEpisodeMutationError = ErrorType<unknown>
-
-    /**
- * @summary Approve an episode for publishing
- */
-export const useApproveEpisode = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approveEpisode>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof approveEpisode>>,
-        TError,
-        {id: number},
-        TContext
-      > => {
-      return useMutation(getApproveEpisodeMutationOptions(options));
-    }
-
 export const getGetBuildStatusUrl = (id: number,) => {
 
 
@@ -816,78 +743,6 @@ export const useRunProduction = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getRunProductionMutationOptions(options));
-    }
-
-export const getRejectEpisodeUrl = (id: number,) => {
-
-
-
-
-  return `/api/episodes/${id}/reject`
-}
-
-/**
- * @summary Reject a building episode
- */
-export const rejectEpisode = async (id: number,
-    rejectEpisodeBody?: RejectEpisodeBody, options?: RequestInit): Promise<RejectEpisodeResponse> => {
-
-  return customFetch<RejectEpisodeResponse>(getRejectEpisodeUrl(id),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(rejectEpisodeBody)
-  }
-);}
-
-
-
-
-
-export const getRejectEpisodeMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectEpisode>>, TError,{id: number;data?: BodyType<RejectEpisodeBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof rejectEpisode>>, TError,{id: number;data?: BodyType<RejectEpisodeBody>}, TContext> => {
-
-const mutationKey = ['rejectEpisode'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rejectEpisode>>, {id: number;data?: BodyType<RejectEpisodeBody>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  rejectEpisode(id,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type RejectEpisodeMutationResult = NonNullable<Awaited<ReturnType<typeof rejectEpisode>>>
-    export type RejectEpisodeMutationBody = BodyType<RejectEpisodeBody> | undefined
-    export type RejectEpisodeMutationError = ErrorType<unknown>
-
-    /**
- * @summary Reject a building episode
- */
-export const useRejectEpisode = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectEpisode>>, TError,{id: number;data?: BodyType<RejectEpisodeBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
- ): UseMutationResult<
-        Awaited<ReturnType<typeof rejectEpisode>>,
-        TError,
-        {id: number;data?: BodyType<RejectEpisodeBody>},
-        TContext
-      > => {
-      return useMutation(getRejectEpisodeMutationOptions(options));
     }
 
 export const getGetYouTubeAuthUrlUrl = () => {

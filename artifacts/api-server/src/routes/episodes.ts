@@ -6,12 +6,9 @@ import {
   UpdateEpisodeBody,
   GetEpisodeParams,
   UpdateEpisodeParams,
-  ApproveEpisodeParams,
   CreateEpisodeBody,
   GetBuildStatusParams,
   RunProductionParams,
-  RejectEpisodeParams,
-  RejectEpisodeBody,
 } from "@workspace/api-zod";
 import { spawn } from "child_process";
 import { promises as fs, openSync, closeSync, mkdirSync } from "fs";
@@ -22,12 +19,9 @@ type EpisodeStatusValue =
   | "draft"
   | "scripted"
   | "complete"
-  | "review"
-  | "approved"
   | "scheduled"
   | "published"
-  | "building"
-  | "rejected";
+  | "building";
 
 const router = Router();
 
@@ -98,12 +92,9 @@ router.get("/episodes/stats", async (req, res): Promise<void> => {
     draft: 0,
     scripted: 0,
     complete: 0,
-    review: 0,
-    approved: 0,
     scheduled: 0,
     published: 0,
     building: 0,
-    rejected: 0,
   };
 
   for (const ep of all) {
@@ -256,54 +247,8 @@ router.patch("/episodes/:id", async (req, res): Promise<void> => {
   res.json(updated);
 });
 
-// POST /episodes/:id/approve
-router.post("/episodes/:id/approve", async (req, res): Promise<void> => {
-  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const id = parseInt(raw, 10);
-  if (isNaN(id) || id <= 0) {
-    res.status(400).json({ error: "Invalid id" });
-    return;
-  }
-
-  const parsed = ApproveEpisodeParams.safeParse({ id });
-  if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
-    return;
-  }
-
-  const [episode] = await db
-    .select()
-    .from(episodesTable)
-    .where(eq(episodesTable.id, id));
-
-  if (!episode) {
-    res.status(404).json({ error: "Episode not found" });
-    return;
-  }
-
-  // Derive scheduledPublishAt from postDate + 09:00 UTC (= 2:00 PM PKT) so the
-  // scheduler can pick it up without manual entry. This is the authoritative
-  // source of truth — never compute it from the previous episode's scheduled
-  // time (that pattern causes cumulative drift).
-  let scheduledPublishAt: Date | null = null;
-  if (episode.postDate) {
-    const d = new Date(`${episode.postDate}T09:00:00Z`);
-    if (!Number.isNaN(d.getTime())) scheduledPublishAt = d;
-  }
-
-  const [updated] = await db
-    .update(episodesTable)
-    .set({
-      status: "approved",
-      approvedAt: new Date(),
-      updatedAt: new Date(),
-      ...(scheduledPublishAt ? { scheduledPublishAt } : {}),
-    })
-    .where(eq(episodesTable.id, id))
-    .returning();
-
-  res.json(updated);
-});
+// REMOVED: POST /episodes/:id/approve — manual approval workflow eliminated
+// Episodes now auto-advance: build completion (stage=exported) → complete/scheduled
 
 // GET /episodes/:id/build-status
 router.get("/episodes/:id/build-status", async (req, res): Promise<void> => {
@@ -436,49 +381,7 @@ router.post("/episodes/:id/run-production", async (req, res): Promise<void> => {
   res.json({ success: true, message: "Production render started. Poll /build-status for progress." });
 });
 
-// POST /episodes/:id/reject
-router.post("/episodes/:id/reject", async (req, res): Promise<void> => {
-  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const id = parseInt(raw, 10);
-  if (isNaN(id) || id <= 0) {
-    res.status(400).json({ error: "Invalid id" });
-    return;
-  }
-
-  const paramParsed = RejectEpisodeParams.safeParse({ id });
-  if (!paramParsed.success) {
-    res.status(400).json({ error: paramParsed.error.message });
-    return;
-  }
-
-  const bodyParsed = RejectEpisodeBody.safeParse(req.body);
-  if (!bodyParsed.success) {
-    res.status(400).json({ error: bodyParsed.error.message });
-    return;
-  }
-
-  const [episode] = await db
-    .select()
-    .from(episodesTable)
-    .where(eq(episodesTable.id, id));
-
-  if (!episode) {
-    res.status(404).json({ error: "Episode not found" });
-    return;
-  }
-
-  const [updated] = await db
-    .update(episodesTable)
-    .set({
-      status: "rejected",
-      buildNote: bodyParsed.data.buildNote ?? episode.buildNote,
-      updatedAt: new Date(),
-    })
-    .where(eq(episodesTable.id, id))
-    .returning();
-
-  res.json(updated);
-});
+// REMOVED: POST /episodes/:id/reject — manual rejection workflow eliminated
 
 // GET /episodes/:id/video — stream the exported mp4
 router.get("/episodes/:id/video", async (req, res): Promise<void> => {
