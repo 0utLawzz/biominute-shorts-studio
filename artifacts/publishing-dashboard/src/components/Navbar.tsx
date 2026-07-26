@@ -49,12 +49,12 @@ export function Navbar() {
         <span className="text-[#0D9970]">SHORTS</span>
       </Link>
 
-      <nav className="flex gap-1 overflow-x-auto">
+      <nav className="flex items-center gap-0.5 overflow-x-auto shrink min-w-0">
         {NAV_LINKS.map(({ href, label }) => {
           const isActive = href === "/" ? location === "/" : location.startsWith(href);
           return (
             <Link key={href} href={href}>
-              <span className={`whitespace-nowrap font-mono font-bold px-3 py-1 text-xs uppercase cursor-pointer transition-colors border-b-2 ${
+              <span className={`whitespace-nowrap font-mono font-bold px-1.5 py-1 text-[10px] uppercase cursor-pointer transition-colors border-b-2 ${
                 isActive
                   ? "text-[#C9A800] border-[#C9A800]"
                   : "text-[#999] border-transparent hover:text-white"
