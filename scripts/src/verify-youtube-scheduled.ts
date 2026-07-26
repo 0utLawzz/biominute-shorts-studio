@@ -77,8 +77,11 @@ async function main() {
       const snippet = video.snippet;
       const privacy = status?.privacyStatus;
       const publishAt = status?.publishAt;
-      const dbTime = ep.scheduledPublishAt ? new Date(ep.scheduledPublishAt).toISOString() : "N/A";
-      const match = publishAt === dbTime ? "✅" : "⚠️";
+      const publishDate = publishAt ? new Date(publishAt) : null;
+      const dbDate = ep.scheduledPublishAt ? new Date(ep.scheduledPublishAt) : null;
+      const timesMatch = publishDate && dbDate && Math.abs(publishDate.getTime() - dbDate.getTime()) < 1000;
+      const dbTime = dbDate ? dbDate.toISOString() : "N/A";
+      const match = timesMatch ? "✅" : "⚠️";
 
       console.log(
         `EP${ep.epNumber}: ${match} privacy=${privacy} publishAt=${publishAt} db=${dbTime} id=${ep.youtubeVideoId}`,
