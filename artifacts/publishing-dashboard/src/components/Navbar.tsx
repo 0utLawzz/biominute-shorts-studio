@@ -6,7 +6,7 @@ import { useGetEpisodeStats, useGetYouTubeStatus } from "@workspace/api-client-r
 const NAV_LINKS = [
   { href: "/", label: "Dashboard" },
   { href: "/building", label: "Building" },
-  { href: "/preview-queue", label: "Preview Queue" },
+  { href: "/preview-queue", label: "Preview" },
   { href: "/scheduled", label: "Scheduled" },
   { href: "/published", label: "Published" },
   { href: "/analytics", label: "Analytics" },
