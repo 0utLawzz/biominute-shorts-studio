@@ -34,8 +34,18 @@ export default function EpisodeDetail() {
   const [editForm, setEditForm] = useState<Partial<EpisodeUpdate>>({});
   const [confirmApprove, setConfirmApprove] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<string>("");
-  
+  const [fbStatus, setFbStatus] = useState<{ connected: boolean } | null>(null);
+  const [fbIsPending, setFbIsPending] = useState(false);
+
   const initRef = useRef<number | null>(null);
+
+  // Facebook credentials check
+  useEffect(() => {
+    fetch("/api/facebook/status")
+      .then((r) => r.json())
+      .then((data) => setFbStatus(data as { connected: boolean }))
+      .catch(() => setFbStatus({ connected: false }));
+  }, []);
 
   useEffect(() => {
     if (episode && initRef.current !== episode.id) {
@@ -114,6 +124,29 @@ export default function EpisodeDetail() {
         }
       }
     );
+  };
+
+  const handlePublishFacebook = async () => {
+    setFbIsPending(true);
+    try {
+      const res = await fetch(`/api/facebook/publish/${id}`, { method: "POST" });
+      const data = (await res.json()) as { error?: string; message?: string; facebookVideoId?: string };
+      if (!res.ok) throw new Error(data.error ?? "Facebook publish failed");
+      refetch();
+      toast({
+        title: "Posted to Facebook",
+        description: data.message ?? "Uploaded to Facebook Page.",
+        className: "bg-[#1877F2] text-white border-2 border-black rounded-none",
+      });
+    } catch (err) {
+      toast({
+        title: "Facebook Error",
+        description: err instanceof Error ? err.message : "Facebook publish failed",
+        variant: "destructive",
+      });
+    } finally {
+      setFbIsPending(false);
+    }
   };
 
   const handleRunProduction = () => {
@@ -212,6 +245,15 @@ export default function EpisodeDetail() {
               </button>
             )}
 
+            {/* YouTube token expired warning */}
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {(ytStatus as any)?.tokenHealth === "expired" && (
+              <div className="font-mono text-[10px] font-bold text-[#C94A00] border-[1.5px] border-[#C94A00] px-2 py-1.5 bg-[#fff3f0] flex items-start gap-1.5">
+                <span className="shrink-0 mt-0.5">⚠</span>
+                <span>YT token expired — run <code className="bg-[#f0d9d0] px-0.5">youtube-reauth.ts</code> and update the secret.</span>
+              </div>
+            )}
+
             {episode.youtubeVideoId && (
               <a 
                 href={`https://youtube.com/shorts/${episode.youtubeVideoId}`} 
@@ -220,6 +262,40 @@ export default function EpisodeDetail() {
               >
                 <Youtube className="w-5 h-5 text-[#C94A00]" />
                 VIEW ON YOUTUBE
+              </a>
+            )}
+
+            {/* Facebook publish — show when credentials are present and not yet posted */}
+            {fbStatus?.connected &&
+              !episode.facebookVideoId &&
+              ["approved", "building", "scheduled", "published"].includes(episode.status) && (
+              <button
+                onClick={handlePublishFacebook}
+                disabled={fbIsPending}
+                className="brutal-btn flex items-center justify-center gap-2 py-3 text-white border-[2.5px] border-[#0C0C0C]"
+                style={{ backgroundColor: "#1877F2" }}
+              >
+                {fbIsPending ? (
+                  <Loader2 className="animate-spin w-5 h-5" />
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97H15.83c-1.491 0-1.956.93-1.956 1.886v2.268h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+                  </svg>
+                )}
+                POST TO FACEBOOK
+              </button>
+            )}
+
+            {episode.facebookVideoId && (
+              <a
+                href={`https://www.facebook.com/watch/?v=${episode.facebookVideoId}`}
+                target="_blank" rel="noreferrer"
+                className="brutal-btn brutal-btn-secondary flex items-center justify-center gap-2 py-3 bg-[#E2DDD0]"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2" aria-hidden="true">
+                  <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97H15.83c-1.491 0-1.956.93-1.956 1.886v2.268h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+                </svg>
+                VIEW ON FACEBOOK
               </a>
             )}
 
