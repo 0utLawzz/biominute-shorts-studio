@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { href: "/preview-queue", label: "Preview Queue" },
   { href: "/scheduled", label: "Scheduled" },
   { href: "/published", label: "Published" },
+  { href: "/analytics", label: "Analytics" },
 ];
 
 const STATUS_PILLS = [

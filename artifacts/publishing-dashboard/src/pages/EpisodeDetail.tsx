@@ -13,7 +13,7 @@ import {
 import { Navbar } from "../components/Navbar";
 import { YouTubeBanner } from "../components/YouTubeBanner";
 import { StatusBadge } from "../components/StatusBadge";
-import { ArrowLeft, CheckCircle, Youtube, Loader2, Save, Clapperboard, RefreshCw } from "lucide-react";
+import { ArrowLeft, CheckCircle, Youtube, Loader2, Save, Clapperboard, RefreshCw, Eye, ThumbsUp, MessageSquare, Share2 } from "lucide-react";
 import { formatPKT } from "../lib/date";
 import { useToast } from "@/hooks/use-toast";
 
@@ -36,6 +36,10 @@ export default function EpisodeDetail() {
   const [pendingStatus, setPendingStatus] = useState<string>("");
   const [fbStatus, setFbStatus] = useState<{ connected: boolean } | null>(null);
   const [fbIsPending, setFbIsPending] = useState(false);
+  const [ytAnalytics, setYtAnalytics] = useState<{ views: number; likes: number; comments: number } | null>(null);
+  const [fbAnalytics, setFbAnalytics] = useState<{ views: number; likes: number; comments: number; shares: number } | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
 
   const initRef = useRef<number | null>(null);
 
@@ -124,6 +128,51 @@ export default function EpisodeDetail() {
         }
       }
     );
+  };
+
+  const fetchAnalytics = async () => {
+    setAnalyticsLoading(true);
+    setAnalyticsError(null);
+    setYtAnalytics(null);
+    setFbAnalytics(null);
+
+    const promises: Promise<unknown>[] = [];
+
+    if (episode?.youtubeVideoId) {
+      promises.push(
+        fetch(`/api/analytics/youtube/${id}`)
+          .then((r) => {
+            if (!r.ok) throw new Error(`YouTube: ${r.status}`);
+            return r.json();
+          })
+          .then((data) => {
+            setYtAnalytics(data as { views: number; likes: number; comments: number });
+          })
+          .catch((err) => {
+            console.error("YT analytics error:", err);
+            setAnalyticsError(err instanceof Error ? err.message : "YouTube analytics failed");
+          }),
+      );
+    }
+
+    if (episode?.facebookVideoId) {
+      promises.push(
+        fetch(`/api/analytics/facebook/${id}`)
+          .then((r) => {
+            if (!r.ok) throw new Error(`Facebook: ${r.status}`);
+            return r.json();
+          })
+          .then((data) => {
+            setFbAnalytics(data as { views: number; likes: number; comments: number; shares: number });
+          })
+          .catch((err) => {
+            console.error("FB analytics error:", err);
+          }),
+      );
+    }
+
+    await Promise.all(promises);
+    setAnalyticsLoading(false);
   };
 
   const handlePublishFacebook = async () => {
@@ -488,6 +537,64 @@ export default function EpisodeDetail() {
                 {episode.publishedAt && <TimelineItem date={episode.publishedAt} label="Published" color="bg-[#8B2FC9]" />}
               </div>
             </div>
+
+            {/* Analytics Panel */}
+            {(episode.youtubeVideoId || episode.facebookVideoId) && (
+              <div className="brutal-card p-6 bg-[#FAF7EE] border-t-[4px] border-t-[#C94A00]">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="font-display text-2xl">📊 Analytics</h2>
+                  <button
+                    onClick={fetchAnalytics}
+                    disabled={analyticsLoading}
+                    className="brutal-btn bg-[#0C0C0C] text-white font-mono text-[10px] font-bold px-3 py-1.5 border-2 border-[#0C0C0C] flex items-center gap-1 disabled:opacity-40"
+                  >
+                    {analyticsLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                    REFRESH
+                  </button>
+                </div>
+
+                {analyticsError && (
+                  <div className="font-mono text-[10px] font-bold text-[#C94A00] bg-[#fff3f0] border-[1.5px] border-[#C94A00] px-2 py-1.5 mb-3">
+                    {analyticsError.split(": ").pop()}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  {/* YouTube Analytics */}
+                  {episode.youtubeVideoId && (
+                    <div className="border-2 border-[#0C0C0C] p-3 bg-white">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Youtube className="w-4 h-4 text-[#8B2FC9]" />
+                        <span className="font-mono text-[10px] font-bold uppercase">YouTube</span>
+                      </div>
+                      <div className="space-y-2">
+                        <AnalyticRow label="Views" value={ytAnalytics?.views ?? episode.youtubeViews ?? 0} color="#8B2FC9" />
+                        <AnalyticRow label="Likes" value={ytAnalytics?.likes ?? episode.youtubeLikes ?? 0} color="#8B2FC9" />
+                        <AnalyticRow label="Comments" value={ytAnalytics?.comments ?? episode.youtubeComments ?? 0} color="#8B2FC9" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Facebook Analytics */}
+                  {episode.facebookVideoId && (
+                    <div className="border-2 border-[#0C0C0C] p-3 bg-white">
+                      <div className="flex items-center gap-2 mb-3">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#1877F2" aria-hidden="true">
+                          <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97H15.83c-1.491 0-1.956.93-1.956 1.886v2.268h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+                        </svg>
+                        <span className="font-mono text-[10px] font-bold uppercase">Facebook</span>
+                      </div>
+                      <div className="space-y-2">
+                        <AnalyticRow label="Views" value={fbAnalytics?.views ?? episode.facebookViews ?? 0} color="#1877F2" />
+                        <AnalyticRow label="Likes" value={fbAnalytics?.likes ?? episode.facebookLikes ?? 0} color="#1877F2" />
+                        <AnalyticRow label="Comments" value={fbAnalytics?.comments ?? episode.facebookComments ?? 0} color="#1877F2" />
+                        <AnalyticRow label="Shares" value={fbAnalytics?.shares ?? episode.facebookShares ?? 0} color="#1877F2" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -502,6 +609,23 @@ function TimelineItem({ date, label, color }: { date: string, label: string, col
       <div className={`absolute -left-[23px] top-1 w-3 h-3 ${color} border-2 border-[#0C0C0C] rounded-full`}></div>
       <div className="font-mono font-bold text-xs uppercase">{label}</div>
       <div className="font-sans text-sm text-[#555]">{formatPKT(date)}</div>
+    </div>
+  );
+}
+
+function AnalyticRow({ label, value, color }: { label: string; value: number; color: string }) {
+  const icons: Record<string, React.ReactNode> = {
+    Views: <Eye className="w-3 h-3" />,
+    Likes: <ThumbsUp className="w-3 h-3" />,
+    Comments: <MessageSquare className="w-3 h-3" />,
+    Shares: <Share2 className="w-3 h-3" />,
+  };
+  return (
+    <div className="flex items-center justify-between">
+      <span className="flex items-center gap-1 font-mono text-[10px] font-bold uppercase" style={{ color }}>
+        {icons[label] ?? null} {label}
+      </span>
+      <span className="font-display text-lg tabular-nums">{value.toLocaleString()}</span>
     </div>
   );
 }

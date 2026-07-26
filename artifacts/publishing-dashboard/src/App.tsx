@@ -11,6 +11,7 @@ import Building from './pages/Building';
 import PreviewQueue from './pages/PreviewQueue';
 import Scheduled from './pages/Scheduled';
 import Published from './pages/Published';
+import AnalyticsPage from './pages/Analytics';
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/scheduled" component={Scheduled} />
       <Route path="/published" component={Published} />
       <Route path="/episodes/:id" component={EpisodeDetail} />
+      <Route path="/analytics" component={AnalyticsPage} />
       <Route component={NotFound} />
     </Switch>
   );
