@@ -12,7 +12,7 @@ import { eq } from "drizzle-orm";
 const PROJECT_ROOT = path.resolve(import.meta.dirname, "../..");
 const MASTER_WORKBOOK = path.join(
   PROJECT_ROOT,
-  "attached_assets/BioMinute-Master-Workbook-3_1784865612938.xlsx",
+  "attached_assets/BioMinute-Master-Workbook_1785093582748.xlsx",
 );
 const EXPORTS_DIR = path.join(PROJECT_ROOT, "exports");
 
@@ -147,7 +147,11 @@ async function main() {
 
     const exported = hasExportedVideo(epNumber);
     const dbStatus = workbookStatusToDb(p.status);
-    const status: DbStatus = exported && dbStatus === "draft" ? "complete" : dbStatus;
+    let status: DbStatus = exported && dbStatus === "draft" ? "complete" : dbStatus;
+
+    // User directive: new batch 51–65 are approved, 66–100 are scripted.
+    if (epNumber >= 51 && epNumber <= 65) status = "approved";
+    else if (epNumber >= 66 && epNumber <= 100) status = "scripted";
 
     const citationText = s.citation || p.citation || "";
     const cta = s.cta ? `CTA: ${s.cta}` : "";
@@ -224,7 +228,7 @@ async function main() {
   const existingMap = new Map(existing.map((e) => [e.epNumber, e.status]));
 
   const toInsert = rows.filter((r) => !existingMap.has(r.epNumber));
-  const toUpdate = rows.filter((r) => existingMap.has(r.epNumber) && r.epNumber <= 50);
+  const toUpdate = rows.filter((r) => existingMap.has(r.epNumber));
 
   if (toInsert.length > 0) {
     await db.insert(episodesTable).values(toInsert);
@@ -235,23 +239,38 @@ async function main() {
   const LOCKED_STATUSES = new Set<string>(["published", "scheduled"]);
 
   for (const row of toUpdate) {
-    // scheduledPublishAt is recomputed from postDate + 09:00 UTC whenever
-    // a postDate is present (fixes cumulative-drift bugs).
+    const currentStatus = existingMap.get(row.epNumber)!;
+
+    // Episodes 1–50 that are already published/scheduled keep their live state
+    // AND keep their existing post/schedule dates so we don't wipe real history.
+    const preserveLiveState = row.epNumber <= 50 && LOCKED_STATUSES.has(currentStatus);
+
+    // 51–65 are explicitly marked approved (not scheduled) per user request.
+    const markApproved = row.epNumber >= 51 && row.epNumber <= 65;
+
+    // scheduledPublishAt is recomputed from postDate + 09:00 UTC whenever a postDate
+    // is present (fixes cumulative-drift bugs). For approved/scripted without a date, clear it.
     let scheduledPublishAt: Date | null | undefined = undefined; // undefined = leave unchanged
-    if (row.postDate) {
+    if (row.postDate && !preserveLiveState && !markApproved) {
       const d = new Date(`${row.postDate}T09:00:00Z`);
       if (!Number.isNaN(d.getTime())) scheduledPublishAt = d;
+    } else if (!row.postDate && !preserveLiveState) {
+      scheduledPublishAt = null;
     }
 
-    const currentStatus = existingMap.get(row.epNumber)!;
-    // Only overwrite status when the episode is NOT already live (published/scheduled).
-    // draft, scripted, review, approved, complete — all accept workbook-derived status.
-    const statusOverride = LOCKED_STATUSES.has(currentStatus) ? {} : { status: row.status };
+    // Only overwrite status when the episode is NOT already live (1–50 published/scheduled),
+    // OR when the user explicitly asked for the 51–65 batch to be approved.
+    let statusOverride: { status?: DbStatus } = {};
+    if (markApproved) {
+      statusOverride = { status: "approved" };
+    } else if (!preserveLiveState) {
+      statusOverride = { status: row.status };
+    }
 
     await db
       .update(episodesTable)
       .set({
-        postDate: row.postDate,
+        ...(preserveLiveState ? {} : { postDate: row.postDate }),
         season: row.season,
         duration: row.duration,
         hookTitle: row.hookTitle,
@@ -263,7 +282,6 @@ async function main() {
         hashtags: row.hashtags,
         updatedAt: new Date(),
         ...statusOverride,
-        // Only write scheduledPublishAt if we have a valid postDate to derive from
         ...(scheduledPublishAt !== undefined ? { scheduledPublishAt } : {}),
       })
       .where(eq(episodesTable.epNumber, row.epNumber));

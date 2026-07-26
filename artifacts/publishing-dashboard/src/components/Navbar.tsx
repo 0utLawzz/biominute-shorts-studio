@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Activity, CheckCircle2, Clock, Hammer, CalendarCheck } from "lucide-react";
+import { useGetEpisodeStats } from "@workspace/api-client-react";
 
 const NAV_LINKS = [
   { href: "/", label: "Dashboard" },
@@ -10,8 +11,30 @@ const NAV_LINKS = [
   { href: "/published", label: "Published" },
 ];
 
+const STATUS_PILLS = [
+  { key: "published", label: "Pub", icon: CheckCircle2, color: "#8B2FC9", href: "/published" },
+  { key: "approved", label: "Apr", icon: CalendarCheck, color: "#0A6B52", href: "/" },
+  { key: "building", label: "Bld", icon: Hammer, color: "#C9A800", href: "/building" },
+  { key: "scheduled", label: "Sch", icon: Clock, color: "#0D9970", href: "/scheduled" },
+];
+
 export function Navbar() {
   const [location] = useLocation();
+  const { data: stats } = useGetEpisodeStats();
+
+  const byStatus = stats?.byStatus;
+  const total = stats?.total ?? 0;
+  const published = byStatus?.published ?? 0;
+  const approved = byStatus?.approved ?? 0;
+  const building = byStatus?.building ?? 0;
+  const scheduled = byStatus?.scheduled ?? 0;
+
+  // Surface a one-line system health readout based on real pipeline state.
+  let systemStatus = { text: "SYSTEM READY", color: "#0A6B52" };
+  if (building > 0) systemStatus = { text: `${building} RENDERING`, color: "#C9A800" };
+  else if (scheduled > 0) systemStatus = { text: `${scheduled} QUEUED`, color: "#0D9970" };
+  else if (approved > 0) systemStatus = { text: `${approved} NEED BUILD`, color: "#C94A00" };
+  else if (published === total && total > 0) systemStatus = { text: "ALL PUBLISHED", color: "#8B2FC9" };
 
   return (
     <header className="sticky top-0 z-[100] h-[58px] bg-[#0C0C0C] border-b-[3px] border-[#0C0C0C] flex items-center px-6 gap-6">
@@ -38,7 +61,32 @@ export function Navbar() {
         })}
       </nav>
 
-      <div className="ml-auto shrink-0">
+      {/* Live pipeline status — visible on every page */}
+      <div className="ml-auto hidden lg:flex items-center gap-3">
+        <div className="flex items-center gap-1.5 bg-[#1a1a1a] border-[1.5px] border-[#333] px-2 py-1">
+          <Activity size={12} style={{ color: systemStatus.color }} />
+          <span className="font-mono text-[10px] font-bold uppercase tracking-wider" style={{ color: systemStatus.color }}>
+            {systemStatus.text}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1">
+          {STATUS_PILLS.map(({ key, label, icon: Icon, color, href }) => {
+            const count = byStatus?.[key as keyof typeof byStatus] ?? 0;
+            return (
+              <Link key={key} href={href}>
+                <span className="flex items-center gap-1 font-mono text-[10px] font-bold uppercase px-2 py-1 border-[1.5px] border-[#333] cursor-pointer hover:border-[#555] transition-colors" title={`${count} ${key}`}>
+                  <Icon size={11} style={{ color }} />
+                  <span className="text-[#FAF7EE]">{label}</span>
+                  <span className="text-[#FAF7EE] tabular-nums">{count}</span>
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="shrink-0">
         <Link href="/new">
           <span className="flex items-center gap-2 bg-[#C9A800] text-[#0C0C0C] font-mono font-bold text-xs px-4 py-2 border-[2px] border-[#0C0C0C] shadow-[3px_3px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer uppercase">
             <PlusCircle size={14} />
