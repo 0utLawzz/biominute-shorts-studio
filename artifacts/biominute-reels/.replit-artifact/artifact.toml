@@ -11,7 +11,7 @@ paths = [ "/biominute-reels/" ]
 localPort = 25078
 
 [services.development]
-run = "pnpm --filter @workspace/biominute-reels run dev"
+run = "BASE_PATH=/biominute-reels/ pnpm --filter @workspace/biominute-reels run dev"
 
 [services.production]
 build = [ "pnpm", "--filter", "@workspace/biominute-reels", "run", "build" ]
