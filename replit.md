@@ -22,7 +22,8 @@ scripts/
   src/generate-dashboard.ts  Regenerate exports/dashboard.html from DB
   src/verify-export.ts  Verify MP4 resolution is 1080×1920
 exports/               Output directory for generated MP4s, thumbnails, production-log.md, dashboard.html
-attached_assets/       Master plan XLSX, brand assets, logos
+docs/                  Project documentation, including the social platform setup guide
+attached_assets/       Master plan XLSX, brand assets, logos, screenshots
 ```
 
 ## How to Run
@@ -81,6 +82,10 @@ All required secrets are configured:
 | `pnpm run typecheck` | TypeScript validation across workspace |
 | `pnpm --filter @workspace/db run push-force` | Push schema to the database |
 | `pnpm --filter @workspace/scripts exec tsx ./src/upload-now.ts <ep>` | Manual one-off YouTube upload |
+
+## Social Platforms
+
+To connect YouTube, Facebook, TikTok, Instagram, X/Twitter, or LinkedIn, see `docs/Social-Platforms-Setup.md`. It covers required credentials, OAuth steps, token types, and how credentials flow into Replit Secrets.
 
 ## User Preferences
 
