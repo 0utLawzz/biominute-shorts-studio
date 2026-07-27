@@ -13,3 +13,4 @@
 - [YouTube refresh token lifecycle](youtube-refresh-token-lifecycle.md) — `invalid_grant` means the refresh token is revoked or expired; run `scripts/src/youtube-reauth.ts` and update the Replit secret.
 - [Export folder naming convention](export-folder-naming-convention.md) — export folders must use descriptive slugs (`Episode-51-does-washing-your-hair...`), never generic names like `Episode-51-build`.
 - [Neon PR branch automation](neon-pr-branch-automation.md) — `.github/workflows/neon_workflow.yml` creates a Neon DB branch per PR and deletes it on close; requires `NEON_API_KEY` and `NEON_PROJECT_ID`.
+- [YouTube-status reconciliation](yt-status-reconcile.md) — `scripts/src/reconcile-yt-status.mjs` rewrites DB status from YouTube `privacyStatus`+`publishAt`; run before seed when counts diverge. videos.list rejects `maxResults` with `id=` filter — split into ≤50 chunks.
