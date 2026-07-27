@@ -17,6 +17,8 @@ router.get("/facebook/status", (_req, res): void => {
   res.json({
     connected,
     pageId: connected ? process.env.FACEBOOK_PAGE_ID : null,
+    hasAccessToken: !!process.env.FACEBOOK_PAGE_ACCESS_TOKEN,
+    hasPageId: !!process.env.FACEBOOK_PAGE_ID,
   });
 });
 

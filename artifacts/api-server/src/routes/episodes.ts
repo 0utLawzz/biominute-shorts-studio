@@ -11,7 +11,7 @@ import {
   RunProductionParams,
 } from "@workspace/api-zod";
 import { spawn } from "child_process";
-import { promises as fs, openSync, closeSync, mkdirSync } from "fs";
+import { promises as fs, openSync, closeSync, mkdirSync, readdirSync, existsSync } from "fs";
 import path from "path";
 
 // The valid set of episode status strings (mirrors the Drizzle pgEnum)
@@ -114,6 +114,53 @@ router.get("/episodes", async (req, res): Promise<void> => {
     .orderBy(asc(episodesTable.epNumber));
 
   res.json(episodes);
+});
+
+// GET /episodes/social-rows
+// Per-episode matrix used by the dashboard's Social Stats tabs.
+// Returns folder / video / YouTube / Facebook presence so the UI can
+// render the four-column indicator (e.g. "ep 66  video ❌ folder ✅
+// YouTube ❌ Facebook ❌") without N+1 client requests.
+router.get("/episodes/social-rows", async (_req, res): Promise<void> => {
+  const all = await db
+    .select({
+      epNumber: episodesTable.epNumber,
+      hookTitle: episodesTable.hookTitle,
+      status: episodesTable.status,
+      youtubeVideoId: episodesTable.youtubeVideoId,
+      facebookVideoId: episodesTable.facebookVideoId,
+      postDate: episodesTable.postDate,
+      scheduledPublishAt: episodesTable.scheduledPublishAt,
+    })
+    .from(episodesTable)
+    .orderBy(episodesTable.epNumber);
+
+  const EXPORTS_DIR = path.resolve(process.cwd(), "../../exports");
+  const rows = all
+    .filter((row) => row.epNumber >= 1 && row.epNumber <= 100)
+    .map((row) => {
+      const padded = String(row.epNumber).padStart(2, "0");
+      const folderName = readdirSync(EXPORTS_DIR, { withFileTypes: true })
+        .filter((d) => d.isDirectory() && d.name.startsWith(`Episode-${padded}-`))
+        .map((d) => d.name)[0] ?? null;
+      const hasFolder = folderName !== null;
+      const hasVideoFile =
+        hasFolder &&
+        existsSync(path.join(EXPORTS_DIR, folderName, "episode.mp4"));
+      return {
+        epNumber: row.epNumber,
+        hookTitle: row.hookTitle,
+        status: row.status,
+        hasFolder,
+        hasVideoFile,
+        youtubeVideoId: row.youtubeVideoId,
+        facebookVideoId: row.facebookVideoId,
+        postDate: row.postDate,
+        scheduledPublishAt: row.scheduledPublishAt,
+      };
+    });
+
+  res.json({ total: rows.length, rows });
 });
 
 // GET /episodes/stats
