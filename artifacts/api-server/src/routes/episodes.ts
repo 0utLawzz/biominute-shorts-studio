@@ -554,7 +554,12 @@ router.post("/episodes/:id/run-production", async (req, res): Promise<void> => {
     });
     await db
       .update(episodesTable)
-      .set({ buildNote: `Render failed: ${error.message}`, updatedAt: new Date() })
+      .set({
+        status: "scripted",
+        buildStage: "script_ready",
+        buildNote: `Render failed: ${error.message}`,
+        updatedAt: new Date(),
+      })
       .where(eq(episodesTable.id, id));
   });
   child.once("exit", async (code, signal) => {
@@ -570,6 +575,8 @@ router.post("/episodes/:id/run-production", async (req, res): Promise<void> => {
       await db
         .update(episodesTable)
         .set({
+          status: "scripted",
+          buildStage: "script_ready",
           buildNote: `Render failed: ${signal ? `signal ${signal}` : `code ${code}`}`,
           updatedAt: new Date(),
         })

@@ -107,6 +107,30 @@ export async function finishRenderJob(params: {
     .where(eq(renderJobsTable.id, params.jobId));
 }
 
+/**
+ * Stop active render children before the API process exits.
+ *
+ * The database row is durable, but detached children must not be left behind
+ * when the workflow is intentionally restarted.
+ */
+export async function shutdownRenderJobs(): Promise<void> {
+  const running = await db
+    .select()
+    .from(renderJobsTable)
+    .where(eq(renderJobsTable.status, "running"));
+
+  await Promise.all(
+    running.map(async (job) => {
+      terminateProcess(job.pid);
+      await finishRenderJob({
+        jobId: job.id,
+        status: "failed",
+        error: "API server stopped while the render was running",
+      });
+    }),
+  );
+}
+
 export async function getRenderJob(
   episodeId: number,
   outputExists = false,

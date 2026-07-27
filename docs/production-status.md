@@ -1,6 +1,6 @@
 # Production Status — BioMinute Shorts Studio
 
-> **Canonical snapshot of the pipeline.** Refreshed **2026-07-27** after workbook re-seed + YouTube Data API reconciliation.
+> **Canonical snapshot of the pipeline.** Refreshed **2026-07-28** after YouTube Data API reconciliation and render-queue safety work.
 
 This document is the single source of truth for *where every episode lives* in the publish pipeline. The dashboard (`http://<host>:5173/`) and the API endpoint `GET /api/episodes/stats` reflect the same numbers in real time.
 
@@ -10,8 +10,8 @@ This document is the single source of truth for *where every episode lives* in t
 
 | Status                     | Count | What it means                                                                  |
 |----------------------------|-------|--------------------------------------------------------------------------------|
-| `published`                | 11    | Live on YouTube (`privacyStatus=public`)                                       |
-| `scheduled`                | 54    | Uploaded as private, will auto-publish at `publishAt` (9:00 UTC)               |
+| `published`                | 12    | Live on YouTube (`privacyStatus=public`)                                       |
+| `scheduled`                | 53    | Uploaded as private, will auto-publish at `publishAt` (9:00 UTC)               |
 | `scripted`                 | 35    | Script + visual direction in master workbook, no MP4, no YouTube ID           |
 | `complete` (test slots)    |  2    | `TEST-1` (immediate) and `TEST-2` (delayed) — pipeline smoke tests             |
 | **Total**                  | **102** | 100 regular episodes (Ep 1–100) + 2 test slots                              |
@@ -24,7 +24,8 @@ This document is the single source of truth for *where every episode lives* in t
 |----------------|----------------------------------------|--------------|-------------------------|
 | Ep 1, 4–11     | public (9 episodes)                    | `published`  | Jul 12 – Jul 26, 2026   |
 | Ep 2, 3        | uploaded, deleted/lost API record      | `published`  | Jul 15, Jul 17, 2026    |
-| Ep 12–50       | private, future `publishAt`            | `scheduled`  | Jul 27 – Sep 03, 2026   |
+| Ep 12          | public                                | `published`  | live                    |
+| Ep 13–50       | private, future `publishAt`            | `scheduled`  | Jul 28 – Sep 03, 2026   |
 | Ep 51–65       | private, future `publishAt`            | `scheduled`  | Sep 04 – Sep 18, 2026   |
 
 **Ep 2 and 3** had `youtube_video_id` set but are no longer retrievable from the YouTube Data API. The DB treats them as `published` because the IDs were confirmed live at some point in the past.

@@ -10,6 +10,7 @@ import {
   buildYouTubeDescription,
   assertNotAlreadyPublished,
 } from "./lib/youtube-upload";
+import { shutdownRenderJobs } from "./lib/render-jobs";
 
 // ---------------------------------------------------------------------------
 // Startup credential check — hard-fails if any required env var is absent.
@@ -321,6 +322,21 @@ if (Number.isNaN(port) || port <= 0) {
 }
 
 assertAndLogCredentials();
+
+let isShuttingDown = false;
+async function shutdown(signal: string): Promise<void> {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+  logger.info({ signal }, "Shutting down — stopping active render jobs");
+  try {
+    await shutdownRenderJobs();
+  } finally {
+    process.exit(0);
+  }
+}
+
+process.once("SIGTERM", () => void shutdown("SIGTERM"));
+process.once("SIGINT", () => void shutdown("SIGINT"));
 
 app.listen(port, (err) => {
   if (err) {

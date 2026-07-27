@@ -57,7 +57,11 @@ export default function Building() {
       showToast("Render started — polling for progress…");
       await refreshStatus(id);
     } catch (e: any) {
-      showToast(e?.message ?? "Failed to start render");
+      const detail =
+        e?.data?.error ??
+        e?.message ??
+        "Failed to start render";
+      showToast(detail);
     } finally {
       setRunningIds((prev) => {
         const next = new Set(prev);

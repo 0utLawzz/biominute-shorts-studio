@@ -146,8 +146,11 @@ export function BuildingCard({
         )}
 
         {renderStatus?.status === "failed" && !isRendering && (
-          <span className="font-mono text-[10px] font-bold text-[#C94A00] uppercase">
-            Last render failed
+          <span
+            className="font-mono text-[10px] font-bold text-[#C94A00] uppercase"
+            title={renderStatus.error ?? undefined}
+          >
+            Render failed — retry
           </span>
         )}
 

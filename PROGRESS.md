@@ -150,6 +150,22 @@ ep 66  ·  Magnesium and Insulin Sensitivity  ·  folder ✗  MP4 ✗  YT ✗  F
 11. Requested and set `DASHBOARD_PASSWORD` in Replit Secrets; restarted the API server.
 12. **Commits pushed** *(this turn).*
 
+### Request 8 — Start stage two: make the render pipeline restart-safe
+*(Session: 2026-07-28)*
+
+**User said:** "Stage one is completed, and stage two is not fully completed. Kindly start stage two and complete it."
+
+**Agent did:**
+1. Reviewed `PROGRESS.md`, the production status, and the numbered improvement plan.
+2. Ran the YouTube reconciliation successfully. Current Ep 1–100 counts: **12 published, 53 scheduled, 35 scripted** (plus 2 test slots).
+3. Completed improvement-plan item 2:
+   - Existing per-episode database render lock now reports conflicts as HTTP 409 with the active job ID.
+   - Failed child processes return episodes from `building/rendering` to retryable `scripted/script_ready`.
+   - API shutdown now terminates active detached render children and records a clear failed state.
+   - Building UI now shows the server's conflict/error message and exposes the latest render failure reason on hover.
+4. Workspace typecheck passed across all libraries, artifacts, and scripts.
+5. Updated `docs/production-status.md` with the current reconciled counts.
+
 ---
 
 ## Git commit history (chronological, oldest → newest)

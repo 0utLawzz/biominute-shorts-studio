@@ -17,9 +17,9 @@ description: Critical bugs, security gaps, and improvement areas found during th
 - **How to apply:** Item 1 in `docs/improvement-plan.md` implements session auth using the existing `SESSION_SECRET`.
 
 ### Render process has no lock
-- **Rule:** Never call `POST /run-production` for an episode that already has a render in flight.
-- **Why:** Two concurrent renders write to the same output folder — frames interleave, MP4 is corrupt.
-- **How to apply:** Item 2 in `docs/improvement-plan.md` adds an in-memory lock + status endpoint.
+- **Rule:** Never call `POST /run-production` for an episode that already has a render in flight; treat the database render job as the durable source of truth.
+- **Why:** Two concurrent renders write to the same output folder — frames interleave, MP4 is corrupt. API restarts must also stop detached children and return failed renders to a retryable state.
+- **How to apply:** The render job row provides the per-episode lock/status; shutdown handlers terminate active children, and failed renders reset to `scripted`/`script_ready` for retry.
 
 ---
 
