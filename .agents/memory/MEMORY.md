@@ -1,3 +1,4 @@
+- [Dashboard auth session](dashboard-auth-session.md) — cookie-based session auth for the production dashboard; module augmentation, CORS credentials, customFetch defaults.
 - [Code audit findings (2026-07-28)](code-audit-findings.md) — critical bugs + numbered 1–5 improvement plan; auth missing, render has no lock, postDate is text not timestamp.
 - [Importing an external artifacts-repo](importing-external-artifact-repo.md) — overlay source onto a freshly-scaffolded artifact, don't hand-copy scaffold-generated files (tsconfig/vite.config/artifact.toml).
 - [PROGRESS.md is the first stop](progress-md-is-first-stop.md) — read repo-root PROGRESS.md at the start of every session; it's the canonical chronological log of user requests → actions → commits.

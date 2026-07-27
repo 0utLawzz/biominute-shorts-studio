@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
+import type { Session } from "express-session";
 import { logger } from "../lib/logger";
 
 /**
@@ -11,6 +12,12 @@ import { logger } from "../lib/logger";
  * consumer app, and Replit Auth would require every admin to have a Replit
  * account.
  */
+
+declare module "express-session" {
+  interface SessionData {
+    authenticated?: boolean;
+  }
+}
 
 const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD;
 
@@ -28,9 +35,7 @@ export function isPasswordConfigured(): boolean {
 }
 
 export interface AuthenticatedRequest extends Request {
-  session: {
-    authenticated?: boolean;
-  } & Express.SessionData;
+  session: Session & { authenticated?: boolean };
 }
 
 /**

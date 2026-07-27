@@ -74,28 +74,6 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 3. Updated: `README.md` refresh stamp, `docs/production-status.md` refresh stamp, appended `2026-07-27 — Database re-seed + reconcile + dashboard regen` entry to `exports/production-log.md`.
 4. **Commits pushed:** `1f8a8da` (production-log + PROGRESS), `b67ea2b` (README + docs refresh stamp), and `b67ea2b+` (dashboard.html + this PROGRESS entry).
 
-### Request 6 — Code audit + numbered improvement plan
-*(Session: 2026-07-28)*
-
-**User said:** "I asked for code audit and want suggestions or feedback for improvement. Build a system where you can say Start from 1 to 5 and the agent knows what to do. Also thinking about production-wise scope. Update PROGRESS.md and memory like a changelog."
-
-**Agent did:**
-1. Ran full codebase audit via explore subagent across all 7 areas (api-server, dashboard, biominute-reels, lib/db, lib/api-spec, scripts, root config).
-2. Identified **3 critical production blockers** + 12 improvement items (see `docs/improvement-plan.md`).
-3. Defined the **1–5 numbered plan** (see below + `docs/improvement-plan.md`) so any future session can run `Start N` and know exactly what to do.
-4. Updated PROGRESS.md + agent memory with audit findings.
-5. **Commit pushed** *(this turn).*
-
-**Critical findings:**
-- 🔴 No authentication on dashboard/API — anyone with the URL can trigger renders or publish to YouTube
-- 🔴 `/run-production` spawns detached processes with no queue/lock — double-clicks corrupt exports
-- 🟡 `postDate` stored as `text` in DB instead of `timestamp` — requires manual normalization everywhere
-- 🟡 `seed-episodes.ts` has a hardcoded workbook filename — breaks on rename
-- 🟡 Dead auto-scheduler code in `api-server/index.ts` causes confusion
-- 🟢 OpenAPI spec has ghost endpoints that don't match actual routes
-
----
-
 ### Request 5 — Add YouTube & Facebook stats tabs + Social Setup UI
 *(Session: 2026-07-27, present turn)*
 
@@ -120,6 +98,57 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 ```
 ep 66  ·  Magnesium and Insulin Sensitivity  ·  folder ✗  MP4 ✗  YT ✗  FB ✗
 ```
+
+---
+
+### Request 6 — Code audit + numbered improvement plan
+*(Session: 2026-07-28)*
+
+**User said:** "I asked for code audit and want suggestions or feedback for improvement. Build a system where you can say Start from 1 to 5 and the agent knows what to do. Also thinking about production-wise scope. Update PROGRESS.md and memory like a changelog."
+
+**Agent did:**
+1. Ran full codebase audit via explore subagent across all 7 areas (api-server, dashboard, biominute-reels, lib/db, lib/api-spec, scripts, root config).
+2. Identified **3 critical production blockers** + 12 improvement items (see `docs/improvement-plan.md`).
+3. Defined the **1–5 numbered plan** (see below + `docs/improvement-plan.md`) so any future session can run `Start N` and know exactly what to do.
+4. Updated PROGRESS.md + agent memory with audit findings.
+5. **Commit pushed** *(this turn).*
+
+**Critical findings:**
+- 🔴 No authentication on dashboard/API — anyone with the URL can trigger renders or publish to YouTube
+- 🔴 `/run-production` spawns detached processes with no queue/lock — double-clicks corrupt exports
+- 🟡 `postDate` stored as `text` in DB instead of `timestamp` — requires manual normalization everywhere
+- 🟡 `seed-episodes.ts` has a hardcoded workbook filename — breaks on rename
+- 🟡 Dead auto-scheduler code in `api-server/index.ts` causes confusion
+- 🟢 OpenAPI spec has ghost endpoints that don't match actual routes
+
+---
+
+### Request 7 — Start 1: Lock the dashboard behind a password
+*(Session: 2026-07-28)*
+
+**User said:** "Start 1"
+
+**Agent did:**
+1. Installed `express-session` + `@types/express-session` in the API server.
+2. Created `artifacts/api-server/src/middleware/auth.ts` with password verification, session cookie handling, and `requireAuth` middleware.
+3. Created `artifacts/api-server/src/routes/auth.ts` with `/api/auth/login`, `/api/auth/logout`, `/api/auth/me`, and `/api/auth/protected`.
+4. Updated `artifacts/api-server/src/app.ts` to mount session middleware with `SESSION_SECRET`, secure/sameSite cookies, and CORS credentials.
+5. Updated `artifacts/api-server/src/routes/index.ts` so all routes except `/api/healthz` and `/api/auth/*` require a valid session.
+6. Made `DASHBOARD_PASSWORD` a required env var; server now hard-fails if missing.
+7. Built dashboard auth layer:
+   - `artifacts/publishing-dashboard/src/lib/auth.tsx` — auth context + `useAuth` hook.
+   - `artifacts/publishing-dashboard/src/pages/Login.tsx` — password gate UI.
+   - Updated `App.tsx` to redirect unauthenticated users to Login and wrap the app in `AuthProvider`.
+   - Updated `Navbar.tsx` with a Lock button that logs out.
+8. Updated `lib/api-client-react/src/custom-fetch.ts` to send `credentials: "include"` by default in browsers so the session cookie travels with every API request.
+9. Fixed a pre-existing type bug in `lib/api-zod/src/index.ts` where several Zod schemas were exported as `type` only, breaking `.safeParse()` calls in the API server.
+10. Verified:
+    - `curl /api/episodes` returns `401` without a session.
+    - `curl /api/auth/me` and `/api/healthz` return `200`.
+    - TypeScript typecheck passes across the entire workspace.
+    - Dashboard now shows a password login screen on first visit.
+11. Requested and set `DASHBOARD_PASSWORD` in Replit Secrets; restarted the API server.
+12. **Commits pushed** *(this turn).*
 
 ---
 
