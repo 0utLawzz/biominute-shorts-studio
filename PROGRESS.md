@@ -181,6 +181,7 @@ ep 66  ·  Magnesium and Insulin Sensitivity  ·  folder ✗  MP4 ✗  YT ✗  F
 | `dbab846` | 2026-07-27 05:30:08  | (mirrored) Update video scene components and project memory tracker             |
 | `ba135b9` | 2026-07-27 05:44:35  | Published your App                                                               |
 | `94d4d5d` | 2026-07-27 05:44:35  | (mirrored) Published your App                                                     |
+| `0c44618` | 2026-07-28 03:24:40  | feat(auth): lock dashboard behind session-based password (Start 1)                |
 
 > "Published your App" marks are Replit's automatic deploy notes — they don't change code, they just publish the current `main` snapshot.
 
