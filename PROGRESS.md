@@ -74,6 +74,31 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 3. Updated: `README.md` refresh stamp, `docs/production-status.md` refresh stamp, appended `2026-07-27 — Database re-seed + reconcile + dashboard regen` entry to `exports/production-log.md`.
 4. **Commits pushed:** `1f8a8da` (production-log + PROGRESS), `b67ea2b` (README + docs refresh stamp), and `b67ea2b+` (dashboard.html + this PROGRESS entry).
 
+### Request 5 — Add YouTube & Facebook stats tabs + Social Setup UI
+*(Session: 2026-07-27, present turn)*
+
+**User said:** "Add Facebook and YouTube stats in Separate in tab new. Like e.g. ep 66 video ✅ folder available ✅ YouTube ✅ Facebook ❌. Add social integration of social where user follow the instructions and add social keys etc push to github update progress.md 66"
+
+**Agent did:**
+1. Built a new API endpoint `GET /api/episodes/social-rows` (api-server/src/routes/episodes.ts) that returns per-episode `{epNumber, hookTitle, hasFolder, hasVideoFile, youtubeVideoId, facebookVideoId, status, postDate, scheduledPublishAt}` — one row per episode, drives the new tabs without N+1 requests.
+2. Enhanced `GET /api/facebook/status` to also expose `hasAccessToken` / `hasPageId` so the Social Setup page can show each env var in isolation.
+3. Dashboard additions:
+   - `src/pages/SocialStatus.tsx` — new page at `/social-status` with two Radix Tabs:
+     - **YouTube tab**: per-episode matrix showing folder ✓/✗, MP4 ✓/✗, YouTube pill (clickable link), Facebook pill (clickable link), YT id + schedule.
+     - **Facebook tab**: same matrix. Counts `{uploaded}/{pending}` and `{posted}/{pending}` highlighted at the top.
+   - `src/pages/SocialSetup.tsx` — new page at `/social-setup` with two toggles:
+     - **YouTube section**: live status pills (connected, token health, channel, season playlists), alert when refresh token is expired, full step-by-step setup with Replit Secrets names.
+     - **Facebook section**: live pills (connection, page id, access token), full setup walkthrough including Graph API Explorer token generation.
+   - `src/App.tsx` — both routes registered.
+   - `src/components/Navbar.tsx` — nav now includes `Social` (status matrix) and `Setup` (integration walkthrough) between `Published` and `Analytics`.
+4. Built + restarted the **api-server** workflow (`dist/index.mjs` regenerated, process restarted) so the new endpoint is live.
+5. **Commits pushed** *(this turn, chunks below).*
+
+**Sample row produced by the new endpoint** (Ep 66 — exactly the format the user asked for):
+```
+ep 66  ·  Magnesium and Insulin Sensitivity  ·  folder ✗  MP4 ✗  YT ✗  FB ✗
+```
+
 ---
 
 ## Git commit history (chronological, oldest → newest)
