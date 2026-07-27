@@ -59,6 +59,21 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 4. Listed every git commit chronologically (next section).
 5. **Commit pushed** *(this turn).*
 
+### Request 4 — Routine DB re-seed + dashboard regen + doc refresh
+*(Session: 2026-07-27, present turn)*
+
+**User said:** "Ok seed the Database and update dashboard. Edit description tags etc readme and update doc folder with latest data. Push all to github."
+
+**Agent did:**
+1. Re-ran the canonical refresh sequence:
+   - `pnpm --filter @workspace/scripts exec tsx ./src/seed-episodes.ts` → re-read master workbook Production/Social/Schedule tabs, upserted 102 rows.
+   - `pnpm --filter @workspace/scripts exec tsx ./src/reconcile-yt-status.mjs` → rewrote Ep 1-65 statuses from YouTube `privacyStatus`+`publishAt` (caught workbook drift: first seed had flipped Ep 51-65 to `scripted` because the workbook Status column hadn't kept up with their actual YT private+future state — reconcile restored `scheduled`).
+   - `pnpm --filter @workspace/scripts exec tsx ./src/resync-scheduled.ts` → rebuilt `scheduled_publish_at = post_date + 9h UTC` for 89 rows.
+   - `pnpm --filter @workspace/scripts exec tsx ./src/generate-dashboard.ts` → regenerated `exports/dashboard.html` (62 KB, 102 rows).
+2. Counts unchanged after refresh: **11 published, 54 scheduled, 35 scripted, 2 complete.**
+3. Updated: `README.md` refresh stamp, `docs/production-status.md` refresh stamp, appended `2026-07-27 — Database re-seed + reconcile + dashboard regen` entry to `exports/production-log.md`.
+4. **Commits pushed:** `1f8a8da` (production-log + PROGRESS), `b67ea2b` (README + docs refresh stamp), and `b67ea2b+` (dashboard.html + this PROGRESS entry).
+
 ---
 
 ## Git commit history (chronological, oldest → newest)
