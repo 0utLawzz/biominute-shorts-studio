@@ -29,11 +29,12 @@ const REQUIRED_ENV_VARS = [
   "YOUTUBE_PLAYLIST_S4",
   "YOUTUBE_PLAYLIST_S5",
   "YOUTUBE_PLAYLIST_S6",
+  "SESSION_SECRET",
+  "DASHBOARD_PASSWORD",
 ] as const;
 
 /** Additional vars that are present but not strictly required (logged for visibility). */
 const OPTIONAL_ENV_VARS = [
-  "SESSION_SECRET",
   "YOUTUBE_CHANNEL_NAME",
   "YOUTUBE_CHANNEL_ID",
   "GITHUB_TOKEN",

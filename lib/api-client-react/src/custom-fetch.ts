@@ -331,6 +331,13 @@ export async function customFetch<T = unknown>(
 
   const method = resolveMethod(input, init.method);
 
+  // In a browser, always send cookies so session-based auth works across Vite's
+  // dev proxy and the Replit production proxy. In server/Node callers, leave
+  // the default untouched so it does not leak cookies.
+  if (init.credentials === undefined && typeof window !== "undefined") {
+    init.credentials = "include";
+  }
+
   if (init.body != null && (method === "GET" || method === "HEAD")) {
     throw new TypeError(`customFetch: ${method} requests cannot have a body.`);
   }

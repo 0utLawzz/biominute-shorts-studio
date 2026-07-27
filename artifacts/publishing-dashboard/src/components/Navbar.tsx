@@ -1,7 +1,8 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
-import { PlusCircle, Activity, CheckCircle2, Clock, Hammer, CalendarCheck, AlertTriangle } from "lucide-react";
+import { PlusCircle, Activity, CheckCircle2, Clock, Hammer, CalendarCheck, AlertTriangle, LogOut } from "lucide-react";
 import { useGetEpisodeStats, useGetYouTubeStatus } from "@workspace/api-client-react";
+import { useAuth } from "@/lib/auth";
 
 const NAV_LINKS = [
   { href: "/", label: "Dashboard" },
@@ -106,14 +107,29 @@ export function Navbar() {
         </a>
       )}
 
-      <div className="shrink-0">
+      <div className="shrink-0 flex items-center gap-2">
         <Link href="/new">
           <span className="flex items-center gap-2 bg-[#C9A800] text-[#0C0C0C] font-mono font-bold text-xs px-4 py-2 border-[2px] border-[#0C0C0C] shadow-[3px_3px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer uppercase">
             <PlusCircle size={14} />
             New Episode
           </span>
         </Link>
+        <LogoutButton />
       </div>
     </header>
+  );
+}
+
+function LogoutButton() {
+  const { logout } = useAuth();
+  return (
+    <button
+      onClick={logout}
+      title="Lock dashboard"
+      className="flex items-center gap-1.5 bg-[#0C0C0C] text-[#FAF7EE] font-mono font-bold text-[10px] px-3 py-2 border-[2px] border-[#0C0C0C] hover:bg-[#333] transition-colors uppercase"
+    >
+      <LogOut size={12} />
+      Lock
+    </button>
   );
 }
