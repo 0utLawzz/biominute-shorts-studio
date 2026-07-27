@@ -117,3 +117,22 @@ Reconciled Ep 1–65 DB status against YouTube Data API (`scripts/src/reconcile-
 - `pnpm --filter @workspace/scripts exec tsx ./src/resync-scheduled.ts`  → recompute `scheduled_publish_at = post_date + 9h UTC` for the 54 scheduled rows + 35 scripted rows with workbook post_dates
 
 **Next checkpoint**: after Ep 12 auto-publishes today, re-run reconcile to confirm Ep 12 rolls from `scheduled` → `published` (publishAt past + private = live).
+
+---
+
+## 2026-07-27 — Database re-seed + reconcile + dashboard regen
+
+Routine pipeline refresh with the master workbook.
+
+**Commands run (in order):**
+1. `pnpm --filter @workspace/scripts exec tsx ./src/seed-episodes.ts` → re-reads Production/Social/Schedule tabs, upserts 102 rows
+2. `pnpm --filter @workspace/scripts exec tsx ./src/reconcile-yt-status.mjs` → rewrites Ep 1–65 status from YouTube Data API (`privacyStatus`+`publishAt`), forces Ep 66–100 to `scripted`
+3. `pnpm --filter @workspace/scripts exec tsx ./src/resync-scheduled.ts` → rebuilds `scheduled_publish_at = post_date + 9h UTC` for all 54 scheduled + 35 scripted-with-dates rows
+4. `pnpm --filter @workspace/scripts exec tsx ./src/generate-dashboard.ts` → regenerates `exports/dashboard.html` (62 KB, 102 episodes)
+
+**Workbook drift fix:**
+- First re-seed flipped Ep 51–65 from `scheduled` → `scripted` because the workbook's Production Status column had been edited since their YouTube upload. `seed-episodes.ts` doesn't preserve Ep >50 status.
+- Re-reconcile pulled truth from YouTube (52 of those 65 are now private + future `publishAt`) and re-wrote `status='scheduled'`.
+- **Order matters**: workbook seed alone is unsafe — always follow with `reconcile-yt-status` + `resync-scheduled` to keep Ep >50 in lockstep with their actual YouTube state.
+
+Live counts after refresh: 11 published, 54 scheduled, 35 scripted, 2 complete. Dashboard endpoint `GET /api/episodes/stats` matches.
