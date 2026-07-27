@@ -123,19 +123,30 @@ Every episode row in the master workbook contains: hook title, VO script, visual
 ## Daily Facebook Auto-Publish (Ep 1–50)
 
 The script `scripts/src/facebook-daily-publish.ts` runs once per day (via a
-Replit Scheduled Deployment) and publishes **exactly one** Ep 1–50 video to the
-Facebook Page — the lowest-numbered episode that does not yet have a
-`facebookVideoId` set. Re-running picks up the next episode; it never
-reprocesses one.
+Replit Scheduled Deployment) and **schedules** exactly one Ep 1–50 video as
+a Facebook Page Scheduled post — the lowest-numbered episode that does not
+yet have a `facebookVideoId` set. Each upload is set to publish at **09:00 UTC
+the following day**, so the daily deployment naturally paces one FB post per
+day going forward.
 
 ```bash
-pnpm run facebook-daily-publish                   # daily scheduled run
-TEST_MODE=true pnpm run facebook-daily-publish    # dry-run (no API call, DB unchanged)
+pnpm run facebook-daily-publish                       # daily scheduled run
+pnpm run facebook-daily-publish --all                 # backfill all remaining (paces 1/day)
+pnpm run facebook-daily-publish --num 44              # backfill next 44 episodes
+FB_SLOT_START_OFFSET_DAYS=N pnpm run facebook-daily-publish --num 8
+                                                      # resume cadence N days after tomorrow's slot
+TEST_MODE=true pnpm run facebook-daily-publish --all  # dry-run
 ```
 
 **Required env vars:** `DATABASE_URL`, `FACEBOOK_PAGE_ACCESS_TOKEN`, `FACEBOOK_PAGE_ID`.
 
-**Disk cleanup — safety-gated.** After publishing to Facebook, the script
+**Schedule pacing.** The first slot is "tomorrow 09:00 UTC" and each
+subsequent slot adds 24 hours, so a `--all` run lays down all remaining
+episodes 1/day. If a run is interrupted, the next batch should pass
+`FB_SLOT_START_OFFSET_DAYS=<N>` so the new slots continue the cadence instead
+of restarting at "tomorrow".
+
+**Disk cleanup — safety-gated.** After the FB upload succeeds, the script
 deletes the local export folder for that episode **only when both**:
 - `facebookVideoId` was set successfully (just now), AND
 - `youtubeVideoId` was already set beforehand.
