@@ -28,8 +28,9 @@ async function main() {
   for (const [epStr, dateStr] of Object.entries(SCHEDULE)) {
     const epNumber = Number(epStr);
     const scheduledPublishAt = new Date(`${dateStr}T09:00:00Z`);
+    const postDate = new Date(`${dateStr}T00:00:00Z`);
     await db.update(episodesTable)
-      .set({ postDate: dateStr, scheduledPublishAt, updatedAt: new Date() })
+      .set({ postDate, scheduledPublishAt, updatedAt: new Date() })
       .where(eq(episodesTable.epNumber, epNumber));
     console.log(`EP${epNumber} → ${scheduledPublishAt.toISOString()}`);
   }

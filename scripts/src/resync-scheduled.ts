@@ -6,14 +6,13 @@ import { sql, ne } from "drizzle-orm";
 
 async function main() {
   // Update every episode that has a post_date and isn't already published.
-  // Uses PostgreSQL date arithmetic so the result is always exactly post_date + 9h UTC.
+  // Uses PostgreSQL timestamp arithmetic so the result is always exactly post_date + 9h UTC.
   const updated = await db.execute(sql`
     UPDATE episodes
     SET
-      scheduled_publish_at = (post_date::date + interval '9 hours'),
+      scheduled_publish_at = (post_date + interval '9 hours'),
       updated_at = now()
     WHERE post_date IS NOT NULL
-      AND post_date != ''
       AND status != 'published'
     RETURNING ep_number, status, post_date, scheduled_publish_at
   `);

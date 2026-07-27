@@ -51,6 +51,11 @@ To reseed the database from the master XLSX:
 pnpm --filter @workspace/scripts exec tsx ./src/seed-episodes.ts
 ```
 
+To preview a reseed without changing the database:
+```
+pnpm --filter @workspace/scripts exec tsx ./src/seed-episodes.ts --dry-run
+```
+
 To export the current episode to MP4:
 ```
 BIOMINUTE_EXPORT_DIR="exports/Episode-NN-<slug>" pnpm run export-video

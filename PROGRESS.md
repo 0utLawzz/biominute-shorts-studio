@@ -166,6 +166,39 @@ ep 66  ·  Magnesium and Insulin Sensitivity  ·  folder ✗  MP4 ✗  YT ✗  F
 4. Workspace typecheck passed across all libraries, artifacts, and scripts.
 5. Updated `docs/production-status.md` with the current reconciled counts.
 
+### Request 9 — Start Stage 3: make database dates and workbook seeding safer
+*(Session: 2026-07-27)*
+
+**User said:** "Start Stage 3. Mark progress in small chunks and explain it simply."
+
+**Agent did:**
+1. Made workbook selection automatic: the seed script now chooses the newest `.xlsx` file in `attached_assets/`, so a renamed workbook no longer requires a code edit.
+2. Added safe preview mode:
+   - `pnpm --filter @workspace/scripts exec tsx ./src/seed-episodes.ts --dry-run`
+   - It reports the workbook and expected insert/update counts without changing the database.
+3. Changed `episodes.post_date` from text to a nullable PostgreSQL timestamp.
+   - Existing valid dates were preserved.
+   - Empty test-slot dates became `NULL`.
+   - Development database verification: 102 total episodes, 100 with dates, 2 without dates.
+4. Updated seed, rescheduling, API, dashboard, OpenAPI, and generated client types for timestamp dates.
+5. Ran the real seed and YouTube reconciliation:
+   - 12 published
+   - 53 scheduled
+   - 35 scripted
+   - 2 test slots
+6. Verification passed:
+   - Full workspace typecheck
+   - Seed dry-run
+   - Database schema push reports no pending changes
+   - API health endpoint returns 200
+   - Unauthenticated protected API returns 401
+   - All four workflows are running
+   - Dashboard screenshot shows the password gate
+
+**Stage 3 status: COMPLETE.**
+
+**Next task: Stage 4 — clean dead scheduler code and synchronize the OpenAPI route definitions.**
+
 ---
 
 ## Git commit history (chronological, oldest → newest)

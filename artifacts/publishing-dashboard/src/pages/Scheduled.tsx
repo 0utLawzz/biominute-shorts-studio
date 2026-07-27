@@ -51,7 +51,14 @@ export default function Scheduled() {
         ) : (
           <div className="space-y-4">
             {episodes
-              .sort((a, b) => (a.scheduledPublishAt ?? a.postDate) > (b.scheduledPublishAt ?? b.postDate) ? 1 : -1)
+              .sort((a, b) => {
+                const aDate = a.scheduledPublishAt ?? a.postDate;
+                const bDate = b.scheduledPublishAt ?? b.postDate;
+                if (!aDate && !bDate) return 0;
+                if (!aDate) return 1;
+                if (!bDate) return -1;
+                return aDate > bDate ? 1 : -1;
+              })
               .map((ep) => {
                 const targetDate = ep.scheduledPublishAt
                   ? new Date(ep.scheduledPublishAt)

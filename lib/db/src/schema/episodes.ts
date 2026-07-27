@@ -16,7 +16,7 @@ export const episodesTable = pgTable("episodes", {
   epNumber: integer("ep_number").notNull(),
   status: episodeStatusEnum("status").notNull().default("draft"),
   dateBuilt: text("date_built"),
-  postDate: text("post_date").notNull(),
+  postDate: timestamp("post_date"),
   season: text("season").notNull(),
   aspectRatio: text("aspect_ratio").notNull().default("9:16"),
   duration: text("duration").notNull(),

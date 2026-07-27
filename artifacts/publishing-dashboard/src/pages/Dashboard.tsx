@@ -138,9 +138,19 @@ export default function Dashboard() {
             ) : upcoming && upcoming.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {upcoming.slice(0, 3).map((ep) => {
-                  const days = differenceInDays(new Date(ep.postDate), new Date());
-                  const daysLabel = days < 0 ? "PAST DUE" : days === 0 ? "TODAY" : `IN ${days} DAYS`;
-                  const daysStyle = days < 0 ? "text-[#8B2FC9] border-[#8B2FC9]" : "text-[#C94A00] border-[#0C0C0C]";
+                  const days = ep.postDate
+                    ? differenceInDays(new Date(ep.postDate), new Date())
+                    : null;
+                  const daysLabel = days === null
+                    ? "DATE TBD"
+                    : days < 0
+                    ? "PAST DUE"
+                    : days === 0
+                    ? "TODAY"
+                    : `IN ${days} DAYS`;
+                  const daysStyle = days !== null && days < 0
+                    ? "text-[#8B2FC9] border-[#8B2FC9]"
+                    : "text-[#C94A00] border-[#0C0C0C]";
                   return (
                     <div key={ep.id} className="bg-[#FAF7EE] border-2 border-[#0C0C0C] p-4 flex flex-col justify-between shadow-[3px_3px_0_#0C0C0C]">
                       <div>

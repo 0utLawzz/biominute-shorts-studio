@@ -13,7 +13,7 @@ export interface Episode {
   status: EpisodeStatus;
   /** @nullable */
   dateBuilt?: string | null;
-  postDate: string;
+  postDate: Date | null;
   season: string;
   aspectRatio?: string;
   duration: string;

@@ -1,6 +1,6 @@
 # Production Status — BioMinute Shorts Studio
 
-> **Canonical snapshot of the pipeline.** Refreshed **2026-07-28** after YouTube Data API reconciliation and render-queue safety work.
+> **Canonical snapshot of the pipeline.** Refreshed **2026-07-27** after Stage 3 database date migration, seed refresh, and YouTube reconciliation.
 
 This document is the single source of truth for *where every episode lives* in the publish pipeline. The dashboard (`http://<host>:5173/`) and the API endpoint `GET /api/episodes/stats` reflect the same numbers in real time.
 
@@ -30,7 +30,7 @@ This document is the single source of truth for *where every episode lives* in t
 
 **Ep 2 and 3** had `youtube_video_id` set but are no longer retrievable from the YouTube Data API. The DB treats them as `published` because the IDs were confirmed live at some point in the past.
 
-**Ep 66–100** — all carry `scripted` status. They have `hookTitle`, `voScript`, `visualDirection`, citation, CTA, hashtags, and a `postDate` allocated by the master workbook but no rendered MP4 yet.
+**Ep 66–100** — all carry `scripted` status. They have `hookTitle`, `voScript`, `visualDirection`, citation, CTA, hashtags, and a timestamp `postDate` allocated by the master workbook but no rendered MP4 yet.
 
 ---
 
@@ -52,9 +52,12 @@ This script:
 After it runs, follow with the canonical seeding step so workbook metadata stays in lockstep with DB:
 
 ```bash
+pnpm --filter @workspace/scripts exec tsx ./src/seed-episodes.ts --dry-run
 pnpm --filter @workspace/scripts exec tsx ./src/seed-episodes.ts
 pnpm --filter @workspace/scripts exec tsx ./src/resync-scheduled.ts
 ```
+
+The seed script automatically selects the newest `.xlsx` file in `attached_assets/`. Empty dates are stored as `NULL`; real episode dates are stored as PostgreSQL timestamps.
 
 ---
 

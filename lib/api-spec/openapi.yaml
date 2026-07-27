@@ -293,6 +293,8 @@ components:
           type: ["string", "null"]
         postDate:
           type: string
+          format: date-time
+          nullable: true
         season:
           type: string
         aspectRatio:
@@ -464,6 +466,8 @@ components:
           type: integer
         postDate:
           type: string
+          format: date-time
+          nullable: true
         season:
           type: string
         duration:

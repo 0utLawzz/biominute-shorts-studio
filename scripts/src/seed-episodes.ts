@@ -1,5 +1,5 @@
-// One-off seed: populates the `episodes` table from the master workbook
-// `attached_assets/BioMinute-Master-Workbook.xlsx` (Production, Social, Schedule tabs).
+// Seed: populates the `episodes` table from the newest master workbook
+// in attached_assets/ (Production, Social, Schedule tabs).
 // - Existing rows (1-36) are updated with workbook metadata only; their real
 //   publish/schedule status and YouTube IDs are preserved.
 // - New rows (37-50) and the two pipeline test slots (TEST-1, TEST-2) are inserted.
@@ -10,11 +10,9 @@ import { db, episodesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 
 const PROJECT_ROOT = path.resolve(import.meta.dirname, "../..");
-const MASTER_WORKBOOK = path.join(
-  PROJECT_ROOT,
-  "attached_assets/BioMinute-Master-Workbook_1785093582748.xlsx",
-);
+const ATTACHED_ASSETS_DIR = path.join(PROJECT_ROOT, "attached_assets");
 const EXPORTS_DIR = path.join(PROJECT_ROOT, "exports");
+const DRY_RUN = process.argv.includes("--dry-run");
 
 type DbStatus = "draft" | "scripted" | "complete" | "scheduled" | "published";
 
@@ -26,10 +24,27 @@ function hasExportedVideo(epNumber: number): boolean {
   return fs.existsSync(path.join(EXPORTS_DIR, folder, "episode.mp4"));
 }
 
-function normalizePostDate(raw: string): string {
+function findMasterWorkbook(): string {
+  const workbooks = fs
+    .readdirSync(ATTACHED_ASSETS_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && /\.xlsx$/i.test(entry.name))
+    .map((entry) => {
+      const fullPath = path.join(ATTACHED_ASSETS_DIR, entry.name);
+      return { fullPath, modifiedAt: fs.statSync(fullPath).mtimeMs };
+    })
+    .sort((a, b) => b.modifiedAt - a.modifiedAt);
+
+  if (workbooks.length === 0) {
+    throw new Error(`No .xlsx workbook found in ${ATTACHED_ASSETS_DIR}`);
+  }
+
+  return workbooks[0].fullPath;
+}
+
+function normalizePostDate(raw: string): Date | null {
   const parsed = new Date(raw);
-  if (Number.isNaN(parsed.getTime())) return "";
-  return parsed.toISOString().slice(0, 10);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed;
 }
 
 function extractEpNumberFromSchedule(cellValue: unknown): number | null {
@@ -66,8 +81,13 @@ function parseDescriptionBlock(description: string): { citation: string; hashtag
 }
 
 async function main() {
+  const masterWorkbook = findMasterWorkbook();
+  console.log(
+    `${DRY_RUN ? "[DRY RUN] " : ""}Using workbook: ${path.basename(masterWorkbook)}`,
+  );
+
   const wb = new ExcelJS.Workbook();
-  await wb.xlsx.readFile(MASTER_WORKBOOK);
+  await wb.xlsx.readFile(masterWorkbook);
 
   const prod = wb.getWorksheet("Production");
   const social = wb.getWorksheet("Social");
@@ -122,14 +142,15 @@ async function main() {
   // Read Schedule sheet for post dates
   // Headers are on row 4; data starts at row 5.
   // -------------------------------------------------------------------------
-  const scheduleByEp = new Map<number, string>();
+  const scheduleByEp = new Map<number, Date | null>();
   if (schedule) {
     schedule.eachRow((row, rowNumber) => {
       if (rowNumber <= 4) return;
       const epNumber = extractEpNumberFromSchedule(row.getCell(4).value);
       const date = String(row.getCell(2).value ?? "");
       if (epNumber && date) {
-        scheduleByEp.set(epNumber, normalizePostDate(date));
+        const normalized = normalizePostDate(date);
+        if (normalized) scheduleByEp.set(epNumber, normalized);
       }
     });
   }
@@ -157,7 +178,7 @@ async function main() {
       epNumber,
       status,
       dateBuilt: null,
-      postDate: scheduleByEp.get(epNumber) || "",
+      postDate: scheduleByEp.get(epNumber) ?? null,
       season: p.season,
       aspectRatio: "9:16",
       duration: p.duration,
@@ -180,7 +201,7 @@ async function main() {
       epNumber: 998,
       status: "complete",
       dateBuilt: null,
-      postDate: "",
+      postDate: null,
       season: "S1: Morning Habits",
       aspectRatio: "9:16",
       duration: "~30 seconds",
@@ -197,7 +218,7 @@ async function main() {
       epNumber: 999,
       status: "complete",
       dateBuilt: null,
-      postDate: "",
+      postDate: null,
       season: "S1: Morning Habits",
       aspectRatio: "9:16",
       duration: "~30 seconds",
@@ -214,6 +235,23 @@ async function main() {
   rows.push(...testEpisodes);
 
   if (rows.length === 0) throw new Error("No episode rows parsed from workbook");
+
+  if (DRY_RUN) {
+    const existing = await db
+      .select({ epNumber: episodesTable.epNumber, status: episodesTable.status })
+      .from(episodesTable);
+    const existingNumbers = new Set(existing.map((episode) => episode.epNumber));
+    const toInsert = rows.filter((row) => !existingNumbers.has(row.epNumber));
+    const toUpdate = rows.filter((row) => existingNumbers.has(row.epNumber));
+
+    console.log(`[DRY RUN] Parsed ${rows.length} workbook/test rows.`);
+    console.log(`[DRY RUN] Would insert ${toInsert.length} new rows.`);
+    console.log(`[DRY RUN] Would update ${toUpdate.length} existing rows.`);
+    console.log(
+      `[DRY RUN] Database unchanged. Remove --dry-run to apply the seed.`,
+    );
+    return;
+  }
 
   // -------------------------------------------------------------------------
   // Upsert: preserve existing publish/schedule state for real episodes
@@ -245,8 +283,9 @@ async function main() {
     // is present (fixes cumulative-drift bugs). For complete/scripted without a date, clear it.
     let scheduledPublishAt: Date | null | undefined = undefined; // undefined = leave unchanged
     if (row.postDate && !preserveLiveState) {
-      const d = new Date(`${row.postDate}T09:00:00Z`);
-      if (!Number.isNaN(d.getTime())) scheduledPublishAt = d;
+      const d = new Date(row.postDate);
+      d.setUTCHours(9, 0, 0, 0);
+      scheduledPublishAt = d;
     } else if (!row.postDate && !preserveLiveState) {
       scheduledPublishAt = null;
     }

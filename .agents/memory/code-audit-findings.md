@@ -25,9 +25,10 @@ description: Critical bugs, security gaps, and improvement areas found during th
 
 ## Data / reliability
 
-### `postDate` is stored as `text`, not `timestamp`
-- **Rule:** Any date arithmetic on `postDate` in SQL must cast it manually (`postDate::date`). Until the migration in item 3 runs, do not assume it behaves like a real date column.
-- **File:** `lib/db/schema/episodes.ts`
+### `postDate` is stored as a nullable timestamp
+- **Rule:** Treat missing post dates as `NULL`; do not use empty strings or cast `post_date` manually in SQL.
+- **Why:** Stage 3 migrated the development schema from text to timestamp so date arithmetic is type-safe. Production receives this schema change through Replit's publish flow.
+- **How to apply:** Use `postDate: Date | null` in application code and `post_date + interval` in SQL. Re-publish the app to apply the schema change to production.
 
 ### `seed-episodes.ts` has a hardcoded workbook filename
 - **Rule:** After any workbook rename or re-export, update the filename constant in `seed-episodes.ts` before re-seeding, OR run item 3 which auto-discovers the newest XLSX.

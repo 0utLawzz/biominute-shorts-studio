@@ -31,7 +31,7 @@ export interface Episode {
   status: EpisodeStatus;
   /** @nullable */
   dateBuilt?: string | null;
-  postDate: string;
+  postDate: string | null;
   season: string;
   aspectRatio?: string;
   duration: string;
@@ -159,7 +159,7 @@ export interface PublishResult {
 
 export interface CreateEpisodeBody {
   epNumber: number;
-  postDate: string;
+  postDate: string | null;
   season: string;
   duration?: string;
   hookTitle: string;

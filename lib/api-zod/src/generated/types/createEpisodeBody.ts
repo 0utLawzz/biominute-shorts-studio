@@ -8,7 +8,7 @@
 
 export interface CreateEpisodeBody {
   epNumber: number;
-  postDate: string;
+  postDate: Date | null;
   season: string;
   duration?: string;
   hookTitle: string;

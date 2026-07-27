@@ -371,7 +371,8 @@ router.get("/episodes/:id/build-status", async (req, res): Promise<void> => {
   if (videoExists && episode.buildStage === "rendering") {
     let scheduledPublishAt: Date | null = null;
     if (episode.postDate) {
-      const d = new Date(`${episode.postDate}T09:00:00Z`);
+      const d = new Date(episode.postDate);
+      d.setUTCHours(9, 0, 0, 0);
       if (!Number.isNaN(d.getTime())) scheduledPublishAt = d;
     }
     const nextStatus = episode.status === "published" ? episode.status : "scheduled";
