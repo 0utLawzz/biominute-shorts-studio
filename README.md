@@ -258,16 +258,27 @@ For platform-specific setup instructions (YouTube, Facebook, TikTok, Instagram, 
 
 ## Project Status
 
-- ✅ Episodes 1–50: Published/scheduled on YouTube with post dates preserved
-- ✅ Episodes 51–65: Exported, uploaded to YouTube as private/scheduled, and marked `scheduled` in the database (auto-publish 2026-09-04 through 2026-09-18)
-- ✅ Episodes 66–100: Scripted in the database, ready for production
+> Last reconciled 2026-07-27 against YouTube Data API via `scripts/src/reconcile-yt-status.mjs`.
+
+- ✅ **Ep 1–11 Published** — live on YouTube; DB `status='published'`, post dates preserved (Jul 12 – Jul 26, 2026)
+- ✅ **Ep 12–65 Scheduled** — uploaded as private with `publishAt` future; DB `status='scheduled'`; auto-publish window Jul 27 – Sep 18, 2026
+- ✅ **Ep 66–100 Scripted** — copy + visual direction captured in master workbook; no MP4 / no YouTube ID yet
 - ✅ Publishing dashboard: Live with Neo-Brutalism UI, pipeline status header, full CRUD + YouTube publish
 - ✅ API server: Running with full OpenAPI spec, duplicate-upload guard, and canonical description template
-- ✅ Database: 102 episodes seeded (50 published, 15 scheduled, 35 scripted, 2 approved test slots)
+- ✅ Database: 102 episodes (11 published + 54 scheduled + 35 scripted + 2 test slots). Live counts: `GET /api/episodes/stats`
 - ✅ Static dashboard: `exports/dashboard.html` reflects live DB state
 - ✅ Neon PR branch automation: `.github/workflows/neon_workflow.yml` creates/deletes database branches with pull requests
-- 🔄 Test episodes `TEST-1` and `TEST-2` reserved for pipeline smoke tests
+- 🔄 Test episodes `TEST-1` (immediate publish) and `TEST-2` (scheduler smoke test) reserved
 - 🔄 GitHub Pages: ready to deploy from `main` root
+
+### Live count breakdown (Ep 1–100)
+
+```
+published   : 11   (Ep 1–11, yt privacyStatus=public)
+scheduled   : 54   (Ep 12–65, yt privacyStatus=private + future publishAt)
+scripted    : 35   (Ep 66–100, no MP4 / no YT id)
+complete    :  2   (TEST-1, TEST-2 smoke-test slots)
+```
 
 ---
 

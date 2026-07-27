@@ -95,3 +95,25 @@ Record exact constants and creative choices here so future episodes don't drift.
 
 ## Full source data
 - Full spreadsheet with scripts, visual direction, citations, descriptions, hashtags, CTAs, and thumbnail prompts for every episode: `attached_assets/BioMinute-Episode-Master-Plan_1783893698840.xlsx` (sheet "Episode Master Plan"). Re-read this sheet's row for an episode's exact script/citation before producing — do not rely on the title alone.
+
+---
+
+## 2026-07-27 — Status reconciliation pass
+
+Reconciled Ep 1–65 DB status against YouTube Data API (`scripts/src/reconcile-yt-status.mjs`).
+
+**Outcome** (Ep 1–100 live counts):
+- `published` = 11  (Ep 1, 4–11 public on YouTube + Ep 2, 3 historical)
+- `scheduled` = 54  (Ep 12–65 private + future `publishAt`, auto-publish Jul 27 – Sep 18, 2026)
+- `scripted`  = 35  (Ep 66–100, no MP4 / no YouTube ID)
+- `complete`  =  2  (TEST-1 / TEST-2 test slots)
+
+**YouTube scheduler auto-publish windows**:
+- Jul 27 → Sep 03: Ep 12–50  (1/day @ 09:00 UTC)
+- Sep 04 → Sep 18: Ep 51–65  (1/day @ 09:00 UTC, fresh upload batch)
+
+**Reconciled DB then re-seeded** via:
+- `pnpm --filter @workspace/scripts exec tsx ./src/seed-episodes.ts`      → workbook metadata refresh
+- `pnpm --filter @workspace/scripts exec tsx ./src/resync-scheduled.ts`  → recompute `scheduled_publish_at = post_date + 9h UTC` for the 54 scheduled rows + 35 scripted rows with workbook post_dates
+
+**Next checkpoint**: after Ep 12 auto-publishes today, re-run reconcile to confirm Ep 12 rolls from `scheduled` → `published` (publishAt past + private = live).
