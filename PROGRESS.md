@@ -74,6 +74,28 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 3. Updated: `README.md` refresh stamp, `docs/production-status.md` refresh stamp, appended `2026-07-27 — Database re-seed + reconcile + dashboard regen` entry to `exports/production-log.md`.
 4. **Commits pushed:** `1f8a8da` (production-log + PROGRESS), `b67ea2b` (README + docs refresh stamp), and `b67ea2b+` (dashboard.html + this PROGRESS entry).
 
+### Request 6 — Code audit + numbered improvement plan
+*(Session: 2026-07-28)*
+
+**User said:** "I asked for code audit and want suggestions or feedback for improvement. Build a system where you can say Start from 1 to 5 and the agent knows what to do. Also thinking about production-wise scope. Update PROGRESS.md and memory like a changelog."
+
+**Agent did:**
+1. Ran full codebase audit via explore subagent across all 7 areas (api-server, dashboard, biominute-reels, lib/db, lib/api-spec, scripts, root config).
+2. Identified **3 critical production blockers** + 12 improvement items (see `docs/improvement-plan.md`).
+3. Defined the **1–5 numbered plan** (see below + `docs/improvement-plan.md`) so any future session can run `Start N` and know exactly what to do.
+4. Updated PROGRESS.md + agent memory with audit findings.
+5. **Commit pushed** *(this turn).*
+
+**Critical findings:**
+- 🔴 No authentication on dashboard/API — anyone with the URL can trigger renders or publish to YouTube
+- 🔴 `/run-production` spawns detached processes with no queue/lock — double-clicks corrupt exports
+- 🟡 `postDate` stored as `text` in DB instead of `timestamp` — requires manual normalization everywhere
+- 🟡 `seed-episodes.ts` has a hardcoded workbook filename — breaks on rename
+- 🟡 Dead auto-scheduler code in `api-server/index.ts` causes confusion
+- 🟢 OpenAPI spec has ghost endpoints that don't match actual routes
+
+---
+
 ### Request 5 — Add YouTube & Facebook stats tabs + Social Setup UI
 *(Session: 2026-07-27, present turn)*
 
