@@ -120,6 +120,32 @@ Every episode row in the master workbook contains: hook title, VO script, visual
 
 ---
 
+## Daily Facebook Auto-Publish (Ep 1–50)
+
+The script `scripts/src/facebook-daily-publish.ts` runs once per day (via a
+Replit Scheduled Deployment) and publishes **exactly one** Ep 1–50 video to the
+Facebook Page — the lowest-numbered episode that does not yet have a
+`facebookVideoId` set. Re-running picks up the next episode; it never
+reprocesses one.
+
+```bash
+pnpm run facebook-daily-publish                   # daily scheduled run
+TEST_MODE=true pnpm run facebook-daily-publish    # dry-run (no API call, DB unchanged)
+```
+
+**Required env vars:** `DATABASE_URL`, `FACEBOOK_PAGE_ACCESS_TOKEN`, `FACEBOOK_PAGE_ID`.
+
+**Disk cleanup — safety-gated.** After publishing to Facebook, the script
+deletes the local export folder for that episode **only when both**:
+- `facebookVideoId` was set successfully (just now), AND
+- `youtubeVideoId` was already set beforehand.
+
+If `youtubeVideoId` is missing, the local video file is **kept**. This prevents
+ever deleting the only copy of a video that isn't safely backed up on both
+platforms.
+
+---
+
 ## Quick Start
 
 ```bash

@@ -12,5 +12,9 @@ export interface EpisodeUpdate {
   youtubeTitle?: string;
   citationCta?: string;
   hashtags?: string;
+  /** @nullable */
+  buildStage?: string | null;
+  /** @nullable */
+  buildNote?: string | null;
   scheduledPublishAt?: string;
 }

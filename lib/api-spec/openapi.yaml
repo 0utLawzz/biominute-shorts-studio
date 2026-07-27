@@ -296,6 +296,24 @@ components:
           type: ["string", "null"]
         facebookVideoId:
           type: ["string", "null"]
+        youtubeViews:
+          type: ["integer", "null"]
+        youtubeLikes:
+          type: ["integer", "null"]
+        youtubeComments:
+          type: ["integer", "null"]
+        facebookViews:
+          type: ["integer", "null"]
+        facebookLikes:
+          type: ["integer", "null"]
+        facebookComments:
+          type: ["integer", "null"]
+        facebookShares:
+          type: ["integer", "null"]
+        buildStage:
+          type: ["string", "null"]
+        buildNote:
+          type: ["string", "null"]
         scheduledPublishAt:
           type: ["string", "null"]
         approvedAt:
@@ -336,6 +354,10 @@ components:
           type: string
         hashtags:
           type: string
+        buildStage:
+          type: ["string", "null"]
+        buildNote:
+          type: ["string", "null"]
         scheduledPublishAt:
           type: string
 

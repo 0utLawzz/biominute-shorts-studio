@@ -30,6 +30,24 @@ export interface Episode {
   /** @nullable */
   facebookVideoId?: string | null;
   /** @nullable */
+  youtubeViews?: number | null;
+  /** @nullable */
+  youtubeLikes?: number | null;
+  /** @nullable */
+  youtubeComments?: number | null;
+  /** @nullable */
+  facebookViews?: number | null;
+  /** @nullable */
+  facebookLikes?: number | null;
+  /** @nullable */
+  facebookComments?: number | null;
+  /** @nullable */
+  facebookShares?: number | null;
+  /** @nullable */
+  buildStage?: string | null;
+  /** @nullable */
+  buildNote?: string | null;
+  /** @nullable */
   scheduledPublishAt?: string | null;
   /** @nullable */
   approvedAt?: string | null;

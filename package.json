@@ -8,7 +8,8 @@
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "dashboard:generate": "pnpm --filter @workspace/scripts generate-dashboard",
     "export-video": "cross-env BIOMINUTE_EXPORT_URL=http://localhost:25078/biominute-reels/ pnpm --filter @workspace/scripts export-video",
-    "verify-export": "pnpm --filter @workspace/scripts verify-export"
+    "verify-export": "pnpm --filter @workspace/scripts verify-export",
+    "facebook-daily-publish": "pnpm --filter @workspace/scripts exec tsx ./src/facebook-daily-publish.ts"
   },
   "private": true,
   "dependencies": {
