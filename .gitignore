@@ -55,3 +55,4 @@ Thumbs.db
 # Rendered episode videos — large binaries, not source. Kept on disk / uploaded
 # to YouTube+Facebook, not committed to git.
 exports/**/episode.mp4
+exports/**/*.webm

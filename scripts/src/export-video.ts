@@ -138,6 +138,16 @@ async function main() {
       );
     }
 
+    // The Playwright .webm recording has now been fully converted into the final
+    // mp4 (with music mixed in) — delete it immediately so these intermediate
+    // recordings never pile up in exports/ or get accidentally committed to git.
+    try {
+      await fs.unlink(videoPath);
+      console.log('Deleted intermediate Playwright recording:', videoPath);
+    } catch (cleanupErr) {
+      console.warn('Could not delete intermediate .webm (non-fatal):', cleanupErr);
+    }
+
     console.log('Exported MP4:', mp4Path);
 
     // Regenerate the static dashboard so the latest export is visible immediately.
