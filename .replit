@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "web", "python-3.12", "bash"]
+modules = ["nodejs-20", "web", "python-3.12"]
 
 [deployment]
 router = "application"
@@ -58,7 +58,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "PORT=25078 pnpm --filter @workspace/biominute-reels run dev"
+args = "BASE_PATH=/biominute-reels/ PORT=25078 pnpm --filter @workspace/biominute-reels run dev"
 waitForPort = 25078
 
 [workflows.workflow.metadata]
