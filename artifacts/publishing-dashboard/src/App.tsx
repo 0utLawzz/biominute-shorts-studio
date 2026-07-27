@@ -12,6 +12,8 @@ import PreviewQueue from './pages/PreviewQueue';
 import Scheduled from './pages/Scheduled';
 import Published from './pages/Published';
 import AnalyticsPage from './pages/Analytics';
+import SocialStatus from './pages/SocialStatus';
+import SocialSetup from './pages/SocialSetup';
 
 const queryClient = new QueryClient();
 
@@ -26,6 +28,8 @@ function Router() {
       <Route path="/published" component={Published} />
       <Route path="/episodes/:id" component={EpisodeDetail} />
       <Route path="/analytics" component={AnalyticsPage} />
+      <Route path="/social-status" component={SocialStatus} />
+      <Route path="/social-setup" component={SocialSetup} />
       <Route component={NotFound} />
     </Switch>
   );

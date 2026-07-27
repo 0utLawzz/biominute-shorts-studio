@@ -9,6 +9,8 @@ const NAV_LINKS = [
   { href: "/preview-queue", label: "Preview" },
   { href: "/scheduled", label: "Scheduled" },
   { href: "/published", label: "Published" },
+  { href: "/social-status", label: "Social" },
+  { href: "/social-setup", label: "Setup" },
   { href: "/analytics", label: "Analytics" },
 ];
 
