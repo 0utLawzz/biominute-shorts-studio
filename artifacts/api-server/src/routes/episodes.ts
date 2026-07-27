@@ -13,6 +13,13 @@ import {
 import { spawn } from "child_process";
 import { promises as fs, openSync, closeSync, mkdirSync, readdirSync, existsSync } from "fs";
 import path from "path";
+import {
+  attachRenderPid,
+  claimRenderJob,
+  finishRenderJob,
+  getRenderJob,
+  RenderAlreadyRunningError,
+} from "../lib/render-jobs";
 
 // The valid set of episode status strings (mirrors the Drizzle pgEnum)
 type EpisodeStatusValue =
@@ -400,6 +407,43 @@ router.get("/episodes/:id/build-status", async (req, res): Promise<void> => {
   });
 });
 
+// GET /episodes/:id/render-status — durable process-level render status
+router.get("/episodes/:id/render-status", async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  if (isNaN(id) || id <= 0) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
+
+  const [episode] = await db
+    .select({ id: episodesTable.id })
+    .from(episodesTable)
+    .where(eq(episodesTable.id, id));
+  if (!episode) {
+    res.status(404).json({ error: "Episode not found" });
+    return;
+  }
+
+  const [statusEpisode] = await db
+    .select({ epNumber: episodesTable.epNumber })
+    .from(episodesTable)
+    .where(eq(episodesTable.id, id));
+  const outputExists = statusEpisode
+    ? (await findVideoPath(statusEpisode.epNumber)) !== null
+    : false;
+  const job = await getRenderJob(id, outputExists);
+  res.json({
+    status: job?.status ?? "idle",
+    jobId: job?.id ?? null,
+    pid: job?.pid ?? null,
+    startedAt: job?.startedAt?.toISOString() ?? null,
+    finishedAt: job?.finishedAt?.toISOString() ?? null,
+    logPath: job?.logPath ?? null,
+    error: job?.error ?? null,
+  });
+});
+
 // POST /episodes/:id/run-production
 router.post("/episodes/:id/run-production", async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
@@ -430,6 +474,26 @@ router.post("/episodes/:id/run-production", async (req, res): Promise<void> => {
     return;
   }
 
+  // Claim the durable per-episode render slot before touching the episode or
+  // spawning a child. The row-level lock makes simultaneous requests safe.
+  const exportDir = buildExportDir(episode.epNumber);
+  const logPath = path.join(exportDir, "export.log");
+  let renderJob: Awaited<ReturnType<typeof claimRenderJob>>;
+  try {
+    renderJob = await claimRenderJob({ episodeId: id, logPath });
+  } catch (error) {
+    if (error instanceof RenderAlreadyRunningError) {
+      res.status(409).json({
+        error: error.message,
+        status: "running",
+        jobId: error.job.id,
+        startedAt: error.job.startedAt,
+      });
+      return;
+    }
+    throw error;
+  }
+
   // Promote scripted → building, then mark as rendering
   await db
     .update(episodesTable)
@@ -441,7 +505,6 @@ router.post("/episodes/:id/run-production", async (req, res): Promise<void> => {
   const exportUrl =
     process.env.BIOMINUTE_EXPORT_URL ||
     `http://localhost:${process.env.BIOMINUTE_REELS_PORT || "25078"}/biominute-reels/`;
-  const exportDir = buildExportDir(episode.epNumber);
   const scriptPath = path.join(WORKSPACE_ROOT, "scripts", "src", "export-video.ts");
 
   // tsx lives in the scripts package's node_modules — use that path directly
@@ -450,10 +513,11 @@ router.post("/episodes/:id/run-production", async (req, res): Promise<void> => {
 
   // Ensure export dir exists so the log file can be opened before tsx starts.
   mkdirSync(exportDir, { recursive: true });
-  const logPath = path.join(exportDir, "export.log");
   const logFd = openSync(logPath, "w");
 
-  // Spawn the export script detached so it survives the HTTP response.
+  // Keep the child detached so a normal HTTP/API lifecycle does not cancel a
+  // render. The database row remains the durable lock across restarts and lets
+  // the next API instance reconcile the PID.
   // stdout + stderr both go to export.log — never silent-fail again.
   const child = spawn(
     tsxBin,
@@ -469,10 +533,56 @@ router.post("/episodes/:id/run-production", async (req, res): Promise<void> => {
     }
   );
   child.unref();
-  // Close our copy of the fd immediately — the child holds its own reference.
   closeSync(logFd);
 
-  res.json({ success: true, message: "Production render started. Poll /build-status for progress." });
+  if (!child.pid) {
+    await finishRenderJob({
+      jobId: renderJob.id,
+      status: "failed",
+      error: "Render process did not provide a PID",
+    });
+    res.status(500).json({ error: "Render process did not start" });
+    return;
+  }
+
+  await attachRenderPid(renderJob.id, child.pid);
+  child.once("error", async (error) => {
+    await finishRenderJob({
+      jobId: renderJob.id,
+      status: "failed",
+      error: error.message,
+    });
+    await db
+      .update(episodesTable)
+      .set({ buildNote: `Render failed: ${error.message}`, updatedAt: new Date() })
+      .where(eq(episodesTable.id, id));
+  });
+  child.once("exit", async (code, signal) => {
+    const succeeded = code === 0;
+    await finishRenderJob({
+      jobId: renderJob.id,
+      status: succeeded ? "succeeded" : "failed",
+      error: succeeded
+        ? null
+        : `Render exited with ${signal ? `signal ${signal}` : `code ${code}`}`,
+    });
+    if (!succeeded) {
+      await db
+        .update(episodesTable)
+        .set({
+          buildNote: `Render failed: ${signal ? `signal ${signal}` : `code ${code}`}`,
+          updatedAt: new Date(),
+        })
+        .where(eq(episodesTable.id, id));
+    }
+  });
+
+  res.json({
+    success: true,
+    jobId: renderJob.id,
+    pid: child.pid,
+    message: "Production render started. Poll /render-status for progress.",
+  });
 });
 
 // REMOVED: POST /episodes/:id/reject — manual rejection workflow eliminated

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { BuildingCard } from "../components/BuildingCard";
@@ -14,8 +14,18 @@ export default function Building() {
   const queryClient = useQueryClient();
   const { data: episodes, isLoading } = useListEpisodes({ status: "building" });
   const [buildStatuses, setBuildStatuses] = useState<Record<number, BuildStatus>>({});
+  const [renderStatuses, setRenderStatuses] = useState<Record<number, RenderStatus>>({});
   const [runningIds, setRunningIds] = useState<Set<number>>(new Set());
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  type RenderStatus = {
+    status: "idle" | "running" | "succeeded" | "failed";
+    jobId: number | null;
+    pid: number | null;
+    startedAt: string | null;
+    finishedAt: string | null;
+    error: string | null;
+  };
 
   function showToast(msg: string) {
     setToastMsg(msg);
@@ -24,12 +34,21 @@ export default function Building() {
 
   const refreshStatus = useCallback(async (id: number) => {
     try {
-      const status = await customFetch<BuildStatus>(`/api/episodes/${id}/build-status`);
-      setBuildStatuses((prev) => ({ ...prev, [id]: status }));
+      const [buildStatus, renderStatus] = await Promise.all([
+        customFetch<BuildStatus>(`/api/episodes/${id}/build-status`),
+        customFetch<RenderStatus>(`/api/episodes/${id}/render-status`),
+      ]);
+      setBuildStatuses((prev) => ({ ...prev, [id]: buildStatus }));
+      setRenderStatuses((prev) => ({ ...prev, [id]: renderStatus }));
     } catch {
       // non-fatal
     }
   }, []);
+
+  useEffect(() => {
+    if (!episodes) return;
+    void Promise.all(episodes.map((episode) => refreshStatus(episode.id)));
+  }, [episodes, refreshStatus]);
 
   async function handleRunProduction(id: number) {
     setRunningIds((prev) => new Set(prev).add(id));
@@ -133,6 +152,7 @@ export default function Building() {
                 onReject={handleReject}
                 onApprove={handleApprove}
                 isRunningProduction={runningIds.has(ep.id)}
+                renderStatus={renderStatuses[ep.id] ?? null}
                 buildStatus={buildStatuses[ep.id] ?? null}
                 onRefreshStatus={refreshStatus}
               />

@@ -27,6 +27,10 @@ export default function EpisodeDetail() {
   const updateMutation = useUpdateEpisode();
   const publishMutation = usePublishToYouTube();
   const runProductionMutation = useRunProduction();
+  const [renderStatus, setRenderStatus] = useState<{
+    status: "idle" | "running" | "succeeded" | "failed";
+    error?: string | null;
+  } | null>(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<Partial<EpisodeUpdate>>({});
@@ -59,6 +63,27 @@ export default function EpisodeDetail() {
       setPendingStatus(episode.status);
     }
   }, [episode]);
+
+  useEffect(() => {
+    if (!id) return;
+    let active = true;
+    const refreshRenderStatus = async () => {
+      try {
+        const response = await fetch(`/api/episodes/${id}/render-status`);
+        if (response.ok && active) {
+          setRenderStatus(await response.json());
+        }
+      } catch {
+        // The existing episode query remains usable if status polling is down.
+      }
+    };
+    void refreshRenderStatus();
+    const interval = window.setInterval(refreshRenderStatus, 3000);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, [id]);
 
   if (isLoading) {
     return (
@@ -324,10 +349,10 @@ export default function EpisodeDetail() {
               {episode.status === "scripted" && (
                 <button
                   onClick={handleRunProduction}
-                  disabled={runProductionMutation.isPending}
+                  disabled={runProductionMutation.isPending || renderStatus?.status === "running"}
                   className="w-full brutal-btn bg-[#C9A800] text-[#0C0C0C] border-[2.5px] border-[#0C0C0C] flex items-center justify-center gap-2 py-2 text-sm hover:brightness-95"
                 >
-                  {runProductionMutation.isPending
+                  {runProductionMutation.isPending || renderStatus?.status === "running"
                     ? <Loader2 className="animate-spin w-4 h-4" />
                     : <Clapperboard className="w-4 h-4" />}
                   RUN PRODUCTION

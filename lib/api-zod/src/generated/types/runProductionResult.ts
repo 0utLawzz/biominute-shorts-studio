@@ -8,5 +8,7 @@
 
 export interface RunProductionResult {
   success: boolean;
+  jobId: number;
+  pid: number;
   message: string;
 }

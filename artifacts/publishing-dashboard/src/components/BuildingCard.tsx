@@ -27,6 +27,7 @@ interface BuildingCardProps {
   onReject: (id: number) => void;
   onApprove: (id: number) => void;
   isRunningProduction?: boolean;
+  renderStatus?: { status: "idle" | "running" | "succeeded" | "failed"; error?: string | null } | null;
   buildStatus?: { buildStage?: string | null; videoExists?: boolean } | null;
   onRefreshStatus: (id: number) => void;
 }
@@ -38,6 +39,7 @@ export function BuildingCard({
   onReject,
   onApprove,
   isRunningProduction,
+  renderStatus,
   buildStatus,
   onRefreshStatus,
 }: BuildingCardProps) {
@@ -45,7 +47,7 @@ export function BuildingCard({
   const stage = (buildStatus?.buildStage ?? episode.buildStage ?? "script_ready") as Stage;
   const stageIndex = STAGES.indexOf(stage);
   const stageColor = STAGE_COLORS[stage] ?? "#C9A800";
-  const isRendering = stage === "rendering";
+  const isRendering = stage === "rendering" || renderStatus?.status === "running";
 
   // Poll while rendering
   useEffect(() => {
@@ -122,7 +124,7 @@ export function BuildingCard({
           Edit
         </button>
 
-        {stage === "script_ready" && (
+        {stage === "script_ready" && !isRendering && (
           <button
             onClick={() => onRunProduction(episode.id)}
             disabled={isRunningProduction}
@@ -133,7 +135,7 @@ export function BuildingCard({
           </button>
         )}
 
-        {stage === "rendering" && (
+        {isRendering && (
           <button
             disabled
             className="flex items-center gap-1.5 font-mono text-xs font-bold px-3 py-1.5 border-[2px] border-[#0C0C0C] bg-[#C94A00] text-white shadow-[2px_2px_0_#0C0C0C] opacity-80 uppercase cursor-not-allowed"
@@ -141,6 +143,12 @@ export function BuildingCard({
             <Loader2 size={11} className="animate-spin" />
             Rendering…
           </button>
+        )}
+
+        {renderStatus?.status === "failed" && !isRendering && (
+          <span className="font-mono text-[10px] font-bold text-[#C94A00] uppercase">
+            Last render failed
+          </span>
         )}
 
         {stage === "exported" && (

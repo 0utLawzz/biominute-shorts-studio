@@ -164,6 +164,27 @@ paths:
               schema:
                 $ref: "#/components/schemas/BuildStatus"
 
+  /episodes/{id}/render-status:
+    get:
+      operationId: getRenderStatus
+      tags: [episodes]
+      summary: Get durable render process status for an episode
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Render process status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RenderStatus"
+        "404":
+          description: Episode not found
+
   /episodes/{id}/run-production:
     post:
       operationId: runProduction
@@ -182,6 +203,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RunProductionResult"
+        "409":
+          description: A render is already running for this episode
 
   /youtube/auth-url:
     get:
@@ -503,8 +526,34 @@ components:
       properties:
         success:
           type: boolean
+        jobId:
+          type: integer
+        pid:
+          type: integer
         message:
           type: string
-      required: [success, message]
+      required: [success, jobId, pid, message]
+
+    RenderStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [idle, running, succeeded, failed]
+        jobId:
+          type: ["integer", "null"]
+        pid:
+          type: ["integer", "null"]
+        startedAt:
+          type: ["string", "null"]
+          format: date-time
+        finishedAt:
+          type: ["string", "null"]
+          format: date-time
+        logPath:
+          type: ["string", "null"]
+        error:
+          type: ["string", "null"]
+      required: [status, jobId, pid, startedAt, finishedAt, logPath, error]
 
     # REMOVED: RejectEpisodeBody, RejectEpisodeResponse — manual rejection workflow eliminated

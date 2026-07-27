@@ -30,6 +30,7 @@ import type {
   ListEpisodesParams,
   PublishRequest,
   PublishResult,
+  RenderStatus,
   RunProductionResult,
   YouTubeAuthUrl,
   YouTubeStatus
@@ -674,6 +675,83 @@ export function useGetBuildStatus<TData = Awaited<ReturnType<typeof getBuildStat
 
 
 
+export const getGetRenderStatusUrl = (id: number,) => {
+
+
+
+
+  return `/api/episodes/${id}/render-status`
+}
+
+/**
+ * @summary Get durable render process status for an episode
+ */
+export const getRenderStatus = async (id: number, options?: RequestInit): Promise<RenderStatus> => {
+
+  return customFetch<RenderStatus>(getGetRenderStatusUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetRenderStatusQueryKey = (id: number,) => {
+    return [
+    `/api/episodes/${id}/render-status`
+    ] as const;
+    }
+
+
+export const getGetRenderStatusQueryOptions = <TData = Awaited<ReturnType<typeof getRenderStatus>>, TError = ErrorType<void>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRenderStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRenderStatusQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRenderStatus>>> = ({ signal }) => getRenderStatus(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRenderStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetRenderStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getRenderStatus>>>
+export type GetRenderStatusQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get durable render process status for an episode
+ */
+
+export function useGetRenderStatus<TData = Awaited<ReturnType<typeof getRenderStatus>>, TError = ErrorType<void>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRenderStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetRenderStatusQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
 export const getRunProductionUrl = (id: number,) => {
 
 
@@ -700,7 +778,7 @@ export const runProduction = async (id: number, options?: RequestInit): Promise<
 
 
 
-export const getRunProductionMutationOptions = <TError = ErrorType<unknown>,
+export const getRunProductionMutationOptions = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runProduction>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof runProduction>>, TError,{id: number}, TContext> => {
 
@@ -729,12 +807,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type RunProductionMutationResult = NonNullable<Awaited<ReturnType<typeof runProduction>>>
 
-    export type RunProductionMutationError = ErrorType<unknown>
+    export type RunProductionMutationError = ErrorType<void>
 
     /**
  * @summary Trigger production render for an episode
  */
-export const useRunProduction = <TError = ErrorType<unknown>,
+export const useRunProduction = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runProduction>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof runProduction>>,

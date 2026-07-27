@@ -187,7 +187,35 @@ export interface BuildStatus {
 
 export interface RunProductionResult {
   success: boolean;
+  jobId: number;
+  pid: number;
   message: string;
+}
+
+export type RenderStatusStatus = typeof RenderStatusStatus[keyof typeof RenderStatusStatus];
+
+
+export const RenderStatusStatus = {
+  idle: 'idle',
+  running: 'running',
+  succeeded: 'succeeded',
+  failed: 'failed',
+} as const;
+
+export interface RenderStatus {
+  status: RenderStatusStatus;
+  /** @nullable */
+  jobId: number | null;
+  /** @nullable */
+  pid: number | null;
+  /** @nullable */
+  startedAt: string | null;
+  /** @nullable */
+  finishedAt: string | null;
+  /** @nullable */
+  logPath: string | null;
+  /** @nullable */
+  error: string | null;
 }
 
 export type ListEpisodesParams = {

@@ -292,6 +292,24 @@ export const GetBuildStatusResponse = zod.object({
 
 
 /**
+ * @summary Get durable render process status for an episode
+ */
+export const GetRenderStatusParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetRenderStatusResponse = zod.object({
+  "status": zod.enum(['idle', 'running', 'succeeded', 'failed']),
+  "jobId": zod.number().nullable(),
+  "pid": zod.number().nullable(),
+  "startedAt": zod.coerce.date().nullable(),
+  "finishedAt": zod.coerce.date().nullable(),
+  "logPath": zod.string().nullable(),
+  "error": zod.string().nullable()
+})
+
+
+/**
  * @summary Trigger production render for an episode
  */
 export const RunProductionParams = zod.object({
@@ -300,6 +318,8 @@ export const RunProductionParams = zod.object({
 
 export const RunProductionResponse = zod.object({
   "success": zod.boolean(),
+  "jobId": zod.number(),
+  "pid": zod.number(),
   "message": zod.string()
 })
 
