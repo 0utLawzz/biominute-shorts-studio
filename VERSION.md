@@ -2,6 +2,15 @@
 
 Project follows [Semantic Versioning](https://semver.org/).
 
+## v0.2.1 — 2026-07-27
+
+### Fixed
+- **Root cause removed:** Deleted the hardcoded episode-range status logic (51–65 → complete, 66–100 → scripted) from `scripts/src/seed-episodes.ts`. Status for every episode now comes exclusively from the workbook's own Status column via `workbookStatusToDb()` — no episode-number special-casing anywhere.
+- **Auto-schedule on export:** `GET /episodes/:id/build-status` now automatically sets `status = "scheduled"` and computes `scheduledPublishAt` (postDate + 09:00 UTC) when a rendering episode's video file appears — no manual approval click needed.
+
+### Added
+- **Sync Workbook button** on the publishing dashboard Overview page. Clicking it POSTs to `POST /api/episodes/sync-workbook`, re-reads the master XLSX, upserts all episodes, and refreshes the page data — no terminal required.
+
 ## v0.2.0 — 2026-07-26
 
 ### Added

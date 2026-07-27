@@ -16,7 +16,7 @@ const MASTER_WORKBOOK = path.join(
 );
 const EXPORTS_DIR = path.join(PROJECT_ROOT, "exports");
 
-type DbStatus = "draft" | "scripted" | "complete" | "review" | "approved" | "scheduled" | "published";
+type DbStatus = "draft" | "scripted" | "complete" | "scheduled" | "published";
 
 function hasExportedVideo(epNumber: number): boolean {
   const padded = String(epNumber).padStart(2, "0");
@@ -149,10 +149,6 @@ async function main() {
     const dbStatus = workbookStatusToDb(p.status);
     let status: DbStatus = exported && dbStatus === "draft" ? "complete" : dbStatus;
 
-    // User directive: new batch 51–65 are complete, 66–100 are scripted.
-    if (epNumber >= 51 && epNumber <= 65) status = "complete";
-    else if (epNumber >= 66 && epNumber <= 100) status = "scripted";
-
     const citationText = s.citation || p.citation || "";
     const cta = s.cta ? `CTA: ${s.cta}` : "";
     const citationCta = [citationText, cta].filter(Boolean).join("\n\n");
@@ -245,9 +241,6 @@ async function main() {
     // AND keep their existing post/schedule dates so we don't wipe real history.
     const preserveLiveState = row.epNumber <= 50 && LOCKED_STATUSES.has(currentStatus);
 
-    // 51–65 are explicitly marked complete per user request.
-    const markComplete = row.epNumber >= 51 && row.epNumber <= 65;
-
     // scheduledPublishAt is recomputed from postDate + 09:00 UTC whenever a postDate
     // is present (fixes cumulative-drift bugs). For complete/scripted without a date, clear it.
     let scheduledPublishAt: Date | null | undefined = undefined; // undefined = leave unchanged
@@ -259,11 +252,13 @@ async function main() {
     }
 
     // Only overwrite status when the episode is NOT already live (1–50 published/scheduled).
+    // Status always comes from row.status, which was already derived purely from the
+    // workbook's own Status column in workbookStatusToDb() above — no hardcoded
+    // episode-number ranges, ever. This is what makes future workbook edits (any
+    // episode range, not just 51-100) sync correctly without code changes.
     let statusOverride: { status?: DbStatus } = {};
-    if (markComplete) {
-      statusOverride = { status: "complete" };
-    } else if (!preserveLiveState) {
-      statusOverride = { status: row.status };
+    if (!preserveLiveState) {
+      statusOverride = { status: row.status as DbStatus };
     }
 
     await db

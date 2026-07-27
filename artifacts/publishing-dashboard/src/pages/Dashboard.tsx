@@ -5,17 +5,21 @@ import {
   useGetUpcomingEpisodes,
   ListEpisodesStatus 
 } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { EpisodeCard } from "../components/EpisodeCard";
 import { Navbar } from "../components/Navbar";
 import { YouTubeBanner } from "../components/YouTubeBanner";
 import { differenceInDays } from "date-fns";
-import { Loader2, PlusCircle } from "lucide-react";
+import { Loader2, PlusCircle, RefreshCw } from "lucide-react";
 import { Link } from "wouter";
 import { formatPKT, formatPKTimeSec, formatPKDateLong } from "../lib/date";
 
 export default function Dashboard() {
   const [activeSeason, setActiveSeason] = useState<string>("all");
   const [activeStatus, setActiveStatus] = useState<ListEpisodesStatus | "all">("all");
+  const [syncing, setSyncing] = useState(false);
+  const [syncToast, setSyncToast] = useState<{ ok: boolean; msg: string } | null>(null);
+  const queryClient = useQueryClient();
 
   const SEASONS = [
     { key: "all", label: "All" },
@@ -44,6 +48,26 @@ export default function Dashboard() {
     status: activeStatus === "all" ? undefined : activeStatus 
   });
 
+  async function handleSyncWorkbook() {
+    setSyncing(true);
+    setSyncToast(null);
+    try {
+      const res = await fetch("/api/episodes/sync-workbook", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        setSyncToast({ ok: false, msg: data.detail || "Sync failed" });
+      } else {
+        setSyncToast({ ok: true, msg: `Synced: ${data.inserted} new, ${data.updated} updated` });
+        await queryClient.invalidateQueries();
+      }
+    } catch (err: any) {
+      setSyncToast({ ok: false, msg: err.message || "Sync failed" });
+    } finally {
+      setSyncing(false);
+      setTimeout(() => setSyncToast(null), 5000);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#EDEAE0] pb-20">
       <Navbar />
@@ -69,6 +93,19 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              {syncToast && (
+                <span className={`font-mono text-xs font-bold px-3 py-2 border-[2px] border-[#0C0C0C] shadow-[2px_2px_0_#0C0C0C] ${syncToast.ok ? "bg-[#0A6B52] text-white" : "bg-[#C94A00] text-white"}`}>
+                  {syncToast.msg}
+                </span>
+              )}
+              <button
+                onClick={handleSyncWorkbook}
+                disabled={syncing}
+                className="flex items-center gap-2 bg-[#FAF7EE] text-[#0C0C0C] font-mono font-bold text-xs px-4 py-2 border-[2px] border-[#0C0C0C] shadow-[3px_3px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer uppercase disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-[3px_3px_0_#0C0C0C]"
+              >
+                <RefreshCw size={14} className={syncing ? "animate-spin" : ""} />
+                {syncing ? "Syncing…" : "Sync Workbook"}
+              </button>
               <div className="bg-[#D4A800] text-[#0C0C0C] font-display text-xl px-4 py-1 border-[3px] border-[#0C0C0C] shadow-[4px_4px_0_#0C0C0C] rotate-1">
                 STATUS REPORT
               </div>

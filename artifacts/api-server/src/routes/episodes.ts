@@ -25,6 +25,38 @@ type EpisodeStatusValue =
 
 const router = Router();
 
+// POST /episodes/sync-workbook
+// Re-reads the master workbook and upserts episodes — this is the manual trigger
+// Nadeem can click instead of running a terminal command by hand.
+router.post("/episodes/sync-workbook", async (req, res): Promise<void> => {
+  const { execFile } = await import("node:child_process");
+  const pathMod = await import("node:path");
+
+  const scriptPath = pathMod.resolve(import.meta.dirname, "../../../../scripts/src/seed-episodes.ts");
+
+  execFile(
+    "pnpm",
+    ["--filter", "@workspace/scripts", "exec", "tsx", scriptPath],
+    { cwd: pathMod.resolve(import.meta.dirname, "../../../../") },
+    (error, stdout, stderr) => {
+      if (error) {
+        res.status(500).json({ error: "Sync failed", detail: stderr || error.message });
+        return;
+      }
+      // seed-episodes.ts logs lines like "Inserted N new episodes." and
+      // "Updated metadata for N existing episodes." — parse those counts out.
+      const insertedMatch = stdout.match(/Inserted (\d+) new episodes/);
+      const updatedMatch = stdout.match(/Updated metadata for (\d+) existing episodes/);
+      res.json({
+        success: true,
+        inserted: insertedMatch ? parseInt(insertedMatch[1], 10) : 0,
+        updated: updatedMatch ? parseInt(updatedMatch[1], 10) : 0,
+        raw: stdout,
+      });
+    },
+  );
+});
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 const WORKSPACE_ROOT = path.resolve(process.cwd(), "..", "..");
@@ -279,15 +311,30 @@ router.get("/episodes/:id/build-status", async (req, res): Promise<void> => {
   const videoExists = videoPath !== null;
 
   // Auto-advance: if video found but stage is still 'rendering', advance to 'exported'
+  // AND auto-schedule the episode (no manual approval step anymore). scheduledPublishAt
+  // is derived from postDate + 09:00 UTC, same formula this app already uses elsewhere
+  // for schedule dates.
   if (videoExists && episode.buildStage === "rendering") {
+    let scheduledPublishAt: Date | null = null;
+    if (episode.postDate) {
+      const d = new Date(`${episode.postDate}T09:00:00Z`);
+      if (!Number.isNaN(d.getTime())) scheduledPublishAt = d;
+    }
+    const nextStatus = episode.status === "published" ? episode.status : "scheduled";
+
     await db
       .update(episodesTable)
-      .set({ buildStage: "exported", updatedAt: new Date() })
+      .set({
+        buildStage: "exported",
+        status: nextStatus,
+        updatedAt: new Date(),
+        ...(scheduledPublishAt ? { scheduledPublishAt } : {}),
+      })
       .where(eq(episodesTable.id, id));
 
     res.json({
       id: episode.id,
-      status: episode.status,
+      status: nextStatus,
       buildStage: "exported",
       buildNote: episode.buildNote,
       videoExists: true,
