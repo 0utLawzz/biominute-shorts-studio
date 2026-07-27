@@ -1,6 +1,6 @@
 # Production Status — BioMinute Shorts Studio
 
-> **Canonical snapshot of the pipeline.** Last reconciled **2026-07-27** against YouTube Data API.
+> **Canonical snapshot of the pipeline.** Refreshed **2026-07-27** after workbook re-seed + YouTube Data API reconciliation.
 
 This document is the single source of truth for *where every episode lives* in the publish pipeline. The dashboard (`http://<host>:5173/`) and the API endpoint `GET /api/episodes/stats` reflect the same numbers in real time.
 

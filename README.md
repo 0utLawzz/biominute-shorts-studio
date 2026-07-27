@@ -258,7 +258,7 @@ For platform-specific setup instructions (YouTube, Facebook, TikTok, Instagram, 
 
 ## Project Status
 
-> Last reconciled 2026-07-27 against YouTube Data API via `scripts/src/reconcile-yt-status.mjs`.
+> Last refreshed **2026-07-27** after workbook re-seed + YouTube Data API reconciliation via `scripts/src/reconcile-yt-status.mjs`.
 
 - ✅ **Ep 1–11 Published** — live on YouTube; DB `status='published'`, post dates preserved (Jul 12 – Jul 26, 2026)
 - ✅ **Ep 12–65 Scheduled** — uploaded as private with `publishAt` future; DB `status='scheduled'`; auto-publish window Jul 27 – Sep 18, 2026
