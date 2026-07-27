@@ -4,6 +4,16 @@ An automated AI-powered production pipeline for health-science YouTube Shorts �
 
 **Version:** `v0.2.0` (see `VERSION.md`)
 
+## ⏩ Start here — read this first
+
+**Before doing anything else, read [`PROGRESS.md`](./PROGRESS.md) at the repo root.** It is the canonical chronological log: every user request, every agent action, every git commit, oldest → newest. New sessions should skim it to learn what's done before touching code.
+
+Other quick-reference docs:
+- `README.md` — public-facing project overview
+- `docs/production-status.md` — current pipeline snapshot (live counts, statuses, workflows)
+- `exports/production-log.md` — free-form timeline of production events
+- `.agents/memory/MEMORY.md` — durable lessons index (long-term knowledge, indexed by topic)
+
 ## Project Structure
 
 ```
