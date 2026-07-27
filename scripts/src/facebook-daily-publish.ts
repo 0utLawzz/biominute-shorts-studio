@@ -146,10 +146,14 @@ function findExportFolder(epNumber: number): string | null {
 /**
  * Phase 1 → 2 → 3 chunked upload. `scheduledPublishAt` (optional) flips the
  * video into a FB Scheduled post: published=0 + scheduled_publish_time.
+ * `title` and `description` are appended to the finish phase so the post
+ * carries the same caption that goes on YouTube.
  */
 async function uploadChunkedToFacebook(
   videoPath: string,
   scheduledPublishAt: Date | null,
+  title: string,
+  description: string,
 ): Promise<string> {
   const fileSize = fs.statSync(videoPath).size;
 
@@ -209,11 +213,14 @@ async function uploadChunkedToFacebook(
     if (cursor >= fileSize) break;
   }
 
-  // Phase 3: finish — optionally schedule instead of publishing immediately.
+  // Phase 3: finish — optionally schedule instead of publishing immediately,
+  // and attach the post's title + description so it carries our caption.
   const finishParams = new URLSearchParams({
     upload_phase: "finish",
     upload_session_id: uploadSessionId,
     access_token: ACCESS_TOKEN,
+    title,
+    description,
   });
   if (scheduledPublishAt) {
     finishParams.append("published", "0");
@@ -309,7 +316,7 @@ async function processEpisode(
   console.log(`  Title       : ${title}`);
   console.log("  Uploading to Facebook Graph API as a Scheduled post...");
 
-  const facebookVideoId = await uploadChunkedToFacebook(videoPath, slot);
+  const facebookVideoId = await uploadChunkedToFacebook(videoPath, slot, title, description);
   const facebookUrl = `https://www.facebook.com/watch/?v=${facebookVideoId}`;
   console.log(`  ✓ Scheduled : ${facebookUrl} @ ${slot.toISOString()}`);
 
