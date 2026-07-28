@@ -64,10 +64,30 @@ const FacebookPill = ({ row }: { row: SocialRow }) => {
   );
 };
 
-const Row = ({ row, platform }: { row: SocialRow; platform: "youtube" | "facebook" }) => {
-  const ytLinked = !!row.youtubeVideoId;
-  const fbLinked = !!row.facebookVideoId;
-  const showLinked = platform === "youtube" ? ytLinked : fbLinked;
+const LinkCell = ({
+  href,
+  id,
+  emptyLabel = "—",
+}: {
+  href: string;
+  id: string | null;
+  emptyLabel?: string;
+}) =>
+  id ? (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-[#0D9970] hover:underline inline-flex items-center gap-1"
+    >
+      {id.slice(0, 8)}…
+      <ExternalLink className="w-3 h-3" />
+    </a>
+  ) : (
+    <span className="text-[#999]">{emptyLabel}</span>
+  );
+
+const Row = ({ row }: { row: SocialRow }) => {
   return (
     <tr className="border-b-[2px] border-[#0C0C0C] hover:bg-[#FAF7EE]">
       <td className="px-4 py-3 font-mono text-sm font-bold">
@@ -91,33 +111,16 @@ const Row = ({ row, platform }: { row: SocialRow; platform: "youtube" | "faceboo
         <FacebookPill row={row} />
       </td>
       <td className="px-4 py-3 font-mono text-xs">
-        {platform === "youtube" ? (
-          showLinked ? (
-            <a
-              href={`https://youtu.be/${row.youtubeVideoId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#0D9970] hover:underline inline-flex items-center gap-1"
-            >
-              {row.youtubeVideoId?.slice(0, 8)}…
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          ) : (
-            <span className="text-[#999]">—</span>
-          )
-        ) : showLinked ? (
-          <a
-            href={`https://www.facebook.com/watch/?v=${row.facebookVideoId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#0D9970] hover:underline inline-flex items-center gap-1"
-          >
-            {row.facebookVideoId?.slice(0, 6)}…
-            <ExternalLink className="w-3 h-3" />
-          </a>
-        ) : (
-          <span className="text-[#999]">—</span>
-        )}
+        <LinkCell
+          href={`https://youtu.be/${row.youtubeVideoId ?? ""}`}
+          id={row.youtubeVideoId}
+        />
+      </td>
+      <td className="px-4 py-3 font-mono text-xs">
+        <LinkCell
+          href={`https://www.facebook.com/watch/?v=${row.facebookVideoId ?? ""}`}
+          id={row.facebookVideoId}
+        />
       </td>
       <td className="px-4 py-3 font-mono text-xs">
         {row.scheduledPublishAt || row.postDate
@@ -128,18 +131,9 @@ const Row = ({ row, platform }: { row: SocialRow; platform: "youtube" | "faceboo
   );
 };
 
-const YouTubeTab = ({ rows }: { rows: SocialRow[] }) => {
-  const linked = rows.filter((r) => r.youtubeVideoId);
-  const notLinked = rows.filter((r) => !r.youtubeVideoId);
+const SocialTable = ({ rows }: { rows: SocialRow[] }) => {
+  const trackedRows = rows.filter((row) => row.epNumber >= 1 && row.epNumber <= 100);
   return (
-    <div className="space-y-8">
-      <div className="bg-[#FF0000] text-white font-display text-xl px-4 py-2 border-[3px] border-[#0C0C0C] shadow-[4px_4px_0_#0C0C0C] inline-block -rotate-1">
-        {linked.length} UPLOADED  ·  {notLinked.length} PENDING
-      </div>
-      <p className="font-sans text-sm text-[#555]">
-        Every Ep 1–100 with a YouTube video ID shows the icon 🔴 that links to the uploaded video on the channel.
-        Hover any cell to see what it means. Click the pills to drill in.
-      </p>
       <div className="bg-[#FAF7EE] border-[3px] border-[#0C0C0C] shadow-[5px_5px_0_#0C0C0C] overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead className="bg-[#0C0C0C] text-[#FAF7EE]">
@@ -159,58 +153,15 @@ const YouTubeTab = ({ rows }: { rows: SocialRow[] }) => {
                 <Facebook className="w-4 h-4 inline-block" />
               </th>
               <th className="px-4 py-2 font-display uppercase text-xs">YouTube link</th>
-              <th className="px-4 py-2 font-display uppercase text-xs">Scheduled (PKT)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => <Row key={row.epNumber} row={row} platform="youtube" />)}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-};
-
-const FacebookTab = ({ rows }: { rows: SocialRow[] }) => {
-  const linked = rows.filter((r) => r.facebookVideoId);
-  const notLinked = rows.filter((r) => !r.facebookVideoId);
-  return (
-    <div className="space-y-8">
-      <div className="bg-[#1877F2] text-white font-display text-xl px-4 py-2 border-[3px] border-[#0C0C0C] shadow-[4px_4px_0_#0C0C0C] inline-block -rotate-1">
-        {linked.length} POSTED  ·  {notLinked.length} PENDING
-      </div>
-      <p className="font-sans text-sm text-[#555]">
-        Facebook cross-post is currently manual via <code className="font-mono bg-[#E2DDD0] px-1">fb-schedule</code>.
-        Icon 🔵 means a Facebook post ID is recorded in the DB; ✗ means it has not been cross-posted yet.
-      </p>
-      <div className="bg-[#FAF7EE] border-[3px] border-[#0C0C0C] shadow-[5px_5px_0_#0C0C0C] overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-[#0C0C0C] text-[#FAF7EE]">
-            <tr>
-              <th className="px-4 py-2 font-display uppercase text-xs">Ep</th>
-              <th className="px-4 py-2 font-display uppercase text-xs">Title</th>
-              <th className="px-2 py-2 font-display uppercase text-xs text-center" title="Export folder exists on disk">
-                <Folder className="w-4 h-4 inline-block" />
-              </th>
-              <th className="px-2 py-2 font-display uppercase text-xs text-center" title="episode.mp4 inside folder">
-                <FileVideo className="w-4 h-4 inline-block" />
-              </th>
-              <th className="px-2 py-2 font-display uppercase text-xs text-center" title="YouTube video ID present">
-                <Youtube className="w-4 h-4 inline-block" />
-              </th>
-              <th className="px-2 py-2 font-display uppercase text-xs text-center" title="Facebook post ID present">
-                <Facebook className="w-4 h-4 inline-block" />
-              </th>
               <th className="px-4 py-2 font-display uppercase text-xs">Facebook link</th>
               <th className="px-4 py-2 font-display uppercase text-xs">Publish Date</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => <Row key={row.epNumber} row={row} platform="facebook" />)}
+            {trackedRows.map((row) => <Row key={row.epNumber} row={row} />)}
           </tbody>
         </table>
       </div>
-    </div>
   );
 };
 
@@ -253,6 +204,50 @@ export default function SocialStatus() {
             <Loader2 className="animate-spin w-8 h-8 text-[#0C0C0C]" />
           </div>
         ) : (
+          <>
+          {data?.rows && (() => {
+            const trackedRows = data.rows.filter((row) => row.epNumber >= 1 && row.epNumber <= 100);
+            return (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+              {[
+                {
+                  label: "YouTube complete",
+                  value: trackedRows.filter((row) => row.youtubeVideoId).length,
+                  color: "#FF0000",
+                  icon: <Youtube className="w-7 h-7" />,
+                },
+                {
+                  label: "Facebook complete",
+                  value: trackedRows.filter((row) => row.facebookVideoId).length,
+                  color: "#1877F2",
+                  icon: <Facebook className="w-7 h-7" />,
+                },
+                {
+                  label: "Both platforms",
+                  value: trackedRows.filter((row) => row.youtubeVideoId && row.facebookVideoId).length,
+                  color: "#0D9970",
+                  icon: <CheckPill ok />,
+                },
+              ].map((metric) => (
+                <div
+                  key={metric.label}
+                  className="bg-[#FAF7EE] border-[3px] border-[#0C0C0C] shadow-[5px_5px_0_#0C0C0C] p-5"
+                >
+                  <div className="flex items-center justify-between" style={{ color: metric.color }}>
+                    <span className="font-display uppercase text-sm">{metric.label}</span>
+                    {metric.icon}
+                  </div>
+                  <div className="font-display text-6xl leading-none mt-3" style={{ color: metric.color }}>
+                    {metric.value}<span className="text-2xl text-[#555]">/100</span>
+                  </div>
+                  <div className="font-mono text-xs uppercase text-[#555] mt-2">
+                    {metric.value === 100 ? "100 complete" : `${100 - metric.value} remaining`}
+                  </div>
+                </div>
+              ))}
+            </div>
+            );
+          })()}
           <Tabs defaultValue="youtube" className="w-full">
             <TabsList className="bg-[#0C0C0C] border-[3px] border-[#0C0C0C] shadow-[4px_4px_0_#0C0C0C] inline-flex mb-6">
               <TabsTrigger
@@ -269,12 +264,13 @@ export default function SocialStatus() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="youtube">
-              <YouTubeTab rows={data?.rows ?? []} />
+              <SocialTable rows={data?.rows ?? []} />
             </TabsContent>
             <TabsContent value="facebook">
-              <FacebookTab rows={data?.rows ?? []} />
+              <SocialTable rows={data?.rows ?? []} />
             </TabsContent>
           </Tabs>
+          </>
         )}
       </main>
     </div>

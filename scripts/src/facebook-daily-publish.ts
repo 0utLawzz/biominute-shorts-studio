@@ -43,6 +43,16 @@ const BACKFILL_NUM = (() => {
   const n = parseInt(args[idx + 1], 10);
   return Number.isFinite(n) && n > 0 ? n : null;
 })();
+const EPISODE_START = (() => {
+  const idx = args.indexOf("--start");
+  const n = idx === -1 ? 1 : parseInt(args[idx + 1], 10);
+  return Number.isInteger(n) && n > 0 ? n : 1;
+})();
+const EPISODE_END = (() => {
+  const idx = args.indexOf("--end");
+  const n = idx === -1 ? 50 : parseInt(args[idx + 1], 10);
+  return Number.isInteger(n) && n >= EPISODE_START ? n : 50;
+})();
 const RUN_ONCE = !BACKFILL_ALL && !BACKFILL_NUM;
 const EFFECTIVE_BATCH_SIZE = BACKFILL_ALL ? Infinity : (BACKFILL_NUM ?? 1);
 
@@ -377,8 +387,8 @@ async function processEpisode(
     .from(episodesTable)
     .where(
       and(
-        gte(episodesTable.epNumber, 1),
-        lte(episodesTable.epNumber, 50),
+        gte(episodesTable.epNumber, EPISODE_START),
+        lte(episodesTable.epNumber, EPISODE_END),
         isNull(episodesTable.facebookVideoId),
       ),
     )
@@ -387,7 +397,7 @@ async function processEpisode(
 
   if (eligible.length === 0) {
     console.log(
-      "\nNo eligible Ep 1–50 episodes left to schedule on Facebook. Done.",
+      `\nNo eligible Ep ${EPISODE_START}–${EPISODE_END} episodes left to schedule on Facebook. Done.`,
     );
     await pool.end();
     process.exit(0);
