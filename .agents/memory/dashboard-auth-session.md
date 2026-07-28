@@ -10,7 +10,7 @@ description: How cookie-based session auth is implemented for the BioMinute prod
 ## How it works
 
 - The API server uses `express-session` with a `biominute.sid` cookie.
-- Cookie is `httpOnly`, `secure: true`, `sameSite: "lax"`, 24-hour TTL.
+- Cookie is `httpOnly`, `sameSite: "lax"`, 24-hour TTL, and is only `secure` in production; forcing `secure` during development caused preview login cookies to be rejected and every protected request to return 401.
 - `SESSION_SECRET` signs the cookie; `DASHBOARD_PASSWORD` is the single shared password.
 - `requireAuth` middleware protects every route under `/api` except `/api/healthz` and `/api/auth/*`.
 - Dashboard `AuthProvider` checks `/api/auth/me` on mount and sends `credentials: "include"` on every fetch.
@@ -31,6 +31,7 @@ description: How cookie-based session auth is implemented for the BioMinute prod
 2. **Type-only exports can shadow Zod schemas**. If a schema is imported as a value for `.safeParse()`, it must not be exported with `type` from the package index. In `lib/api-zod/src/index.ts`, removing `type` from `CreateEpisodeBody` (and other schemas) fixed the compile error.
 3. **Browser fetch needs `credentials: "include"` for cookie auth to work across Vite proxy / Replit proxy**. Setting it as a default in `customFetch` when `typeof window !== "undefined"` covers all generated React Query hooks without touching generated code.
 4. **CORS must reflect the origin and allow credentials**. `origin: (origin, callback) => callback(null, origin ?? true)` plus `credentials: true` works for both dev proxy and Replit production.
+5. **Development preview cookies must not be forced secure**. The app preview can use an HTTP browser origin even when Replit's public proxy is HTTPS; use `secure: process.env.NODE_ENV === "production"`.
 
 ## Production notes
 

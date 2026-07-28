@@ -97,7 +97,7 @@ export function clearSession(
     if (err) {
       logger.error({ err }, "auth: failed to destroy session");
     }
-    res.clearCookie("connect.sid");
+    res.clearCookie("biominute.sid");
     callback();
   });
 }

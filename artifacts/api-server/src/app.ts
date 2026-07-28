@@ -61,9 +61,12 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      // Replit uses HTTPS, so mark the cookie secure. In local development this
-      // still works because the browser sees the proxied origin as HTTPS.
-      secure: true,
+      // The Replit preview proxy is HTTPS, but local browser screenshots and
+      // direct development requests can be HTTP. Secure cookies are rejected
+      // in that development case, which makes every post-login API request
+      // appear unauthenticated. Production runs behind HTTPS, so keep the
+      // stricter setting there.
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
