@@ -16,6 +16,23 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 
 ## User requests → Agent actions
 
+### Request — Export, schedule, and publish Episodes 66–70
+*(Session: 2026-07-28)*
+
+**User said:** Run Episodes 66–70 export, push them to YouTube, update the database and dashboard, and always commit changes to GitHub.
+
+**Agent did:**
+1. Exported all five reels as verified 1080×1920 MP4s under descriptive episode folders.
+2. Uploaded all five to YouTube as private scheduled videos in the S1 playlist:
+   - Ep 66 — `uJODjZB6Gj8` — 2026-09-04 09:00 UTC
+   - Ep 67 — `vxpHY1NDL2M` — 2026-09-05 09:00 UTC
+   - Ep 68 — `SLpRHodm4Vk` — 2026-09-06 09:00 UTC
+   - Ep 69 — `vqtt-fEQoE0` — 2026-09-07 09:00 UTC
+   - Ep 70 — `6RFtIo5JoUM` — 2026-09-08 09:00 UTC
+3. Updated the database records to `scheduled`, `build_stage=exported`, set `date_built=2026-07-28`, and stored each YouTube video ID.
+4. Regenerated `exports/dashboard.html`; Ep 66–70 now show muted MP4 previews, scheduled PKT times, and YouTube links. Active scene/config swaps were restored so they are not left as source changes.
+5. Verified each YouTube video has `privacyStatus=private` and the exact expected `publishAt`, verified all five MP4 dimensions, and kept the existing unrelated dashboard artifact change intact.
+
 ### Request — Silence reels preview audio and verify Episodes 66–80
 *(Session: 2026-07-28)*
 
