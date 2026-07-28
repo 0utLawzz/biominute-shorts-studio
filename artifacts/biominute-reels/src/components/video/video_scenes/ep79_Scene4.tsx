@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Moon, MessageCircle, BookOpen } from 'lucide-react';
+import { MoonStar, MessageCircle, BookOpen } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -21,8 +21,8 @@ export function Scene4() {
           <div className="absolute top-6 right-8 w-4 h-4 bg-[#7c3aed] rounded-full" />
           <motion.div className="flex items-center gap-2 bg-[#7c3aed]/10 border border-[#7c3aed]/30 px-5 py-2 rounded-full mb-5"
             initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ...SPRING_SMOOTH }}>
-            <Moon size={18} color="#7c3aed" />
-            <span className="text-[#7c3aed] font-display font-bold text-[15px] uppercase tracking-wide">Napping Habits</span>
+            <MoonStar size={18} color="#7c3aed" />
+            <span className="text-[#7c3aed] font-display font-bold text-[15px] uppercase tracking-wide">Bedtime Prompt</span>
           </motion.div>
           <motion.div initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.6, ...SPRING_SNAPPY }}>
             <div className="w-24 h-24 rounded-full bg-[#7c3aed] flex items-center justify-center">
@@ -31,9 +31,9 @@ export function Scene4() {
           </motion.div>
           <motion.h2 className="text-[#f8fafc] text-[38px] font-bold uppercase tracking-wider font-display leading-tight mt-7"
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0, duration: 0.8 }}>
-            Do You
-            <span className="text-[#7c3aed] block mt-2">Nap</span>
-            <span className="text-[#f97316] block mt-1">During the Day?</span>
+            What Is Your
+            <span className="text-[#7c3aed] block mt-2">Bedroom Temperature</span>
+            <span className="text-[#2F6FED] block mt-1">At Night?</span>
           </motion.h2>
           <motion.div className="flex items-center gap-3 mt-7 bg-[#0F172A]/80 px-6 py-4 rounded-xl border border-white/10"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.0, duration: 1 }}>
@@ -46,7 +46,7 @@ export function Scene4() {
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.8, duration: 1 }}>
         <div className="flex items-center gap-4 text-[#94a3b8] text-[20px] font-medium bg-[#0F172A]/90 px-6 py-4 rounded-xl backdrop-blur-sm border border-white/10 shadow-lg">
           <BookOpen className="shrink-0" size={26} />
-          <p className="leading-relaxed text-left">Source: Milner CE &amp; Cote KA — napping duration/timing and nighttime sleep onset reviews</p>
+          <p className="leading-relaxed text-left">Source: Okamoto-Mizuno and Mizuno 2012, Journal of Physiological Anthropology — thermal environment and sleep quality</p>
         </div>
       </motion.div>
     </motion.div>

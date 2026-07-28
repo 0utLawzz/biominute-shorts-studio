@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Moon, Clock, Sun } from 'lucide-react';
+import { ThermometerSun, MoonStar, Sparkles } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -24,33 +24,33 @@ export function Scene0() {
             <div className="relative">
               <motion.div className="absolute inset-0 bg-[#7c3aed]/20 blur-[30px] rounded-full"
                 animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 3, repeat: Infinity }} />
-              <Moon size={96} color="#7c3aed" strokeWidth={1.3} />
+              <MoonStar size={96} color="#7c3aed" strokeWidth={1.3} />
             </div>
           </motion.div>
           <motion.div className="absolute top-0 right-0" animate={{ opacity: [0.7, 1, 0.7], scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity }}>
-            <Clock size={52} color="#2F6FED" strokeWidth={1.5} />
+            <ThermometerSun size={52} color="#2F6FED" strokeWidth={1.5} />
           </motion.div>
           <motion.div className="absolute bottom-0 left-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
-            <Sun size={44} color="#f97316" strokeWidth={1.5} />
+            <Sparkles size={44} color="#7c3aed" strokeWidth={1.5} />
           </motion.div>
         </motion.div>
         <motion.div className="flex items-center gap-3 bg-[#7c3aed]/10 border border-[#7c3aed]/30 px-7 py-4 rounded-2xl"
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8, ...SPRING_SMOOTH }}>
-          <Moon size={20} color="#7c3aed" />
+          <MoonStar size={20} color="#7c3aed" />
           <span className="text-[#7c3aed] font-display font-bold text-[18px] uppercase tracking-wider">S3 • Sleep &amp; Recovery</span>
         </motion.div>
       </div>
       <div className="absolute w-full px-12 text-center z-20" style={{ bottom: BOTTOM_SAFE_ZONE_PX + 90 }}>
         <motion.h1 className="text-[#f8fafc] text-[44px] font-bold uppercase tracking-wider font-display leading-tight"
           initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }}>
-          Does Napping
+          Can a Cooler
           <motion.span className="text-[#7c3aed] block mt-2 drop-shadow-md"
             initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.9, ...SPRING_SNAPPY }}>
-            Ruin Your Night
+            Room Help You
           </motion.span>
-          <motion.span className="text-[#f97316] block mt-1 drop-shadow-md"
+          <motion.span className="text-[#2F6FED] block mt-1 drop-shadow-md"
             initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.3, ...SPRING_SNAPPY }}>
-            Sleep?
+            Fall Asleep Faster?
           </motion.span>
         </motion.h1>
       </div>

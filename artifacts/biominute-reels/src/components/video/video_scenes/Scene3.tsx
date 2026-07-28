@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { ShieldCheck, UtensilsCrossed, Sunrise } from 'lucide-react';
+import { ShieldCheck, Clock, Moon } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -16,14 +16,14 @@ export function Scene3() {
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }} transition={{ duration: 0.8 }}>
       <audio ref={audioRef} src={`${BASE_URL}audio/sfx-pop.mp3`} preload="auto" />
       <div className="absolute top-[150px] flex flex-col items-center gap-5 z-10 w-full px-10">
-        <motion.div className="bg-[#f97316]/10 border border-[#f97316]/30 px-8 py-4 rounded-2xl"
+        <motion.div className="bg-[#10b981]/10 border border-[#10b981]/30 px-8 py-4 rounded-2xl"
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ...SPRING_SMOOTH }}>
-          <span className="text-[#f97316] font-display font-bold text-[22px] uppercase tracking-wider">The Bottom Line</span>
+          <span className="text-[#10b981] font-display font-bold text-[22px] uppercase tracking-wider">Nap Smart</span>
         </motion.div>
         {[
-          { icon: ShieldCheck, color: '#10b981', label: 'Skipping is fine if you\'re not hungry', body: 'Forcing breakfast when you\'re not hungry adds calories without any metabolic benefit' },
-          { icon: UtensilsCrossed, color: '#f97316', label: 'Eat when hunger arrives', body: 'Listening to your body\'s hunger cues is more reliable than clock-based meal timing' },
-          { icon: Sunrise, color: '#10b981', label: 'Focus on your full-day pattern', body: 'A nutritious lunch and dinner beats a forced breakfast every time' },
+          { icon: Clock, color: '#10b981', label: 'Keep it to 20–30 minutes', body: 'A short power nap boosts alertness without triggering deep sleep or grogginess' },
+          { icon: Moon, color: '#7c3aed', label: 'Nap before mid-afternoon', body: 'Early-day naps fit your circadian rhythm and preserve nighttime sleep pressure' },
+          { icon: ShieldCheck, color: '#2F6FED', label: 'Naps are not bad by default', body: 'Done right, napping can improve alertness and mood without harming sleep' },
         ].map((item, i) => {
           const Icon = item.icon;
           return (
@@ -44,9 +44,9 @@ export function Scene3() {
       <div className="absolute w-full px-12 text-center z-20" style={{ bottom: BOTTOM_SAFE_ZONE_PX + 80 }}>
         <motion.h2 className="text-[#f8fafc] text-[46px] font-bold uppercase tracking-wider font-display leading-tight"
           initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 1.8 }}>
-          Listen to
-          <motion.span className="text-[#f97316] block mt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.4, ...SPRING_SNAPPY }}>
-            Your Body
+          Short + Early
+          <motion.span className="text-[#10b981] block mt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.4, ...SPRING_SNAPPY }}>
+            = Safe
           </motion.span>
         </motion.h2>
       </div>
