@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Charger, AlarmClockOff, MoveDiagonal } from 'lucide-react';
+import { Cable, AlarmClockOff, MoveDiagonal } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -21,7 +21,7 @@ export function Scene2() {
           <span className="text-[#2F6FED] font-display font-bold text-[22px] uppercase tracking-wider">An Easy Fix</span>
         </motion.div>
         {[
-          { icon: Charger, color: '#2F6FED', title: 'Charge across the room', body: 'Moving the phone away reduces the urge to grab it the second you wake up' },
+          { icon: Cable, color: '#2F6FED', title: 'Charge across the room', body: 'Moving the phone away reduces the urge to grab it the second you wake up' },
           { icon: AlarmClockOff, color: '#7c3aed', title: 'Use a real alarm if needed', body: 'If you need your phone for wake-up, place it far enough away that you have to get out of bed' },
           { icon: MoveDiagonal, color: '#2F6FED', title: 'Break the habit loop', body: 'The goal is to make bedtime less about checking and more about shutting down' },
         ].map((item, i) => {
