@@ -65,8 +65,7 @@ export function Navbar() {
         <span className="text-[#C94A00]">.</span>
         <span className="text-[#0D9970]">SHORTS</span>
       </Link>
-
-      <nav className="flex items-center gap-0.5 overflow-x-auto shrink min-w-0">
+      <nav className="flex gap-0.5 overflow-x-auto shrink min-w-0 justify-center items-center border-t-[1px] border-r-[1px] border-b-[1px] border-l-[1px] border-t-[color:var(--tw-ring-offset-color)] border-r-[color:var(--tw-ring-offset-color)] border-b-[color:var(--tw-ring-offset-color)] border-l-[color:var(--tw-ring-offset-color)]">
         {NAV_GROUPS.map((group, groupIndex) => (
           <React.Fragment key={group.label ?? `group-${groupIndex}`}>
             {groupIndex > 0 && <span className="mx-1 h-5 border-l border-[#444]" aria-hidden="true" />}
@@ -91,7 +90,6 @@ export function Navbar() {
           </React.Fragment>
         ))}
       </nav>
-
       {/* Live pipeline status — visible on every page */}
       <div className="ml-auto hidden lg:flex items-center gap-3">
         <div className="flex items-center gap-1.5 bg-[#1a1a1a] border-[1.5px] border-[#333] px-2 py-1">
@@ -116,7 +114,6 @@ export function Navbar() {
           })}
         </div>
       </div>
-
       {tokenHealth === "expired" && (
         <a
           href="https://github.com/your-repo/scripts/src/youtube-reauth.ts"
@@ -129,7 +126,6 @@ export function Navbar() {
           YT TOKEN EXPIRED
         </a>
       )}
-
       <div className="shrink-0 flex items-center gap-2">
         <Link href="/new">
           <span className="flex items-center gap-2 bg-[#C9A800] text-[#0C0C0C] font-mono font-bold text-xs px-4 py-2 border-[2px] border-[#0C0C0C] shadow-[3px_3px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer uppercase">

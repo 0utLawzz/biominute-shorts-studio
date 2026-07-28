@@ -173,11 +173,10 @@ export default function Dashboard() {
     <div className="min-h-screen bg-[#EDEAE0] pb-20 text-[#0C0C0C]">
       <Navbar />
       <YouTubeBanner />
-
       <main className="mx-auto max-w-[1500px] px-5 pt-10 sm:px-8">
         <section className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="font-display text-6xl uppercase leading-none md:text-7xl">
+            <h1 className="font-display text-6xl uppercase leading-none md:text-7xl text-primary">
               Production Queue
             </h1>
             <p className="mt-2 font-mono text-xs uppercase tracking-[0.18em] text-[#555]">
