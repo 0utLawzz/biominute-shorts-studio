@@ -176,7 +176,7 @@ export default function Dashboard() {
       <main className="mx-auto max-w-[1500px] px-5 pt-10 sm:px-8">
         <section className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="font-display text-6xl uppercase leading-none md:text-7xl text-primary">
+            <h1 className="font-display uppercase md:text-7xl text-primary text-[52px]">
               Production Queue
             </h1>
             <p className="mt-2 font-mono text-xs uppercase tracking-[0.18em] text-[#555]">
@@ -185,7 +185,7 @@ export default function Dashboard() {
           </div>
 
           <div className="flex flex-wrap items-stretch gap-3">
-            <div className="flex border-2 border-[#0C0C0C] bg-[#FAF7EE] shadow-[3px_3px_0_#0C0C0C]">
+            <div className="flex border-2 border-[#0C0C0C] bg-[#FAF7EE] shadow-[3px_3px_0_#0C0C0C] text-center font-medium text-[20px]">
               <QueueStat label="In Draft" value={inDraft} loading={statsLoading} />
               <QueueStat label="Building" value={byStatus?.building} loading={statsLoading} color="#C9A800" />
               <QueueStat label="Complete" value={byStatus?.complete} loading={statsLoading} color="#0A6B52" />
@@ -203,7 +203,7 @@ export default function Dashboard() {
               onClick={() => setPublishOpen(true)}
               disabled={publishableEpisodes.length === 0}
               title="Select complete episodes to publish or schedule on YouTube"
-              className="flex items-center gap-2 border-2 border-[#0C0C0C] bg-[#C9A800] px-3 py-2 font-mono text-[10px] font-bold uppercase shadow-[3px_3px_0_#0C0C0C] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex gap-2 border-2 border-[#0C0C0C] bg-[#C9A800] px-3 py-2 font-mono uppercase shadow-[3px_3px_0_#0C0C0C] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 text-[18px] font-black justify-center items-center flex-col"
             >
               <Send size={13} />
               Publish
@@ -442,7 +442,7 @@ function QueueStat({ label, value, loading, color = "#0C0C0C" }: { label: string
   return (
     <div className="flex min-w-[74px] flex-col border-r border-[#0C0C0C]/20 px-3 py-2 last:border-r-0">
       <span className="font-mono text-[9px] font-bold uppercase text-[#555]">{label}</span>
-      {loading ? <Loader2 size={18} className="mt-1 animate-spin" /> : <span className="font-display text-2xl leading-none" style={{ color }}>{value ?? 0}</span>}
+      {loading ? <Loader2 size={18} className="mt-1 animate-spin" /> : <span className="font-display text-[26px]" style={{ color }}>{value ?? 0}</span>}
     </div>
   );
 }
