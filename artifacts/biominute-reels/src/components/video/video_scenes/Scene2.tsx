@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { PartyPopper, Megaphone, Footprints } from 'lucide-react';
+import { Timer, AlertTriangle, BedDouble } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -18,12 +18,12 @@ export function Scene2() {
       <div className="absolute top-[150px] flex flex-col items-center gap-5 z-10 w-full px-10">
         <motion.div className="bg-[#f97316]/10 border border-[#f97316]/30 px-8 py-4 rounded-2xl"
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ...SPRING_SMOOTH }}>
-          <span className="text-[#f97316] font-display font-bold text-[22px] uppercase tracking-wider">The Real Cause</span>
+          <span className="text-[#f97316] font-display font-bold text-[22px] uppercase tracking-wider">When Naps Backfire</span>
         </motion.div>
         {[
-          { icon: PartyPopper, color: '#f97316', label: 'Excitement and context', body: 'Parties, holidays, and special events are inherently stimulating for kids' },
-          { icon: Megaphone, color: '#10b981', label: 'Less structure, more noise', body: 'Unstructured time with louder environments naturally amplifies behavior' },
-          { icon: Footprints, color: '#2F6FED', label: 'It\'s not the sugar', body: 'The setting drives the behavior — blame the party, not the cupcake' },
+          { icon: Timer, color: '#f97316', label: 'Long naps build sleep debt', body: 'A 90-minute nap can satisfy part of your sleep need, making nighttime harder' },
+          { icon: AlertTriangle, color: '#2F6FED', label: 'Late naps delay sleep onset', body: 'Napping after 3–4 pm can push your circadian clock later' },
+          { icon: BedDouble, color: '#7c3aed', label: 'Sleep inertia is real', body: 'Waking from deep sleep in a long nap can leave you groggy for hours' },
         ].map((item, i) => {
           const Icon = item.icon;
           return (
@@ -44,9 +44,9 @@ export function Scene2() {
       <div className="absolute w-full px-12 text-center z-20" style={{ bottom: BOTTOM_SAFE_ZONE_PX + 80 }}>
         <motion.h2 className="text-[#f8fafc] text-[46px] font-bold uppercase tracking-wider font-display leading-tight"
           initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 1.8 }}>
-          Blame the
+          Long or Late
           <motion.span className="text-[#f97316] block mt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.4, ...SPRING_SNAPPY }}>
-            Party
+            Can Hurt
           </motion.span>
         </motion.h2>
       </div>

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { ShieldCheck, Apple, Candy } from 'lucide-react';
+import { ShieldCheck, Clock, Moon } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -18,12 +18,12 @@ export function Scene3() {
       <div className="absolute top-[150px] flex flex-col items-center gap-5 z-10 w-full px-10">
         <motion.div className="bg-[#10b981]/10 border border-[#10b981]/30 px-8 py-4 rounded-2xl"
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ...SPRING_SMOOTH }}>
-          <span className="text-[#10b981] font-display font-bold text-[22px] uppercase tracking-wider">What This Means</span>
+          <span className="text-[#10b981] font-display font-bold text-[22px] uppercase tracking-wider">Nap Smart</span>
         </motion.div>
         {[
-          { icon: ShieldCheck, color: '#10b981', label: 'Sugar is not a behavior drug', body: 'Repeated studies show no reliable behavioral spike directly from sugar' },
-          { icon: Candy, color: '#f97316', label: 'Still limit added sugar', body: 'Not for hyperactivity — for dental health, energy crashes, and long-term health' },
-          { icon: Apple, color: '#2F6FED', label: 'Focus on overall diet', body: 'Whole-food patterns matter more than singling out one treat at a party' },
+          { icon: Clock, color: '#10b981', label: 'Keep it to 20–30 minutes', body: 'A short power nap boosts alertness without triggering deep sleep or grogginess' },
+          { icon: Moon, color: '#7c3aed', label: 'Nap before mid-afternoon', body: 'Early-day naps fit your circadian rhythm and preserve nighttime sleep pressure' },
+          { icon: ShieldCheck, color: '#2F6FED', label: 'Naps are not bad by default', body: 'Done right, napping can improve alertness and mood without harming sleep' },
         ].map((item, i) => {
           const Icon = item.icon;
           return (
@@ -44,9 +44,9 @@ export function Scene3() {
       <div className="absolute w-full px-12 text-center z-20" style={{ bottom: BOTTOM_SAFE_ZONE_PX + 80 }}>
         <motion.h2 className="text-[#f8fafc] text-[46px] font-bold uppercase tracking-wider font-display leading-tight"
           initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 1.8 }}>
-          Myth:
+          Short + Early
           <motion.span className="text-[#10b981] block mt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.4, ...SPRING_SNAPPY }}>
-            Busted
+            = Safe
           </motion.span>
         </motion.h2>
       </div>
