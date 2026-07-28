@@ -11,7 +11,7 @@ import {
   RunProductionParams,
 } from "@workspace/api-zod";
 import { spawn } from "child_process";
-import { promises as fs, openSync, closeSync, mkdirSync, readdirSync, existsSync } from "fs";
+import { promises as fs, openSync, closeSync, mkdirSync } from "fs";
 import path from "path";
 import {
   attachRenderPid,
@@ -31,6 +31,15 @@ type EpisodeStatusValue =
   | "building";
 
 const router = Router();
+
+async function awaitFileExists(filePath: string): Promise<boolean> {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 // POST /episodes/sync-workbook
 // Re-reads the master workbook and upserts episodes — this is the manual trigger
@@ -128,7 +137,15 @@ router.get("/episodes", async (req, res): Promise<void> => {
 // Returns folder / video / YouTube / Facebook presence so the UI can
 // render the four-column indicator (e.g. "ep 66  video ❌ folder ✅
 // YouTube ❌ Facebook ❌") without N+1 client requests.
-router.get("/episodes/social-rows", async (_req, res): Promise<void> => {
+router.get("/episodes/social-rows", async (req, res): Promise<void> => {
+  const rawEpisodes = typeof req.query.episodes === "string" ? req.query.episodes : undefined;
+  const requestedEpisodes = rawEpisodes
+    ? rawEpisodes
+        .split(",")
+        .map((value) => Number(value.trim()))
+        .filter((value) => Number.isInteger(value) && value >= 1 && value <= 100)
+    : null;
+
   const all = await db
     .select({
       epNumber: episodesTable.epNumber,
@@ -143,23 +160,30 @@ router.get("/episodes/social-rows", async (_req, res): Promise<void> => {
     .orderBy(episodesTable.epNumber);
 
   const EXPORTS_DIR = path.resolve(process.cwd(), "../../exports");
+  let exportEntries: import("fs").Dirent[] = [];
+  try {
+    exportEntries = await fs.readdir(EXPORTS_DIR, { withFileTypes: true });
+  } catch {
+    // The exports directory is created by the first render.
+  }
+
   const rows = all
     .filter((row) => row.epNumber >= 1 && row.epNumber <= 100)
-    .map((row) => {
+    .filter((row) => !requestedEpisodes || requestedEpisodes.includes(row.epNumber))
+    .map(async (row) => {
       const padded = String(row.epNumber).padStart(2, "0");
-      const folderName = readdirSync(EXPORTS_DIR, { withFileTypes: true })
-        .filter((d) => d.isDirectory() && d.name.startsWith(`Episode-${padded}-`))
-        .map((d) => d.name)[0] ?? null;
-      const hasFolder = folderName !== null;
-      const hasVideoFile =
-        hasFolder &&
-        existsSync(path.join(EXPORTS_DIR, folderName, "episode.mp4"));
+      const folderName =
+        exportEntries.find(
+          (entry) => entry.isDirectory() && entry.name.startsWith(`Episode-${padded}-`),
+        )?.name ?? null;
       return {
         epNumber: row.epNumber,
         hookTitle: row.hookTitle,
         status: row.status,
-        hasFolder,
-        hasVideoFile,
+        hasFolder: folderName !== null,
+        hasVideoFile: folderName !== null
+          ? await awaitFileExists(path.join(EXPORTS_DIR, folderName, "episode.mp4"))
+          : false,
         youtubeVideoId: row.youtubeVideoId,
         facebookVideoId: row.facebookVideoId,
         postDate: row.postDate,
@@ -167,7 +191,8 @@ router.get("/episodes/social-rows", async (_req, res): Promise<void> => {
       };
     });
 
-  res.json({ total: rows.length, rows });
+  const resolvedRows = await Promise.all(rows);
+  res.json({ total: resolvedRows.length, rows: resolvedRows });
 });
 
 // GET /episodes/stats

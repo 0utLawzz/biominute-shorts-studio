@@ -30,6 +30,7 @@ import type {
   ErrorResponse,
   FacebookStatus,
   GenericSuccess,
+  GetEpisodeSocialRowsParams,
   HealthStatus,
   ListEpisodesParams,
   PublishRequest,
@@ -449,20 +450,27 @@ export const useSyncWorkbook = <TError = ErrorType<unknown>,
       return useMutation(getSyncWorkbookMutationOptions(options));
     }
 
-export const getGetEpisodeSocialRowsUrl = () => {
+export const getGetEpisodeSocialRowsUrl = (params?: GetEpisodeSocialRowsParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/api/episodes/social-rows`
+  return stringifiedParams.length > 0 ? `/api/episodes/social-rows?${stringifiedParams}` : `/api/episodes/social-rows`
 }
 
 /**
  * @summary Get per-episode asset and social publishing status
  */
-export const getEpisodeSocialRows = async ( options?: RequestInit): Promise<SocialRowsResult> => {
+export const getEpisodeSocialRows = async (params?: GetEpisodeSocialRowsParams, options?: RequestInit): Promise<SocialRowsResult> => {
 
-  return customFetch<SocialRowsResult>(getGetEpisodeSocialRowsUrl(),
+  return customFetch<SocialRowsResult>(getGetEpisodeSocialRowsUrl(params),
   {
     ...options,
     method: 'GET'
@@ -475,23 +483,23 @@ export const getEpisodeSocialRows = async ( options?: RequestInit): Promise<Soci
 
 
 
-export const getGetEpisodeSocialRowsQueryKey = () => {
+export const getGetEpisodeSocialRowsQueryKey = (params?: GetEpisodeSocialRowsParams,) => {
     return [
-    `/api/episodes/social-rows`
+    `/api/episodes/social-rows`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getGetEpisodeSocialRowsQueryOptions = <TData = Awaited<ReturnType<typeof getEpisodeSocialRows>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEpisodeSocialRows>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetEpisodeSocialRowsQueryOptions = <TData = Awaited<ReturnType<typeof getEpisodeSocialRows>>, TError = ErrorType<unknown>>(params?: GetEpisodeSocialRowsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEpisodeSocialRows>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetEpisodeSocialRowsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetEpisodeSocialRowsQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEpisodeSocialRows>>> = ({ signal }) => getEpisodeSocialRows({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEpisodeSocialRows>>> = ({ signal }) => getEpisodeSocialRows(params, { signal, ...requestOptions });
 
 
 
@@ -509,11 +517,11 @@ export type GetEpisodeSocialRowsQueryError = ErrorType<unknown>
  */
 
 export function useGetEpisodeSocialRows<TData = Awaited<ReturnType<typeof getEpisodeSocialRows>>, TError = ErrorType<unknown>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEpisodeSocialRows>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+ params?: GetEpisodeSocialRowsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEpisodeSocialRows>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
-  const queryOptions = getGetEpisodeSocialRowsQueryOptions(options)
+  const queryOptions = getGetEpisodeSocialRowsQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

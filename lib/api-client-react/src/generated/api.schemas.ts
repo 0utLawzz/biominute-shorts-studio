@@ -277,3 +277,10 @@ export const ListEpisodesStatus = {
   building: 'building',
 } as const;
 
+export type GetEpisodeSocialRowsParams = {
+/**
+ * Comma-separated episode numbers to return
+ */
+episodes?: string;
+};
+

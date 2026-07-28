@@ -234,6 +234,35 @@ ep 66  ·  Magnesium and Insulin Sensitivity  ·  folder ✗  MP4 ✗  YT ✗  F
 
 **Next task: Stage 5 — performance pass (async filesystem checks, incremental builds, and render/dashboard efficiency).**
 
+### Request 11 — Start Stage 5: complete the performance pass
+*(Session: 2026-07-28)*
+
+**User said:** "Stage 5 karan start. Or katni stages hain?"
+
+**Agent did:**
+1. Confirmed that the improvement plan contains five planned stages total; Stage 5 is the final planned stage.
+2. Replaced the synchronous `readdirSync`/`existsSync` social-row scan with asynchronous filesystem operations. The exports directory is read once per request and video existence checks run asynchronously.
+3. Added the optional `episodes` query filter:
+   - `GET /api/episodes/social-rows?episodes=66,67`
+   - Invalid or out-of-range values are ignored safely.
+   - The dashboard preserves the filter in its query key and request URL.
+4. Updated OpenAPI and regenerated the API clients.
+5. Converted the six base scene imports in `VideoTemplate.tsx` to lazy dynamic imports. Vite now emits separate Scene0–Scene5 chunks instead of bundling all scenes into the initial reels JavaScript.
+6. Kept TypeScript incremental compilation enabled and added a predictable per-project `.cache/tsbuildinfo` location through the shared base config.
+7. Fixed and verified the Reels workflow after a stale process temporarily held port 25078.
+8. Verification:
+   - OpenAPI codegen passed.
+   - Full workspace typecheck passed.
+   - Full workspace build passed.
+   - Production output contains separate lazy scene chunks.
+   - Unauthenticated filtered social-row request returns 401 as expected.
+   - All four workflows are running.
+
+**Stage 5 status: COMPLETE.**
+
+**Improvement roadmap status: COMPLETE — five planned stages finished.**
+
+---
 ---
 
 ## Git commit history (chronological, oldest → newest)

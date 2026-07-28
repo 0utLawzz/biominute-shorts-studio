@@ -104,6 +104,13 @@ paths:
       operationId: getEpisodeSocialRows
       tags: [episodes]
       summary: Get per-episode asset and social publishing status
+      parameters:
+        - name: episodes
+          in: query
+          required: false
+          description: Comma-separated episode numbers to return
+          schema:
+            type: string
       responses:
         "200":
           description: Social status rows

@@ -152,6 +152,10 @@ export const SyncWorkbookResponse = zod.object({
 /**
  * @summary Get per-episode asset and social publishing status
  */
+export const GetEpisodeSocialRowsQueryParams = zod.object({
+  "episodes": zod.coerce.string().optional().describe('Comma-separated episode numbers to return')
+})
+
 export const GetEpisodeSocialRowsResponse = zod.object({
   "total": zod.number(),
   "rows": zod.array(zod.object({

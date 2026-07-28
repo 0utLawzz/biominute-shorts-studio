@@ -215,9 +215,15 @@ const FacebookTab = ({ rows }: { rows: SocialRow[] }) => {
 };
 
 export default function SocialStatus() {
+  const requestedEpisodes = new URLSearchParams(window.location.search).get("episodes");
   const { data, isLoading, refetch, isFetching } = useQuery<SocialRowsResponse>({
-    queryKey: ["/api/episodes/social-rows"],
-    queryFn: () => customFetch("/api/episodes/social-rows"),
+    queryKey: ["/api/episodes/social-rows", requestedEpisodes],
+    queryFn: () =>
+      customFetch(
+        requestedEpisodes
+          ? `/api/episodes/social-rows?episodes=${encodeURIComponent(requestedEpisodes)}`
+          : "/api/episodes/social-rows",
+      ),
     refetchInterval: 30_000,
   });
 

@@ -75,6 +75,10 @@ pnpm pipeline:run <episode-number> --publish
 
 Use `--publish --now` only when an immediate public YouTube upload is intended. The dashboard publish routes apply the same 1080×1920 verification gate. Episodes without archived scene source files are rejected before rendering.
 
+## Improvement roadmap
+
+The five planned improvement stages are complete. The final performance pass added asynchronous social-row filesystem checks, an optional episode filter, lazy scene chunks for the reels app, and shared incremental TypeScript build caching. Future work is optional maintenance or new user-requested features.
+
 ---
 
 ## How statuses are derived

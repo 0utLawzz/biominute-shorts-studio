@@ -19,6 +19,7 @@ export * from './episodeUpdateStatus';
 export * from './errorResponse';
 export * from './facebookStatus';
 export * from './genericSuccess';
+export * from './getEpisodeSocialRowsParams';
 export * from './healthStatus';
 export * from './listEpisodesParams';
 export * from './listEpisodesStatus';

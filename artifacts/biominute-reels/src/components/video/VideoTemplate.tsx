@@ -1,22 +1,15 @@
-import { useEffect, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo } from 'react';
 import { AudioEngine } from '@/lib/audio/AudioEngine';
 import { SCENE_DURATIONS, useVideoPlayer } from '@/lib/video';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { Scene0 } from './video_scenes/Scene0';
-import { Scene1 } from './video_scenes/Scene1';
-import { Scene2 } from './video_scenes/Scene2';
-import { Scene3 } from './video_scenes/Scene3';
-import { Scene4 } from './video_scenes/Scene4';
-import { Scene5 } from './video_scenes/Scene5';
-
-const SCENE_COMPONENTS: Record<string, React.ComponentType> = {
-  0: Scene0,
-  1: Scene1,
-  2: Scene2,
-  3: Scene3,
-  4: Scene4,
-  5: Scene5,
+const SCENE_COMPONENTS: Record<string, React.LazyExoticComponent<React.ComponentType>> = {
+  0: lazy(() => import('./video_scenes/Scene0').then(({ Scene0 }) => ({ default: Scene0 }))),
+  1: lazy(() => import('./video_scenes/Scene1').then(({ Scene1 }) => ({ default: Scene1 }))),
+  2: lazy(() => import('./video_scenes/Scene2').then(({ Scene2 }) => ({ default: Scene2 }))),
+  3: lazy(() => import('./video_scenes/Scene3').then(({ Scene3 }) => ({ default: Scene3 }))),
+  4: lazy(() => import('./video_scenes/Scene4').then(({ Scene4 }) => ({ default: Scene4 }))),
+  5: lazy(() => import('./video_scenes/Scene5').then(({ Scene5 }) => ({ default: Scene5 }))),
 };
 
 declare global {
@@ -86,7 +79,11 @@ export default function VideoTemplate({
       <div className="absolute inset-0 z-0 opacity-[0.03] bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)] bg-[size:calc(var(--cvw)*4)_calc(var(--cvw)*4)]" />
 
       <AnimatePresence mode="popLayout">
-        {SceneComponent && <SceneComponent key={currentSceneKey} />}
+        {SceneComponent && (
+          <Suspense fallback={null}>
+            <SceneComponent key={currentSceneKey} />
+          </Suspense>
+        )}
       </AnimatePresence>
 
       {/* Audio layer */}

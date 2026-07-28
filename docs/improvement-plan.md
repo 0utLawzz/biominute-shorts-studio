@@ -72,6 +72,22 @@ Last audit: **2026-07-28**
 
 **Files touched:** `artifacts/api-server/src/routes/episodes.ts`, `tsconfig.base.json`, `artifacts/biominute-reels/src/VideoTemplate.tsx`
 
+**Status: COMPLETE (2026-07-28).**
+
+Implemented:
+- `social-rows` now reads the exports directory once with `fs/promises` instead of synchronously scanning it once per episode.
+- `social-rows?episodes=66,67` can return only selected episode rows.
+- The dashboard preserves that optional filter when loading Social Stats.
+- Video scenes are dynamically imported into separate Vite chunks, so the initial reels bundle no longer contains every scene component.
+- TypeScript incremental build info now uses a predictable per-project `.cache/tsbuildinfo` path. Existing incremental compilation was preserved rather than duplicated.
+
+Validation:
+- OpenAPI codegen passed after adding the query parameter.
+- Full workspace typecheck passed.
+- Full workspace build passed.
+- Reels production output contains separate `Scene0`–`Scene5` chunks.
+- API authentication still returns `401` for unauthenticated social-row requests.
+
 ---
 
 ## Summary table
@@ -84,4 +100,4 @@ Last audit: **2026-07-28**
 | 4 | 🟡 Important | Dead code removal + API spec sync | ~1h |
 | 5 | 🟢 Nice-to-have | Async I/O + incremental TS builds | ~1h |
 
-**To execute any item:** say `"Start 1"` (or 2, 3, 4, 5) and the agent will handle it end-to-end.
+**Roadmap status:** Stages 1–5 are complete. This is the final planned improvement stage; future work is optional maintenance or new user-requested features, not hidden roadmap stages.
