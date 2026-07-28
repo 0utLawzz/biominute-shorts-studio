@@ -33,6 +33,29 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 5. Stopped before Episodes 82–90 because the session reached its context limit. No duplicate uploads were attempted.
 6. Pending: synchronize Episode 81 build metadata, verify the generated scene batch, render/upload Episodes 82–90 in small batches, regenerate the dashboard after each batch, and push each completed batch to GitHub.
 
+### Request — Build and schedule Episodes 81–90
+*(Session: 2026-07-28)*
+
+**User said:** Start building Episodes 81–90 and use the existing progress or GitHub history to continue safely.
+
+**Agent did:**
+1. Read the existing progress log and confirmed Episode 81 was already rendered and scheduled; Episodes 82–90 had archived generated scenes but no YouTube IDs.
+2. Fixed the verified pipeline publish gate so it resolves the scripts executable from the workspace root instead of the nested `scripts/scripts` path.
+3. Rendered and verified Episodes 82–90 as valid 1080×1920 MP4s, then scheduled each privately on YouTube:
+   - EP82 — `ob9MtlXaN20` — 2026-09-20 09:00 UTC
+   - EP83 — `Aq9hv8Zd5ek` — 2026-09-21 09:00 UTC
+   - EP84 — `I0DKYgr2sa4` — 2026-09-22 09:00 UTC
+   - EP85 — `lWHXdbUrROk` — 2026-09-23 09:00 UTC
+   - EP86 — `O0ZT0SSOSNY` — 2026-09-24 09:00 UTC
+   - EP87 — `Gd93sVvpivs` — 2026-09-25 09:00 UTC
+   - EP88 — `6qEMcIt3ehQ` — 2026-09-26 09:00 UTC
+   - EP89 — `2Ig2C-pJZmk` — 2026-09-27 09:00 UTC
+   - EP90 — `YjchEud7lCM` — 2026-09-28 09:00 UTC
+4. Regenerated `exports/dashboard.html` after each render and restored temporary active scene/config swaps after production.
+5. Corrected the schedule uploader to persist `status="scheduled"` when saving a YouTube ID, then reconciled EP82–90 in the database.
+
+**Stage status: Episodes 81–90 rendered and scheduled.**
+
 ### Request — Seed the uploaded master workbook without overwriting live state
 *(Session: 2026-07-28)*
 

@@ -1,5 +1,5 @@
 import { db } from "@workspace/db";
-import { assertPublishable, getArtifact, getEpisode, parseEpisodeNumber, probeVideo, VIDEO_HEIGHT, VIDEO_WIDTH, runCommand } from "./helpers.js";
+import { assertPublishable, getArtifact, getEpisode, parseEpisodeNumber, probeVideo, VIDEO_HEIGHT, VIDEO_WIDTH, runCommand, WORKSPACE_ROOT } from "./helpers.js";
 
 async function main() {
   const epNumber = parseEpisodeNumber(process.argv[2]);
@@ -14,8 +14,8 @@ async function main() {
   const script = mode === "now" ? "upload-now.ts" : "schedule-upload.ts";
   console.log(`PUBLISH GATE PASS: EP${epNumber} artifact verified.`);
   runCommand(
-    `${process.cwd()}/scripts/node_modules/.bin/tsx`,
-    [`${process.cwd()}/scripts/src/${script}`, String(epNumber)],
+    `${WORKSPACE_ROOT}/scripts/node_modules/.bin/tsx`,
+    [`${WORKSPACE_ROOT}/scripts/src/${script}`, String(epNumber)],
   );
   await db.$client.end();
 }

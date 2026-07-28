@@ -21,3 +21,4 @@
 - [Workbook seed flip Ep 51–65](workbook-seed-flips-ep51-65.md) — `seed-episodes.ts` preserves Ep ≤50 status only; Ep 51+ flip back to workbook value. Always follow a seed with `reconcile-yt-status` to restore YT truth.
 - [API codegen export barrel](api-codegen-export-barrel.md) — generated Zod runtime schemas and TypeScript types need selective exports to avoid name collisions.
 - [GitHub batch import and push checklist](github-batch-import-checklist.md) — verify imported repos, split work into small batches, and make exports explicit/idempotent before pushing.
+- [Pipeline publish executable path](pipeline-publish-executable-path.md) — pipeline commands run from the scripts package, so publish gates must resolve executables from the workspace root.

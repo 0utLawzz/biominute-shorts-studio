@@ -297,21 +297,19 @@ async function scheduleUploadEp(epNumber: number) {
     console.warn(`  ⚠️  No playlist env var for season "${ep.season}"`);
   }
 
-  // DB: record the video ID but keep status="scheduled" and scheduledPublishAt
-  // intact — the scheduler will NOT re-upload this (youtubeVideoId is now set,
-  // so isNull check fails). YouTube owns the publish timing from here.
+  // DB: record the video ID and explicit scheduled state. YouTube owns the
+  // publish timing from here and will flip the video public at publishAt.
   await db
     .update(episodesTable)
     .set({
       youtubeVideoId,
+      status: "scheduled",
       updatedAt: new Date(),
-      // status stays "scheduled" — flip to "published" can be done via a
-      // webhook or a future polling job once YouTube confirms it's live.
     })
     .where(eq(episodesTable.epNumber, epNumber));
 
   console.log(
-    `  ✓ DB updated — youtubeVideoId saved, status kept "scheduled".`,
+    `  ✓ DB updated — youtubeVideoId saved, status set to "scheduled".`,
   );
   console.log(
     `  ✓ YouTube will auto-publish at ${publishAt.toISOString()}.`,
