@@ -5,6 +5,17 @@ import { and, gte, lte } from "drizzle-orm";
 
 const root = path.resolve(import.meta.dirname, "../..");
 const scenesDir = path.join(root, "artifacts/biominute-reels/src/components/video/video_scenes");
+const startEpisode = Number(process.argv[2] ?? 81);
+const endEpisode = Number(process.argv[3] ?? 90);
+
+if (
+  !Number.isInteger(startEpisode) ||
+  !Number.isInteger(endEpisode) ||
+  startEpisode <= 0 ||
+  endEpisode < startEpisode
+) {
+  throw new Error("Usage: generate-episode-scenes <start-episode> <end-episode>");
+}
 
 const contentTemplate = (episode: {
   epNumber: number;
@@ -28,10 +39,12 @@ const rows = await db
     citationCta: episodesTable.citationCta,
   })
   .from(episodesTable)
-  .where(and(gte(episodesTable.epNumber, 81), lte(episodesTable.epNumber, 90)));
+  .where(and(gte(episodesTable.epNumber, startEpisode), lte(episodesTable.epNumber, endEpisode)));
 
-if (rows.length !== 10) {
-  throw new Error(`Expected 10 episodes, found ${rows.length}`);
+if (rows.length !== endEpisode - startEpisode + 1) {
+  throw new Error(
+    `Expected ${endEpisode - startEpisode + 1} episodes, found ${rows.length}`,
+  );
 }
 
 for (const row of rows) {
@@ -42,4 +55,6 @@ for (const row of rows) {
 }
 
 await db.$client.end();
-console.log(`Generated archived scene wrappers for Episodes ${rows[0].epNumber}–${rows.at(-1)?.epNumber}.`);
+console.log(
+  `Generated archived scene wrappers for Episodes ${rows[0].epNumber}–${rows.at(-1)?.epNumber}.`,
+);

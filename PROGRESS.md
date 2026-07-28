@@ -56,6 +56,31 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 
 **Stage status: Episodes 81–90 rendered and scheduled.**
 
+### Request — Build and publish Episodes 91–100 to YouTube only
+*(Session: 2026-07-28)*
+
+**User said:** Add a YouTube link column like Facebook, then build and publish Episodes 91–100 to YouTube only.
+
+**Agent did:**
+1. Confirmed the dashboard already includes a dedicated clickable **YouTube link** column alongside Facebook in `SocialStatus.tsx`; no duplicate UI was added.
+2. Extended `scripts/src/generate-episode-scenes.ts` to accept a start/end episode range.
+3. Generated archived workbook-driven scene content and Scene0–Scene4 wrappers for Episodes 91–100.
+4. Rendered and verified all ten episodes as valid 1080×1920 MP4s.
+5. Scheduled all ten privately on YouTube only:
+   - EP91 — `Ey-jLoAIMBU` — 2026-09-29 09:00 UTC
+   - EP92 — `L2LbcHcFjQY` — 2026-09-30 09:00 UTC
+   - EP93 — `yGyoF8vRmD8` — 2026-10-01 09:00 UTC
+   - EP94 — `NqqvOJjoCis` — 2026-10-02 09:00 UTC
+   - EP95 — `S25VfUfLUDk` — 2026-10-03 09:00 UTC
+   - EP96 — `P9Mi8bVsNas` — 2026-10-04 09:00 UTC
+   - EP97 — `SIJnPtH1buA` — 2026-10-05 09:00 UTC
+   - EP98 — `JpoBQfqaGOE` — 2026-10-06 09:00 UTC
+   - EP99 — `VUKY6ufXBHM` — 2026-10-07 09:00 UTC
+   - EP100 — `tNAGnZx2UXY` — 2026-10-08 09:00 UTC
+6. Updated the database rows to `scheduled`, regenerated `exports/dashboard.html`, and performed no Facebook uploads or mutations.
+
+**Stage status: Episodes 91–100 rendered and scheduled on YouTube.**
+
 ### Request — Seed the uploaded master workbook without overwriting live state
 *(Session: 2026-07-28)*
 
