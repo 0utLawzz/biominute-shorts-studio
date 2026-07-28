@@ -30,6 +30,7 @@ import { episodesTable } from '@workspace/db';
 // ---------------------------------------------------------------------------
 const TEST_MODE = process.env.TEST_MODE === 'true';
 const SKIP_EXPORT = process.env.SKIP_EXPORT === 'true';
+const RENDER_EXISTING = process.env.RENDER_EXISTING === 'true';
 
 const WORKSPACE_ROOT = path.resolve(process.cwd(), '..');
 const REELS_SRC = path.join(WORKSPACE_ROOT, 'artifacts/biominute-reels/src/components/video/video_scenes');
@@ -307,7 +308,7 @@ async function processEpisode(epNumber: number): Promise<void> {
   if (!rows.length) throw new Error(`Episode ${epNumber} not found in DB`);
   const ep = rows[0];
 
-  if (ep.youtubeVideoId) {
+  if (ep.youtubeVideoId && !RENDER_EXISTING) {
     console.log(`  ⏭  Already on YouTube (${ep.youtubeVideoId}) — skipping`);
     return;
   }
@@ -325,6 +326,16 @@ async function processEpisode(epNumber: number): Promise<void> {
 
   // Export video
   exportVideo(epNumber, mp4Path);
+
+  if (RENDER_EXISTING && ep.youtubeVideoId) {
+    await db.update(episodesTable).set({
+      buildStage: 'exported',
+      dateBuilt: new Date().toISOString().slice(0, 10),
+      updatedAt: new Date(),
+    }).where(eq(episodesTable.epNumber, epNumber));
+    console.log(`  ✓ Existing YouTube video preserved; render metadata updated.`);
+    return;
+  }
 
   // Build YouTube metadata
   const tags = (ep.hashtags ?? '').split(/[\s,]+/).map((t: string) => t.replace(/^#/, '')).filter(Boolean);

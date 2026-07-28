@@ -10,7 +10,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   Calendar,
   ChevronRight,
-  Filter,
   Hammer,
   Loader2,
   MoreHorizontal,
@@ -36,13 +35,13 @@ const SEASONS = [
 ] as const;
 
 const STATUS_FILTERS = [
-  "all",
-  "draft",
-  "scripted",
-  "complete",
-  "scheduled",
-  "published",
-  "building",
+  { value: "all", label: "All statuses" },
+  { value: "draft", label: "Draft" },
+  { value: "scripted", label: "Scripted" },
+  { value: "complete", label: "Complete" },
+  { value: "scheduled", label: "Scheduled" },
+  { value: "published", label: "Published" },
+  { value: "building", label: "Building" },
 ] as const;
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; accent: string }> = {
@@ -283,37 +282,17 @@ export default function Dashboard() {
                   className="w-48 bg-transparent font-mono text-xs uppercase outline-none placeholder:text-[#888]"
                 />
               </div>
-              <div className="flex border-2 border-[#0C0C0C] bg-[#FAF7EE] shadow-[3px_3px_0_#0C0C0C]">
-                <Filter size={14} className="m-2.5 shrink-0" />
-                {SEASONS.map((season) => (
-                  <button
-                    key={season.key}
-                    onClick={() => setActiveSeason(season.key)}
-                    className={`border-l-2 border-[#0C0C0C] px-2.5 py-2 font-mono text-[10px] font-bold uppercase transition ${
-                      activeSeason === season.key ? "bg-[#0C0C0C] text-[#FAF7EE]" : "hover:bg-[#E2DDD0]"
-                    }`}
-                  >
-                    {season.label}
-                  </button>
-                ))}
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="sr-only" htmlFor="season-filter">Season</label>
+                <select id="season-filter" value={activeSeason} onChange={(event) => setActiveSeason(event.target.value)} className="border-2 border-[#0C0C0C] bg-[#FAF7EE] px-3 py-2 font-mono text-[10px] font-bold uppercase shadow-[3px_3px_0_#0C0C0C] outline-none">
+                  {SEASONS.map((season) => <option key={season.key} value={season.key}>{season.label === "All" ? "All seasons" : season.label}</option>)}
+                </select>
+                <label className="sr-only" htmlFor="status-filter">Status</label>
+                <select id="status-filter" value={activeStatus} onChange={(event) => setActiveStatus(event.target.value as ListEpisodesStatus | "all")} className="border-2 border-[#0C0C0C] bg-[#FAF7EE] px-3 py-2 font-mono text-[10px] font-bold uppercase shadow-[3px_3px_0_#0C0C0C] outline-none">
+                  {STATUS_FILTERS.map((status) => <option key={status.value} value={status.value}>{status.label}</option>)}
+                </select>
               </div>
             </div>
-          </div>
-
-          <div className="mb-4 flex flex-wrap gap-2">
-            {STATUS_FILTERS.map((status) => (
-              <button
-                key={status}
-                onClick={() => setActiveStatus(status as ListEpisodesStatus | "all")}
-                className={`border-2 border-[#0C0C0C] px-3 py-1.5 font-mono text-[10px] font-bold uppercase shadow-[2px_2px_0_#0C0C0C] transition ${
-                  activeStatus === status
-                    ? "translate-x-[2px] translate-y-[2px] bg-[#0C0C0C] text-[#FAF7EE] shadow-none"
-                    : "bg-[#FAF7EE] hover:-translate-x-px hover:-translate-y-px"
-                }`}
-              >
-                {status}
-              </button>
-            ))}
           </div>
 
           <div className="overflow-hidden border-[3px] border-[#0C0C0C] bg-[#FAF7EE] shadow-[5px_5px_0_#0C0C0C]">
@@ -383,7 +362,12 @@ function QueueCard({ episode, urgent }: { episode: any; urgent: boolean }) {
     ? Math.ceil((new Date(episode.postDate).getTime() - Date.now()) / 86_400_000)
     : null;
   const dueLabel =
-    daysOut === null ? "DATE TBD" : daysOut < 0 ? `LATE BY ${Math.abs(daysOut)}D` : daysOut === 0 ? "DUE TODAY" : `DUE IN ${daysOut}D`;
+    daysOut === null ? "DATE TBD" : daysOut < 0 ? `LATE BY ${Math.abs(daysOut)}D` : daysOut === 0 ? "DUE TODAY" : daysOut === 1 ? "DUE TOMORROW" : `DUE IN ${daysOut}D`;
+  const dueTone = daysOut !== null && daysOut <= 0
+    ? "border-[#C94A00] bg-[#C94A00] text-white"
+    : daysOut === 1
+      ? "border-[#C9A800] bg-[#FFF3B0] text-[#0C0C0C]"
+      : "border-[#AAA] bg-[#E2DDD0] text-[#555]";
   const action = episode.status === "building" ? "Review Render" : episode.status === "complete" ? "Schedule" : "Edit Script";
   const ActionIcon = episode.status === "building" ? Hammer : episode.status === "complete" ? Play : MoreHorizontal;
   const colors = STATUS_COLORS[episode.status] ?? STATUS_COLORS.draft;
@@ -402,8 +386,8 @@ function QueueCard({ episode, urgent }: { episode: any; urgent: boolean }) {
         <div className="flex flex-1 flex-col justify-between p-4">
           <p className="mb-4 line-clamp-3 font-sans text-base font-bold leading-snug">{episode.hookTitle}</p>
           <div className="mb-4 flex items-center justify-between font-mono text-xs">
-            <span className="text-destructive bg-muted">{dueLabel}</span>
-            <span className="text-foreground bg-ring">{episode.duration || "--:--"}</span>
+            <span className={`border px-2 py-1 text-[10px] font-bold ${dueTone}`}>{dueLabel}</span>
+            <span className="text-[#555]">{episode.duration || "--:--"}</span>
           </div>
           <div className="flex items-center justify-center gap-2 border-2 border-[#0C0C0C] bg-[#0C0C0C] py-2.5 font-mono text-xs font-bold uppercase text-[#FAF7EE] transition group-hover:bg-[#0A6B52]">
             <ActionIcon size={14} />

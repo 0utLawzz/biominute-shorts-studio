@@ -16,6 +16,20 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 
 ## User requests → Agent actions
 
+### Request — Simplify dashboard navigation and finish Episodes 51–65 scheduling
+*(Session: 2026-07-28)*
+
+**User said:** Remove the crowded lower pipeline links from the dashboard navigation, keep only Social, Setup, and Analytics, fix Episodes 51–65 scheduling from September 4 onward, finish builds, update the database, schedule YouTube, and push all changes.
+
+**Agent did:**
+1. Replaced the overflowing navbar with three compact primary links: Social, Setup, and Analytics.
+2. Replaced the long status-filter button row with compact Season and Status selectors.
+3. Styled Due Today, Due Tomorrow, and later due dates as distinct queue labels instead of competing countdown controls.
+4. Seeded and reconciled the database, then locked Episodes 51–65 to daily 09:00 UTC slots from September 4–18, 2026.
+5. Preserved all existing YouTube IDs and schedules; no duplicate uploads were performed.
+6. Completed and validated all 15 local MP4 builds at 1080×1920 and synchronized all 15 rows as `scheduled` / `exported`.
+7. Verified all 15 YouTube videos are private and scheduled with database timestamps matching exactly.
+
 ### Request — Rework Preview placement and replace workbook sync with Seed/Publish actions
 *(Session: 2026-07-28)*
 
