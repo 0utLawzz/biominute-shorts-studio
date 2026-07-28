@@ -16,6 +16,23 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 
 ## User requests → Agent actions
 
+### Request — Generate source scenes and start Episodes 81–90
+*(Session: 2026-07-28 — paused at context limit)*
+
+**User said:** Generate missing Episode 81–90 scenes from the workbook visual direction, then start production.
+
+**Agent did:**
+1. Confirmed the workbook contains the Episode 81–90 titles, scripts, visual directions, citations, and CTAs.
+2. Added a reusable workbook-driven `GeneratedScene` renderer with topic-aware icons, hook scenes, evidence cards, practical takeaways, and citation/CTA scenes.
+3. Generated archived content and Scene0–Scene4 wrappers for Episodes 81–90.
+4. Restarted the reels workflow and completed Episode 81:
+   - Rendered valid 1080×1920 MP4
+   - YouTube ID: `7kq3nB3tTno`
+   - Scheduled: 2026-09-19 09:00 UTC
+   - DB status: `scheduled`
+5. Stopped before Episodes 82–90 because the session reached its context limit. No duplicate uploads were attempted.
+6. Pending: synchronize Episode 81 build metadata, verify the generated scene batch, render/upload Episodes 82–90 in small batches, regenerate the dashboard after each batch, and push each completed batch to GitHub.
+
 ### Request — Seed the uploaded master workbook without overwriting live state
 *(Session: 2026-07-28)*
 
