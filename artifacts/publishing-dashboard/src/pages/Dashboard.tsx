@@ -403,7 +403,7 @@ function QueueCard({ episode, urgent }: { episode: any; urgent: boolean }) {
         <div className="flex flex-1 flex-col justify-between p-4">
           <p className="mb-4 line-clamp-3 font-sans text-base font-bold leading-snug">{episode.hookTitle}</p>
           <div className="mb-4 flex items-center justify-between font-mono text-xs">
-            <span className={daysOut !== null && daysOut < 0 ? "font-bold text-[#C94A00]" : "text-[#555]"}>{dueLabel}</span>
+            <span className="text-destructive bg-muted">{dueLabel}</span>
             <span className="text-[#555]">{episode.duration || "--:--"}</span>
           </div>
           <div className="flex items-center justify-center gap-2 border-2 border-[#0C0C0C] bg-[#0C0C0C] py-2.5 font-mono text-xs font-bold uppercase text-[#FAF7EE] transition group-hover:bg-[#0A6B52]">
