@@ -97,6 +97,30 @@ This writes `exports/dashboard.html` from the current database state.
 pnpm --filter @workspace/scripts exec tsx ./src/upload-now.ts <EP_NUMBER>
 ```
 
+### Safe production pipeline
+
+The pipeline always runs preflight, build, and video verification before it reaches the publish gate:
+
+```bash
+pnpm pipeline:run 66
+```
+
+By default this stops after verification. To explicitly upload to YouTube:
+
+```bash
+pnpm pipeline:run 66 --publish
+```
+
+For an immediate public upload instead of the normal scheduled upload:
+
+```bash
+pnpm pipeline:run 66 --publish --now
+```
+
+The `--publish` flag is required; the normal run never uploads anything. The publish gate requires a non-empty, playable 1080×1920 MP4 and blocks duplicate YouTube IDs.
+
+If an episode has no archived `epN_Scene0.tsx` through `epN_Scene4.tsx` source files, the runner stops before rendering. This prevents a different episode's active scenes from being published accidentally.
+
 ### Upload an episode to YouTube as scheduled
 
 ```bash

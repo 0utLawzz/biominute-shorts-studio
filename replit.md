@@ -61,6 +61,8 @@ To export the current episode to MP4:
 BIOMINUTE_EXPORT_DIR="exports/Episode-NN-<slug>" pnpm run export-video
 ```
 
+For the safe full pipeline, use `pnpm pipeline:run <episode-number>`. It builds and verifies first, then stops. Add `--publish` only when the verified artifact should be uploaded to YouTube.
+
 To manually upload an episode immediately:
 ```
 pnpm --filter @workspace/scripts exec tsx ./src/upload-now.ts 4

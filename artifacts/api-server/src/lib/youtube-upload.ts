@@ -109,7 +109,7 @@ export interface EpisodeGuard {
 
 /**
  * Throws if the episode already has a YouTube video ID. Call before every
- * videos.insert path (scheduler, manual trigger, dashboard publish) to prevent
+ * videos.insert paths (manual CLI and dashboard publish) to prevent
  * duplicate uploads from race conditions or double-clicks.
  */
 export function assertNotAlreadyPublished(episode: EpisodeGuard): void {

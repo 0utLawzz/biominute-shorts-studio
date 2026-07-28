@@ -1,6 +1,6 @@
 # Production Status — BioMinute Shorts Studio
 
-> **Canonical snapshot of the pipeline.** Refreshed **2026-07-27** after Stage 3 database date migration, seed refresh, and YouTube reconciliation.
+> **Canonical snapshot of the pipeline.** Refreshed **2026-07-28** after Stage 4 pipeline runner, verified publish gate, and OpenAPI synchronization.
 
 This document is the single source of truth for *where every episode lives* in the publish pipeline. The dashboard (`http://<host>:5173/`) and the API endpoint `GET /api/episodes/stats` reflect the same numbers in real time.
 
@@ -58,6 +58,22 @@ pnpm --filter @workspace/scripts exec tsx ./src/resync-scheduled.ts
 ```
 
 The seed script automatically selects the newest `.xlsx` file in `attached_assets/`. Empty dates are stored as `NULL`; real episode dates are stored as PostgreSQL timestamps.
+
+## Safe production runner
+
+The production runner is intentionally staged:
+
+```bash
+pnpm pipeline:run <episode-number>
+```
+
+This performs preflight, episode-scene preparation, render, and MP4 verification, then stops before publishing. Publishing requires an explicit flag:
+
+```bash
+pnpm pipeline:run <episode-number> --publish
+```
+
+Use `--publish --now` only when an immediate public YouTube upload is intended. The dashboard publish routes apply the same 1080×1920 verification gate. Episodes without archived scene source files are rejected before rendering.
 
 ---
 

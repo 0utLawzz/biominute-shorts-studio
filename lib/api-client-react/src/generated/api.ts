@@ -20,18 +20,24 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AnalyticsAggregate,
+  AnalyticsResult,
   BuildStatus,
   CreateEpisodeBody,
   Episode,
   EpisodeStats,
   EpisodeUpdate,
   ErrorResponse,
+  FacebookStatus,
+  GenericSuccess,
   HealthStatus,
   ListEpisodesParams,
   PublishRequest,
   PublishResult,
   RenderStatus,
   RunProductionResult,
+  SocialRowsResult,
+  SyncWorkbookResult,
   YouTubeAuthUrl,
   YouTubeStatus
 } from './api.schemas';
@@ -360,6 +366,154 @@ export function useGetEpisodeStats<TData = Awaited<ReturnType<typeof getEpisodeS
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetEpisodeStatsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSyncWorkbookUrl = () => {
+
+
+
+
+  return `/api/episodes/sync-workbook`
+}
+
+/**
+ * @summary Re-seed episode metadata from the newest workbook
+ */
+export const syncWorkbook = async ( options?: RequestInit): Promise<SyncWorkbookResult> => {
+
+  return customFetch<SyncWorkbookResult>(getSyncWorkbookUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getSyncWorkbookMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof syncWorkbook>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof syncWorkbook>>, TError,void, TContext> => {
+
+const mutationKey = ['syncWorkbook'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof syncWorkbook>>, void> = () => {
+
+
+          return  syncWorkbook(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SyncWorkbookMutationResult = NonNullable<Awaited<ReturnType<typeof syncWorkbook>>>
+
+    export type SyncWorkbookMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Re-seed episode metadata from the newest workbook
+ */
+export const useSyncWorkbook = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof syncWorkbook>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof syncWorkbook>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getSyncWorkbookMutationOptions(options));
+    }
+
+export const getGetEpisodeSocialRowsUrl = () => {
+
+
+
+
+  return `/api/episodes/social-rows`
+}
+
+/**
+ * @summary Get per-episode asset and social publishing status
+ */
+export const getEpisodeSocialRows = async ( options?: RequestInit): Promise<SocialRowsResult> => {
+
+  return customFetch<SocialRowsResult>(getGetEpisodeSocialRowsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEpisodeSocialRowsQueryKey = () => {
+    return [
+    `/api/episodes/social-rows`
+    ] as const;
+    }
+
+
+export const getGetEpisodeSocialRowsQueryOptions = <TData = Awaited<ReturnType<typeof getEpisodeSocialRows>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEpisodeSocialRows>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEpisodeSocialRowsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEpisodeSocialRows>>> = ({ signal }) => getEpisodeSocialRows({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEpisodeSocialRows>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetEpisodeSocialRowsQueryResult = NonNullable<Awaited<ReturnType<typeof getEpisodeSocialRows>>>
+export type GetEpisodeSocialRowsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get per-episode asset and social publishing status
+ */
+
+export function useGetEpisodeSocialRows<TData = Awaited<ReturnType<typeof getEpisodeSocialRows>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEpisodeSocialRows>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetEpisodeSocialRowsQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -823,6 +977,83 @@ export const useRunProduction = <TError = ErrorType<void>,
       return useMutation(getRunProductionMutationOptions(options));
     }
 
+export const getGetEpisodeVideoUrl = (id: number,) => {
+
+
+
+
+  return `/api/episodes/${id}/video`
+}
+
+/**
+ * @summary Stream the rendered episode MP4
+ */
+export const getEpisodeVideo = async (id: number, options?: RequestInit): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetEpisodeVideoUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEpisodeVideoQueryKey = (id: number,) => {
+    return [
+    `/api/episodes/${id}/video`
+    ] as const;
+    }
+
+
+export const getGetEpisodeVideoQueryOptions = <TData = Awaited<ReturnType<typeof getEpisodeVideo>>, TError = ErrorType<void>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEpisodeVideo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEpisodeVideoQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEpisodeVideo>>> = ({ signal }) => getEpisodeVideo(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEpisodeVideo>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetEpisodeVideoQueryResult = NonNullable<Awaited<ReturnType<typeof getEpisodeVideo>>>
+export type GetEpisodeVideoQueryError = ErrorType<void>
+
+
+/**
+ * @summary Stream the rendered episode MP4
+ */
+
+export function useGetEpisodeVideo<TData = Awaited<ReturnType<typeof getEpisodeVideo>>, TError = ErrorType<void>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEpisodeVideo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetEpisodeVideoQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
 export const getGetYouTubeAuthUrlUrl = () => {
 
 
@@ -1049,3 +1280,446 @@ export const usePublishToYouTube = <TError = ErrorType<ErrorResponse>,
       return useMutation(getPublishToYouTubeMutationOptions(options));
     }
 
+export const getRepairYouTubeVideoUrl = (id: number,) => {
+
+
+
+
+  return `/api/youtube/repair/${id}`
+}
+
+/**
+ * @summary Repair YouTube metadata for an existing video
+ */
+export const repairYouTubeVideo = async (id: number, options?: RequestInit): Promise<GenericSuccess> => {
+
+  return customFetch<GenericSuccess>(getRepairYouTubeVideoUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getRepairYouTubeVideoMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof repairYouTubeVideo>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof repairYouTubeVideo>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['repairYouTubeVideo'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof repairYouTubeVideo>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  repairYouTubeVideo(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RepairYouTubeVideoMutationResult = NonNullable<Awaited<ReturnType<typeof repairYouTubeVideo>>>
+
+    export type RepairYouTubeVideoMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Repair YouTube metadata for an existing video
+ */
+export const useRepairYouTubeVideo = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof repairYouTubeVideo>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof repairYouTubeVideo>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getRepairYouTubeVideoMutationOptions(options));
+    }
+
+export const getGetFacebookStatusUrl = () => {
+
+
+
+
+  return `/api/facebook/status`
+}
+
+/**
+ * @summary Check Facebook publishing configuration
+ */
+export const getFacebookStatus = async ( options?: RequestInit): Promise<FacebookStatus> => {
+
+  return customFetch<FacebookStatus>(getGetFacebookStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetFacebookStatusQueryKey = () => {
+    return [
+    `/api/facebook/status`
+    ] as const;
+    }
+
+
+export const getGetFacebookStatusQueryOptions = <TData = Awaited<ReturnType<typeof getFacebookStatus>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFacebookStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFacebookStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFacebookStatus>>> = ({ signal }) => getFacebookStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFacebookStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetFacebookStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getFacebookStatus>>>
+export type GetFacebookStatusQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Check Facebook publishing configuration
+ */
+
+export function useGetFacebookStatus<TData = Awaited<ReturnType<typeof getFacebookStatus>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFacebookStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetFacebookStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getPublishToFacebookUrl = (id: number,) => {
+
+
+
+
+  return `/api/facebook/publish/${id}`
+}
+
+/**
+ * @summary Publish an episode to Facebook
+ */
+export const publishToFacebook = async (id: number, options?: RequestInit): Promise<GenericSuccess> => {
+
+  return customFetch<GenericSuccess>(getPublishToFacebookUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getPublishToFacebookMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishToFacebook>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof publishToFacebook>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['publishToFacebook'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publishToFacebook>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  publishToFacebook(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PublishToFacebookMutationResult = NonNullable<Awaited<ReturnType<typeof publishToFacebook>>>
+
+    export type PublishToFacebookMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Publish an episode to Facebook
+ */
+export const usePublishToFacebook = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishToFacebook>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof publishToFacebook>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getPublishToFacebookMutationOptions(options));
+    }
+
+export const getGetYouTubeAnalyticsUrl = (id: number,) => {
+
+
+
+
+  return `/api/analytics/youtube/${id}`
+}
+
+/**
+ * @summary Fetch live YouTube analytics for an episode
+ */
+export const getYouTubeAnalytics = async (id: number, options?: RequestInit): Promise<AnalyticsResult> => {
+
+  return customFetch<AnalyticsResult>(getGetYouTubeAnalyticsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetYouTubeAnalyticsQueryKey = (id: number,) => {
+    return [
+    `/api/analytics/youtube/${id}`
+    ] as const;
+    }
+
+
+export const getGetYouTubeAnalyticsQueryOptions = <TData = Awaited<ReturnType<typeof getYouTubeAnalytics>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getYouTubeAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetYouTubeAnalyticsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getYouTubeAnalytics>>> = ({ signal }) => getYouTubeAnalytics(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getYouTubeAnalytics>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetYouTubeAnalyticsQueryResult = NonNullable<Awaited<ReturnType<typeof getYouTubeAnalytics>>>
+export type GetYouTubeAnalyticsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Fetch live YouTube analytics for an episode
+ */
+
+export function useGetYouTubeAnalytics<TData = Awaited<ReturnType<typeof getYouTubeAnalytics>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getYouTubeAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetYouTubeAnalyticsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetFacebookAnalyticsUrl = (id: number,) => {
+
+
+
+
+  return `/api/analytics/facebook/${id}`
+}
+
+/**
+ * @summary Fetch live Facebook analytics for an episode
+ */
+export const getFacebookAnalytics = async (id: number, options?: RequestInit): Promise<AnalyticsResult> => {
+
+  return customFetch<AnalyticsResult>(getGetFacebookAnalyticsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetFacebookAnalyticsQueryKey = (id: number,) => {
+    return [
+    `/api/analytics/facebook/${id}`
+    ] as const;
+    }
+
+
+export const getGetFacebookAnalyticsQueryOptions = <TData = Awaited<ReturnType<typeof getFacebookAnalytics>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFacebookAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetFacebookAnalyticsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFacebookAnalytics>>> = ({ signal }) => getFacebookAnalytics(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getFacebookAnalytics>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetFacebookAnalyticsQueryResult = NonNullable<Awaited<ReturnType<typeof getFacebookAnalytics>>>
+export type GetFacebookAnalyticsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Fetch live Facebook analytics for an episode
+ */
+
+export function useGetFacebookAnalytics<TData = Awaited<ReturnType<typeof getFacebookAnalytics>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getFacebookAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetFacebookAnalyticsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetEpisodesAnalyticsUrl = () => {
+
+
+
+
+  return `/api/analytics/episodes`
+}
+
+/**
+ * @summary Get aggregate analytics for published episodes
+ */
+export const getEpisodesAnalytics = async ( options?: RequestInit): Promise<AnalyticsAggregate> => {
+
+  return customFetch<AnalyticsAggregate>(getGetEpisodesAnalyticsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEpisodesAnalyticsQueryKey = () => {
+    return [
+    `/api/analytics/episodes`
+    ] as const;
+    }
+
+
+export const getGetEpisodesAnalyticsQueryOptions = <TData = Awaited<ReturnType<typeof getEpisodesAnalytics>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEpisodesAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEpisodesAnalyticsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEpisodesAnalytics>>> = ({ signal }) => getEpisodesAnalytics({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEpisodesAnalytics>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetEpisodesAnalyticsQueryResult = NonNullable<Awaited<ReturnType<typeof getEpisodesAnalytics>>>
+export type GetEpisodesAnalyticsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get aggregate analytics for published episodes
+ */
+
+export function useGetEpisodesAnalytics<TData = Awaited<ReturnType<typeof getEpisodesAnalytics>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEpisodesAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetEpisodesAnalyticsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}

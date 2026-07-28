@@ -4,6 +4,7 @@ import { db, episodesTable } from "@workspace/db";
 import { findEpisodeVideoPath } from "../lib/youtube-upload";
 import { logger } from "../lib/logger";
 import fs from "node:fs";
+import { assertVerifiedVideo } from "../lib/video-verification";
 
 const router = Router();
 const FB_GRAPH_VIDEO_URL = "https://graph-video.facebook.com/v21.0";
@@ -74,12 +75,13 @@ router.post("/facebook/publish/:id", async (req, res): Promise<void> => {
   let videoPath: string;
   try {
     videoPath = findEpisodeVideoPath(episode.epNumber);
+    assertVerifiedVideo(videoPath);
   } catch (err) {
     res.status(400).json({
       error:
         err instanceof Error
           ? err.message
-          : "Episode video file not found. Export the episode first.",
+          : "Verified episode video is required before publishing.",
     });
     return;
   }

@@ -218,6 +218,48 @@ export interface RenderStatus {
   error: string | null;
 }
 
+export interface SyncWorkbookResult {
+  success: boolean;
+  inserted: number;
+  updated: number;
+  raw?: string;
+}
+
+export interface SocialRow {
+  epNumber: number;
+  hookTitle: string;
+  status: string;
+  hasFolder: boolean;
+  hasVideoFile: boolean;
+  /** @nullable */
+  youtubeVideoId?: string | null;
+  /** @nullable */
+  facebookVideoId?: string | null;
+  /** @nullable */
+  postDate?: string | null;
+  /** @nullable */
+  scheduledPublishAt?: string | null;
+}
+
+export interface SocialRowsResult {
+  total: number;
+  rows: SocialRow[];
+}
+
+export interface FacebookStatus {
+  connected: boolean;
+  /** @nullable */
+  pageId?: string | null;
+  hasAccessToken: boolean;
+  hasPageId: boolean;
+}
+
+export interface AnalyticsResult { [key: string]: unknown }
+
+export interface AnalyticsAggregate { [key: string]: unknown }
+
+export interface GenericSuccess { [key: string]: unknown }
+
 export type ListEpisodesParams = {
 status?: ListEpisodesStatus;
 season?: string;

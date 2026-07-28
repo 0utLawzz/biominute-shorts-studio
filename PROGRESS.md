@@ -199,6 +199,41 @@ ep 66  ·  Magnesium and Insulin Sensitivity  ·  folder ✗  MP4 ✗  YT ✗  F
 
 **Next task: Stage 4 — clean dead scheduler code and synchronize the OpenAPI route definitions.**
 
+### Request 10 — Start Stage 4: create a safe build, verify, and publish runner
+*(Session: 2026-07-28)*
+
+**User said:** "Start it. Helping files ko proper structure do. Start runner, then build, build check, render verification, and only then publishing."
+
+**Agent did:**
+1. Added a structured pipeline under `scripts/src/pipeline/`:
+   - `preflight.ts` checks the database episode and blocks duplicates.
+   - `prepare-scenes.ts` loads the selected episode's archived scene source and fails if it is missing.
+   - `build.ts` renders into the episode export folder.
+   - `verify-build.ts` checks MP4 existence, integrity, duration, and exact 1080×1920 dimensions.
+   - `publish-gate.ts` re-checks the verified artifact before calling the existing scheduled/immediate YouTube publisher.
+   - `pipeline-runner.ts` runs preflight → scene preparation → build → verify.
+2. Publishing is opt-in:
+   - `pnpm pipeline:run 66` stops after verification and never uploads.
+   - `pnpm pipeline:run 66 --publish` explicitly enables scheduled publishing.
+   - `pnpm pipeline:run 66 --publish --now` explicitly enables immediate publishing.
+3. Added root and scripts-package commands for each pipeline stage.
+4. Added the same verified-video gate to dashboard YouTube and Facebook publishing routes. Invalid, empty, or non-1080×1920 videos cannot be published.
+5. Removed the disabled in-process auto-scheduler and its stale scheduler routes from the API server. Publishing remains manual/YouTube-managed.
+6. Audited and synchronized the OpenAPI contract with the real workbook sync, social rows, video stream, YouTube repair, Facebook, and analytics routes. Regenerated clients and added a stable API Zod export-normalization step.
+7. Updated `docs/RUN.md`, `docs/improvement-plan.md`, and package build commands. The root build now supplies the Reels artifact's required `PORT` and `BASE_PATH`.
+8. Verification:
+   - Full workspace typecheck passed.
+   - Full workspace build passed.
+   - OpenAPI codegen passed with generated export normalization.
+   - EP66 preflight passed.
+   - EP66 verify safely failed because no export exists yet.
+   - EP61 runner safely blocked because it already has a YouTube video.
+   - Four workflows remain running.
+
+**Stage 4 status: COMPLETE.**
+
+**Next task: Stage 5 — performance pass (async filesystem checks, incremental builds, and render/dashboard efficiency).**
+
 ---
 
 ## Git commit history (chronological, oldest → newest)

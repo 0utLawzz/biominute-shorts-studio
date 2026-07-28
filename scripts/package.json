@@ -10,6 +10,11 @@
     "verify-export": "tsx ./src/verify-export.ts",
     "export-video": "tsx ./src/export-video.ts",
     "read-master-sheet": "tsx ./src/read-master-sheet.ts",
+    "pipeline:check": "tsx ./src/pipeline/preflight.ts",
+    "pipeline:build": "tsx ./src/pipeline/build.ts",
+    "pipeline:verify": "tsx ./src/pipeline/verify-build.ts",
+    "pipeline:publish": "tsx ./src/pipeline/publish-gate.ts",
+    "pipeline:run": "tsx ./src/pipeline/pipeline-runner.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

@@ -3,13 +3,18 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "build": "pnpm run typecheck && PORT=25078 BASE_PATH=/biominute-reels/ pnpm -r --if-present run build",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "dashboard:generate": "pnpm --filter @workspace/scripts generate-dashboard",
     "export-video": "cross-env BIOMINUTE_EXPORT_URL=http://localhost:25078/biominute-reels/ pnpm --filter @workspace/scripts export-video",
     "verify-export": "pnpm --filter @workspace/scripts verify-export",
-    "facebook-daily-publish": "pnpm --filter @workspace/scripts exec tsx ./src/facebook-daily-publish.ts"
+    "facebook-daily-publish": "pnpm --filter @workspace/scripts exec tsx ./src/facebook-daily-publish.ts",
+    "pipeline:check": "pnpm --filter @workspace/scripts exec tsx ./src/pipeline/preflight.ts",
+    "pipeline:build": "pnpm --filter @workspace/scripts exec tsx ./src/pipeline/build.ts",
+    "pipeline:verify": "pnpm --filter @workspace/scripts exec tsx ./src/pipeline/verify-build.ts",
+    "pipeline:publish": "pnpm --filter @workspace/scripts exec tsx ./src/pipeline/publish-gate.ts",
+    "pipeline:run": "pnpm --filter @workspace/scripts exec tsx ./src/pipeline/pipeline-runner.ts"
   },
   "private": true,
   "dependencies": {

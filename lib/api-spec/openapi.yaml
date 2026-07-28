@@ -13,6 +13,10 @@ tags:
     description: Episode management
   - name: youtube
     description: YouTube publishing operations
+  - name: facebook
+    description: Facebook publishing operations
+  - name: analytics
+    description: Social analytics operations
 paths:
   /healthz:
     get:
@@ -81,6 +85,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EpisodeStats"
+
+  /episodes/sync-workbook:
+    post:
+      operationId: syncWorkbook
+      tags: [episodes]
+      summary: Re-seed episode metadata from the newest workbook
+      responses:
+        "200":
+          description: Workbook sync result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyncWorkbookResult"
+
+  /episodes/social-rows:
+    get:
+      operationId: getEpisodeSocialRows
+      tags: [episodes]
+      summary: Get per-episode asset and social publishing status
+      responses:
+        "200":
+          description: Social status rows
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SocialRowsResult"
 
   /episodes/upcoming:
     get:
@@ -206,6 +236,28 @@ paths:
         "409":
           description: A render is already running for this episode
 
+  /episodes/{id}/video:
+    get:
+      operationId: getEpisodeVideo
+      tags: [episodes]
+      summary: Stream the rendered episode MP4
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Rendered MP4
+          content:
+            video/mp4:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Episode or rendered video not found
+
   /youtube/auth-url:
     get:
       operationId: getYouTubeAuthUrl
@@ -262,6 +314,108 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+
+  /youtube/repair/{id}:
+    post:
+      operationId: repairYouTubeVideo
+      tags: [youtube]
+      summary: Repair YouTube metadata for an existing video
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Repair result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericSuccess"
+
+  /facebook/status:
+    get:
+      operationId: getFacebookStatus
+      tags: [facebook]
+      summary: Check Facebook publishing configuration
+      responses:
+        "200":
+          description: Facebook connection status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FacebookStatus"
+
+  /facebook/publish/{id}:
+    post:
+      operationId: publishToFacebook
+      tags: [facebook]
+      summary: Publish an episode to Facebook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Facebook publish result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericSuccess"
+
+  /analytics/youtube/{id}:
+    get:
+      operationId: getYouTubeAnalytics
+      tags: [analytics]
+      summary: Fetch live YouTube analytics for an episode
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: YouTube analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsResult"
+
+  /analytics/facebook/{id}:
+    get:
+      operationId: getFacebookAnalytics
+      tags: [analytics]
+      summary: Fetch live Facebook analytics for an episode
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Facebook analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsResult"
+
+  /analytics/episodes:
+    get:
+      operationId: getEpisodesAnalytics
+      tags: [analytics]
+      summary: Get aggregate analytics for published episodes
+      responses:
+        "200":
+          description: Aggregate analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsAggregate"
 
 components:
   schemas:
@@ -559,5 +713,79 @@ components:
         error:
           type: ["string", "null"]
       required: [status, jobId, pid, startedAt, finishedAt, logPath, error]
+
+    SyncWorkbookResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        inserted:
+          type: integer
+        updated:
+          type: integer
+        raw:
+          type: string
+      required: [success, inserted, updated]
+
+    SocialRow:
+      type: object
+      properties:
+        epNumber:
+          type: integer
+        hookTitle:
+          type: string
+        status:
+          type: string
+        hasFolder:
+          type: boolean
+        hasVideoFile:
+          type: boolean
+        youtubeVideoId:
+          type: ["string", "null"]
+        facebookVideoId:
+          type: ["string", "null"]
+        postDate:
+          type: ["string", "null"]
+          format: date-time
+        scheduledPublishAt:
+          type: ["string", "null"]
+          format: date-time
+      required: [epNumber, hookTitle, status, hasFolder, hasVideoFile]
+
+    SocialRowsResult:
+      type: object
+      properties:
+        total:
+          type: integer
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/SocialRow"
+      required: [total, rows]
+
+    FacebookStatus:
+      type: object
+      properties:
+        connected:
+          type: boolean
+        pageId:
+          type: ["string", "null"]
+        hasAccessToken:
+          type: boolean
+        hasPageId:
+          type: boolean
+      required: [connected, hasAccessToken, hasPageId]
+
+    AnalyticsResult:
+      type: object
+      additionalProperties: true
+
+    AnalyticsAggregate:
+      type: object
+      additionalProperties: true
+
+    GenericSuccess:
+      type: object
+      additionalProperties: true
 
     # REMOVED: RejectEpisodeBody, RejectEpisodeResponse — manual rejection workflow eliminated

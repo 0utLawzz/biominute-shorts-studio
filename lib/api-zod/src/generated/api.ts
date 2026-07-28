@@ -139,6 +139,36 @@ export const GetEpisodeStatsResponse = zod.object({
 
 
 /**
+ * @summary Re-seed episode metadata from the newest workbook
+ */
+export const SyncWorkbookResponse = zod.object({
+  "success": zod.boolean(),
+  "inserted": zod.number(),
+  "updated": zod.number(),
+  "raw": zod.string().optional()
+})
+
+
+/**
+ * @summary Get per-episode asset and social publishing status
+ */
+export const GetEpisodeSocialRowsResponse = zod.object({
+  "total": zod.number(),
+  "rows": zod.array(zod.object({
+  "epNumber": zod.number(),
+  "hookTitle": zod.string(),
+  "status": zod.string(),
+  "hasFolder": zod.boolean(),
+  "hasVideoFile": zod.boolean(),
+  "youtubeVideoId": zod.string().nullish(),
+  "facebookVideoId": zod.string().nullish(),
+  "postDate": zod.coerce.date().nullish(),
+  "scheduledPublishAt": zod.coerce.date().nullish()
+}))
+})
+
+
+/**
  * @summary Get next 5 episodes due to publish
  */
 export const GetUpcomingEpisodesResponseItem = zod.object({
@@ -325,6 +355,16 @@ export const RunProductionResponse = zod.object({
 
 
 /**
+ * @summary Stream the rendered episode MP4
+ */
+export const GetEpisodeVideoParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetEpisodeVideoResponse = zod.unknown()
+
+
+/**
  * @summary Get OAuth URL to connect YouTube account
  */
 export const GetYouTubeAuthUrlResponse = zod.object({
@@ -363,5 +403,62 @@ export const PublishToYouTubeResponse = zod.object({
   "scheduledAt": zod.string().nullish(),
   "message": zod.string()
 })
+
+
+/**
+ * @summary Repair YouTube metadata for an existing video
+ */
+export const RepairYouTubeVideoParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RepairYouTubeVideoResponse = zod.record(zod.string(), zod.unknown())
+
+
+/**
+ * @summary Check Facebook publishing configuration
+ */
+export const GetFacebookStatusResponse = zod.object({
+  "connected": zod.boolean(),
+  "pageId": zod.string().nullish(),
+  "hasAccessToken": zod.boolean(),
+  "hasPageId": zod.boolean()
+})
+
+
+/**
+ * @summary Publish an episode to Facebook
+ */
+export const PublishToFacebookParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const PublishToFacebookResponse = zod.record(zod.string(), zod.unknown())
+
+
+/**
+ * @summary Fetch live YouTube analytics for an episode
+ */
+export const GetYouTubeAnalyticsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetYouTubeAnalyticsResponse = zod.record(zod.string(), zod.unknown())
+
+
+/**
+ * @summary Fetch live Facebook analytics for an episode
+ */
+export const GetFacebookAnalyticsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetFacebookAnalyticsResponse = zod.record(zod.string(), zod.unknown())
+
+
+/**
+ * @summary Get aggregate analytics for published episodes
+ */
+export const GetEpisodesAnalyticsResponse = zod.record(zod.string(), zod.unknown())
 
 

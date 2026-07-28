@@ -49,10 +49,9 @@ Last audit: **2026-07-28**
 
 ## 🟡 4 — Clean up dead code and sync the OpenAPI spec
 
-**Why it matters:** The auto-scheduler block in `api-server/index.ts` (marked disabled) and ghost endpoints in `lib/api-spec/openapi.yaml` create confusion for every future agent session — they suggest features that don't exist or routes that don't match.
+**Why it matters:** Ghost endpoints in `lib/api-spec/openapi.yaml` and a monolithic episode route create confusion for every future agent session — they suggest features that don't exist or routes that don't match.
 
 **What gets built:**
-- Remove the dead auto-scheduler block from `index.ts`
 - Audit all routes in `openapi.yaml` against actual Express routes; add missing ones, remove ghosts
 - Split `artifacts/api-server/src/routes/episodes.ts` (~500 lines) into focused sub-files: `episodes-core.ts`, `episodes-social.ts`, `episodes-production.ts`
 - Regenerate Orval hooks after spec fixes

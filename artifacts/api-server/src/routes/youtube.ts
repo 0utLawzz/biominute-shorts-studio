@@ -15,6 +15,7 @@ import {
   isInvalidGrantError,
 } from "../lib/youtube-upload";
 import { logger } from "../lib/logger";
+import { assertVerifiedVideo } from "../lib/video-verification";
 
 const router = Router();
 
@@ -137,8 +138,7 @@ router.post("/youtube/publish/:id", async (req, res): Promise<void> => {
     !!process.env.YOUTUBE_REFRESH_TOKEN;
 
   // -------------------------------------------------------------------------
-  // DRAFT MODE — no credentials yet; mark scheduled so the scheduler picks
-  // it up once credentials are added.
+  // DRAFT MODE — no credentials yet; mark scheduled for a later manual upload.
   // -------------------------------------------------------------------------
   if (!hasCredentials) {
     const [episode] = await db
@@ -204,13 +204,14 @@ router.post("/youtube/publish/:id", async (req, res): Promise<void> => {
   let videoPath: string;
   try {
     videoPath = findEpisodeVideoPath(episode.epNumber);
+    assertVerifiedVideo(videoPath);
   } catch (err) {
     logger.error({ err, epNumber: episode.epNumber }, "Episode video file not found");
     res.status(400).json({
       error:
         err instanceof Error
           ? err.message
-          : "Episode video file not found. Export the episode first.",
+          : "Verified episode video is required before publishing.",
     });
     return;
   }
