@@ -15,7 +15,9 @@ import {
   Loader2,
   MoreHorizontal,
   Play,
-  RefreshCw,
+  Database,
+  Send,
+  X,
   Search,
 } from "lucide-react";
 import { Link } from "wouter";
@@ -56,8 +58,12 @@ export default function Dashboard() {
   const [activeSeason, setActiveSeason] = useState<string>("all");
   const [activeStatus, setActiveStatus] = useState<ListEpisodesStatus | "all">("all");
   const [search, setSearch] = useState("");
-  const [syncing, setSyncing] = useState(false);
-  const [syncToast, setSyncToast] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [seedState, setSeedState] = useState<"idle" | "checking" | "applying">("idle");
+  const [seedPreview, setSeedPreview] = useState<{ inserted: number; updated: number } | null>(null);
+  const [actionToast, setActionToast] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [publishOpen, setPublishOpen] = useState(false);
+  const [selectedPublishIds, setSelectedPublishIds] = useState<number[]>([]);
+  const [publishing, setPublishing] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: stats, isLoading: statsLoading } = useGetEpisodeStats();
@@ -67,23 +73,85 @@ export default function Dashboard() {
     status: activeStatus === "all" ? undefined : activeStatus,
   });
 
-  async function handleSyncWorkbook() {
-    setSyncing(true);
-    setSyncToast(null);
+  async function handleSeed() {
+    setSeedState("checking");
+    setActionToast(null);
     try {
-      const res = await fetch("/api/episodes/sync-workbook", { method: "POST" });
+      const res = await fetch("/api/episodes/seed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apply: false }),
+      });
       const data = await res.json();
       if (!res.ok) {
-        setSyncToast({ ok: false, msg: data.detail || "Sync failed" });
+        setActionToast({ ok: false, msg: data.detail || "Seed preview failed" });
       } else {
-        setSyncToast({ ok: true, msg: `Synced: ${data.inserted} new, ${data.updated} updated` });
-        await queryClient.invalidateQueries();
+        setSeedPreview({ inserted: data.inserted ?? 0, updated: data.updated ?? 0 });
       }
     } catch (err: any) {
-      setSyncToast({ ok: false, msg: err.message || "Sync failed" });
+      setActionToast({ ok: false, msg: err.message || "Seed preview failed" });
     } finally {
-      setSyncing(false);
-      setTimeout(() => setSyncToast(null), 5000);
+      setSeedState("idle");
+    }
+  }
+
+  async function applySeed() {
+    setSeedState("applying");
+    try {
+      const res = await fetch("/api/episodes/seed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apply: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Seed failed");
+      setSeedPreview(null);
+      setActionToast({ ok: true, msg: `Seeded: ${data.inserted ?? 0} new, ${data.updated ?? 0} updated` });
+      await queryClient.invalidateQueries();
+    } catch (err: any) {
+      setActionToast({ ok: false, msg: err.message || "Seed failed" });
+    } finally {
+      setSeedState("idle");
+    }
+  }
+
+  const publishableEpisodes = (episodes ?? []).filter(
+    (episode) => ["complete", "scheduled"].includes(episode.status) && !episode.youtubeVideoId,
+  );
+
+  async function publishSelected() {
+    setPublishing(true);
+    const failures: string[] = [];
+    let publishedCount = 0;
+    try {
+      for (const id of selectedPublishIds) {
+        const episode = publishableEpisodes.find((item) => item.id === id);
+        if (!episode) continue;
+        const res = await fetch(`/api/youtube/publish/${id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            privacyStatus: episode.scheduledPublishAt ? "private" : "public",
+            scheduleAt: episode.scheduledPublishAt ?? null,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) failures.push(`Ep ${episode.epNumber}: ${data.error || "failed"}`);
+        else publishedCount += 1;
+      }
+      setPublishOpen(false);
+      setSelectedPublishIds([]);
+      setActionToast({
+        ok: failures.length === 0,
+        msg: failures.length === 0
+          ? `${publishedCount} episode${publishedCount === 1 ? "" : "s"} sent to YouTube`
+          : `${publishedCount} sent; ${failures.join(" • ")}`,
+      });
+      await queryClient.invalidateQueries();
+    } catch (err: any) {
+      setActionToast({ ok: false, msg: err.message || "Publish failed" });
+    } finally {
+      setPublishing(false);
     }
   }
 
@@ -124,24 +192,73 @@ export default function Dashboard() {
               <QueueStat label="Complete" value={byStatus?.complete} loading={statsLoading} color="#0A6B52" />
             </div>
             <button
-              onClick={handleSyncWorkbook}
-              disabled={syncing}
-              title="Sync the latest workbook into the episode library"
+              onClick={handleSeed}
+              disabled={seedState !== "idle"}
+              title="Preview workbook changes before seeding the database"
               className="flex items-center gap-2 border-2 border-[#0C0C0C] bg-[#FAF7EE] px-3 py-2 font-mono text-[10px] font-bold uppercase shadow-[3px_3px_0_#0C0C0C] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-60"
             >
-              <RefreshCw size={13} className={syncing ? "animate-spin" : ""} />
-              {syncing ? "Syncing…" : "Sync Workbook"}
+              <Database size={13} className={seedState === "checking" ? "animate-pulse" : ""} />
+              {seedState === "checking" ? "Checking…" : "Seed"}
+            </button>
+            <button
+              onClick={() => setPublishOpen(true)}
+              disabled={publishableEpisodes.length === 0}
+              title="Select complete episodes to publish or schedule on YouTube"
+              className="flex items-center gap-2 border-2 border-[#0C0C0C] bg-[#C9A800] px-3 py-2 font-mono text-[10px] font-bold uppercase shadow-[3px_3px_0_#0C0C0C] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Send size={13} />
+              Publish
             </button>
           </div>
         </section>
 
-        {syncToast && (
+        {actionToast && (
           <div
             className={`mb-6 border-2 border-[#0C0C0C] px-4 py-2 font-mono text-xs font-bold shadow-[3px_3px_0_#0C0C0C] ${
-              syncToast.ok ? "bg-[#0A6B52] text-white" : "bg-[#C94A00] text-white"
+              actionToast.ok ? "bg-[#0A6B52] text-white" : "bg-[#C94A00] text-white"
             }`}
           >
-            {syncToast.msg}
+            {actionToast.msg}
+          </div>
+        )}
+
+        {seedPreview && (
+          <div className="mb-6 border-2 border-[#0C0C0C] bg-[#C9A800] p-4 font-mono text-xs shadow-[3px_3px_0_#0C0C0C]">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="font-bold uppercase">Seed preview</p>
+                <p className="mt-1">Workbook would insert {seedPreview.inserted} and update {seedPreview.updated} episodes. Database is unchanged.</p>
+              </div>
+              <button onClick={() => setSeedPreview(null)} aria-label="Close seed preview"><X size={16} /></button>
+            </div>
+            <button onClick={applySeed} disabled={seedState !== "idle"} className="mt-3 border-2 border-[#0C0C0C] bg-[#FAF7EE] px-3 py-2 font-bold uppercase shadow-[2px_2px_0_#0C0C0C] disabled:opacity-60">
+              {seedState === "applying" ? "Seeding…" : "Confirm & Seed Database"}
+            </button>
+          </div>
+        )}
+
+        {publishOpen && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-[#0C0C0C]/70 p-5" role="dialog" aria-modal="true" aria-labelledby="publish-title">
+            <div className="max-h-[85vh] w-full max-w-xl overflow-y-auto border-[3px] border-[#0C0C0C] bg-[#FAF7EE] p-5 shadow-[7px_7px_0_#0C0C0C]">
+              <div className="flex items-center justify-between border-b-2 border-[#0C0C0C] pb-3">
+                <div><h2 id="publish-title" className="font-display text-4xl uppercase">Publish Episodes</h2><p className="font-mono text-[10px] uppercase text-[#555]">Only episodes without a YouTube ID are shown.</p></div>
+                <button onClick={() => setPublishOpen(false)} aria-label="Close publish dialog"><X /></button>
+              </div>
+              <div className="my-4 space-y-2">
+                {publishableEpisodes.length === 0 ? <p className="font-mono text-xs">No publishable episodes in the current filter.</p> : publishableEpisodes.map((episode) => (
+                  <label key={episode.id} className="flex cursor-pointer items-center gap-3 border-2 border-[#0C0C0C] bg-white p-3 font-mono text-xs">
+                    <input type="checkbox" checked={selectedPublishIds.includes(episode.id)} onChange={(event) => setSelectedPublishIds((ids) => event.target.checked ? [...ids, episode.id] : ids.filter((id) => id !== episode.id))} />
+                    <span className="font-bold">EP {episode.epNumber}</span>
+                    <span className="truncate">{episode.hookTitle}</span>
+                    <span className="ml-auto shrink-0 text-[#555]">{episode.scheduledPublishAt ? "SCHEDULE" : "NOW"}</span>
+                  </label>
+                ))}
+              </div>
+              <div className="flex justify-end gap-3">
+                <button onClick={() => setPublishOpen(false)} className="border-2 border-[#0C0C0C] px-3 py-2 font-mono text-xs font-bold uppercase">Cancel</button>
+                <button onClick={publishSelected} disabled={publishing || selectedPublishIds.length === 0} className="border-2 border-[#0C0C0C] bg-[#C9A800] px-3 py-2 font-mono text-xs font-bold uppercase shadow-[2px_2px_0_#0C0C0C] disabled:opacity-50">{publishing ? "Publishing…" : `Confirm ${selectedPublishIds.length} Publish`}</button>
+              </div>
+            </div>
           </div>
         )}
 

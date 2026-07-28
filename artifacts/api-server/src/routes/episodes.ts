@@ -41,30 +41,34 @@ async function awaitFileExists(filePath: string): Promise<boolean> {
   }
 }
 
-// POST /episodes/sync-workbook
-// Re-reads the master workbook and upserts episodes — this is the manual trigger
-// Nadeem can click instead of running a terminal command by hand.
-router.post("/episodes/sync-workbook", async (req, res): Promise<void> => {
+// POST /episodes/seed
+// Re-reads the master workbook. Dry-run is the default safety mode; apply=true
+// is required before the database is changed.
+router.post("/episodes/seed", async (req, res): Promise<void> => {
   const { execFile } = await import("node:child_process");
   const pathMod = await import("node:path");
+  const apply = req.body?.apply === true;
 
   const scriptPath = pathMod.resolve(import.meta.dirname, "../../../../scripts/src/seed-episodes.ts");
+  const args = ["--filter", "@workspace/scripts", "exec", "tsx", scriptPath];
+  if (!apply) args.push("--dry-run");
 
   execFile(
     "pnpm",
-    ["--filter", "@workspace/scripts", "exec", "tsx", scriptPath],
+    args,
     { cwd: pathMod.resolve(import.meta.dirname, "../../../../") },
     (error, stdout, stderr) => {
       if (error) {
-        res.status(500).json({ error: "Sync failed", detail: stderr || error.message });
+        res.status(500).json({ error: "Seed failed", detail: stderr || error.message });
         return;
       }
       // seed-episodes.ts logs lines like "Inserted N new episodes." and
       // "Updated metadata for N existing episodes." — parse those counts out.
-      const insertedMatch = stdout.match(/Inserted (\d+) new episodes/);
-      const updatedMatch = stdout.match(/Updated metadata for (\d+) existing episodes/);
+      const insertedMatch = stdout.match(/(?:Inserted|Would insert) (\d+) (?:new )?(?:episodes|rows)/);
+      const updatedMatch = stdout.match(/(?:Updated metadata for|Would update) (\d+) (?:existing )?(?:episodes|rows)/);
       res.json({
         success: true,
+        dryRun: !apply,
         inserted: insertedMatch ? parseInt(insertedMatch[1], 10) : 0,
         updated: updatedMatch ? parseInt(updatedMatch[1], 10) : 0,
         raw: stdout,

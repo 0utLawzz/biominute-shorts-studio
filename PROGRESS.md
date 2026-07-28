@@ -16,6 +16,18 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 
 ## User requests → Agent actions
 
+### Request — Rework Preview placement and replace workbook sync with Seed/Publish actions
+*(Session: 2026-07-28)*
+
+**User said:** Change the Preview navigation placement/display and replace the Sync Workbook action with Seed and Publish script actions.
+
+**Agent did:**
+1. Separated Preview into a labelled Review navigation group with an eye icon so it is visually distinct from production/status links.
+2. Replaced Sync Workbook with a safe Seed action: workbook dry-run first, then an explicit Confirm & Seed Database action.
+3. Added a Publish action with episode selection and confirmation; episodes already carrying a YouTube ID are excluded to prevent duplicate uploads.
+4. Added the `/api/episodes/seed` endpoint with dry-run-by-default behavior while retaining the existing authenticated API structure.
+5. Verified the seed dry-run reports 102 parsed rows, 0 inserts, 102 metadata updates, with the database unchanged.
+
 ### Request — Export, schedule, and publish Episodes 66–70
 *(Session: 2026-07-28)*
 

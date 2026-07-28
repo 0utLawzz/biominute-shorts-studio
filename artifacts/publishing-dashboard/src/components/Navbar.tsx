@@ -1,18 +1,32 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
-import { PlusCircle, Activity, CheckCircle2, Clock, Hammer, CalendarCheck, AlertTriangle, LogOut } from "lucide-react";
+import { PlusCircle, Activity, CheckCircle2, Clock, Hammer, CalendarCheck, AlertTriangle, LogOut, Eye } from "lucide-react";
 import { useGetEpisodeStats, useGetYouTubeStatus } from "@workspace/api-client-react";
 import { useAuth } from "@/lib/auth";
 
-const NAV_LINKS = [
-  { href: "/", label: "Dashboard" },
-  { href: "/building", label: "Building" },
-  { href: "/preview-queue", label: "Preview" },
-  { href: "/scheduled", label: "Scheduled" },
-  { href: "/published", label: "Published" },
-  { href: "/social-status", label: "Social" },
-  { href: "/social-setup", label: "Setup" },
-  { href: "/analytics", label: "Analytics" },
+const NAV_GROUPS: Array<{
+  label?: string;
+  links: Array<{ href: string; label: string; icon?: React.ComponentType<{ size?: number }> }>;
+}> = [
+  {
+    links: [
+      { href: "/", label: "Dashboard" },
+      { href: "/building", label: "Building" },
+    ],
+  },
+  {
+    label: "Review",
+    links: [{ href: "/preview-queue", label: "Preview", icon: Eye }],
+  },
+  {
+    links: [
+      { href: "/scheduled", label: "Scheduled" },
+      { href: "/published", label: "Published" },
+      { href: "/social-status", label: "Social" },
+      { href: "/social-setup", label: "Setup" },
+      { href: "/analytics", label: "Analytics" },
+    ],
+  },
 ];
 
 const STATUS_PILLS = [
@@ -53,20 +67,29 @@ export function Navbar() {
       </Link>
 
       <nav className="flex items-center gap-0.5 overflow-x-auto shrink min-w-0">
-        {NAV_LINKS.map(({ href, label }) => {
-          const isActive = href === "/" ? location === "/" : location.startsWith(href);
-          return (
-            <Link key={href} href={href}>
-              <span className={`whitespace-nowrap font-mono font-bold px-1.5 py-1 text-[10px] uppercase cursor-pointer transition-colors border-b-2 ${
-                isActive
-                  ? "text-[#C9A800] border-[#C9A800]"
-                  : "text-[#999] border-transparent hover:text-white"
-              }`}>
-                {label}
-              </span>
-            </Link>
-          );
-        })}
+        {NAV_GROUPS.map((group, groupIndex) => (
+          <React.Fragment key={group.label ?? `group-${groupIndex}`}>
+            {groupIndex > 0 && <span className="mx-1 h-5 border-l border-[#444]" aria-hidden="true" />}
+            <div className="flex items-center gap-0.5">
+              {group.label && <span className="mr-1 hidden font-mono text-[9px] font-bold uppercase tracking-wider text-[#666] xl:inline">{group.label}</span>}
+              {group.links.map(({ href, label, icon: Icon }) => {
+                const isActive = href === "/" ? location === "/" : location.startsWith(href);
+                return (
+                  <Link key={href} href={href}>
+                    <span className={`flex items-center gap-1 whitespace-nowrap font-mono font-bold px-1.5 py-1 text-[10px] uppercase cursor-pointer transition-colors border-b-2 ${
+                      isActive
+                        ? "text-[#C9A800] border-[#C9A800]"
+                        : "text-[#999] border-transparent hover:text-white"
+                    }`}>
+                      {Icon && <Icon size={10} />}
+                      {label}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </React.Fragment>
+        ))}
       </nav>
 
       {/* Live pipeline status — visible on every page */}
