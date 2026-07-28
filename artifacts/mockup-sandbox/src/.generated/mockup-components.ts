@@ -2,6 +2,8 @@
 type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 export const modules: ModuleMap = {
   "./components/mockups/dashboard-variants/KanbanPipeline.tsx": () => import("../components/mockups/dashboard-variants/KanbanPipeline.tsx"),
+  "./components/mockups/dashboard-variants/ProductionQueue.tsx": () => import("../components/mockups/dashboard-variants/ProductionQueue.tsx"),
   "./components/mockups/dashboard-variants/SidebarCommandCenter.tsx": () => import("../components/mockups/dashboard-variants/SidebarCommandCenter.tsx"),
-  "./components/mockups/dashboard-variants/SplitViewDataDock.tsx": () => import("../components/mockups/dashboard-variants/SplitViewDataDock.tsx")
+  "./components/mockups/dashboard-variants/SplitViewDataDock.tsx": () => import("../components/mockups/dashboard-variants/SplitViewDataDock.tsx"),
+  "./components/mockups/dashboard-variants/StatusBands.tsx": () => import("../components/mockups/dashboard-variants/StatusBands.tsx")
 };

@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&family=DM+Mono:wght@500&display=swap');
+
+.biominute-theme {
+  --background: #EDEAE0;
+  --foreground: #0C0C0C;
+  --card: #FAF7EE;
+  --muted: #E2DDD0;
+  --primary: #0A6B52;
+  --secondary: #C94A00;
+  --accent: #C9A800;
+  --purple: #8B2FC9;
+
+  font-family: 'Space Grotesk', sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  min-height: 100dvh;
+}
+
+.biominute-theme h1, 
+.biominute-theme h2, 
+.biominute-theme h3, 
+.biominute-theme h4, 
+.biominute-theme .font-display {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.biominute-theme .font-mono {
+  font-family: 'DM Mono', monospace;
+}
+
+.biominute-theme .shadow-brutal {
+  box-shadow: 4px 4px 0 #0C0C0C;
+}
+
+.biominute-theme .shadow-brutal-sm {
+  box-shadow: 2px 2px 0 #0C0C0C;
+}
+
+.biominute-theme .shadow-brutal-lg {
+  box-shadow: 6px 6px 0 #0C0C0C;
+}
+
+.biominute-theme .brutal-border {
+  border: 2px solid #0C0C0C;
+}
+
+.biominute-theme .brutal-border-thick {
+  border: 3px solid #0C0C0C;
+}
+
+.biominute-theme .hover-brutal:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #0C0C0C;
+}
+
+.biominute-theme .active-brutal:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #0C0C0C;
+}
+
+.biominute-theme .btn-brutal {
+  transition: transform 100ms ease-in-out, box-shadow 100ms ease-in-out;
+  cursor: pointer;
+}
