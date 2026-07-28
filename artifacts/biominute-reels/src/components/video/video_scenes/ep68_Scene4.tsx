@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { UtensilsCrossed, MessageCircle, BookOpen } from 'lucide-react';
+import { AlarmClock, MessageCircle, BookOpen } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -21,8 +21,8 @@ export function Scene4() {
           <div className="absolute top-6 right-8 w-4 h-4 bg-[#f97316] rounded-full" />
           <motion.div className="flex items-center gap-2 bg-[#f97316]/10 border border-[#f97316]/30 px-5 py-2 rounded-full mb-5"
             initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, ...SPRING_SMOOTH }}>
-            <UtensilsCrossed size={18} color="#f97316" />
-            <span className="text-[#f97316] font-display font-bold text-[15px] uppercase tracking-wide">Breakfast Habits</span>
+            <AlarmClock size={18} color="#f97316" />
+            <span className="text-[#f97316] font-display font-bold text-[15px] uppercase tracking-wide">Wake Time Habits</span>
           </motion.div>
           <motion.div initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.6, ...SPRING_SNAPPY }}>
             <div className="w-24 h-24 rounded-full bg-[#f97316] flex items-center justify-center">
@@ -31,9 +31,9 @@ export function Scene4() {
           </motion.div>
           <motion.h2 className="text-[#f8fafc] text-[38px] font-bold uppercase tracking-wider font-display leading-tight mt-7"
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0, duration: 0.8 }}>
-            Do You Eat
-            <span className="text-[#f97316] block mt-2">Breakfast</span>
-            <span className="text-[#10b981] block mt-1">Every Day?</span>
+            Same Wake Time
+            <span className="text-[#f97316] block mt-2">on Weekends</span>
+            <span className="text-[#10b981] block mt-1">Too?</span>
           </motion.h2>
           <motion.div className="flex items-center gap-3 mt-7 bg-[#0F172A]/80 px-6 py-4 rounded-xl border border-white/10"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.0, duration: 1 }}>
@@ -46,7 +46,7 @@ export function Scene4() {
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.8, duration: 1 }}>
         <div className="flex items-center gap-4 text-[#94a3b8] text-[20px] font-medium bg-[#0F172A]/90 px-6 py-4 rounded-xl backdrop-blur-sm border border-white/10 shadow-lg">
           <BookOpen className="shrink-0" size={26} />
-          <p className="leading-relaxed text-left">Source: Betts JA et al. (2014), American Journal of Clinical Nutrition — breakfast and daily energy expenditure</p>
+          <p className="leading-relaxed text-left">Source: Wittmann M et al. (2006), Chronobiology International — social jetlag and metabolic/mood impact</p>
         </div>
       </motion.div>
     </motion.div>

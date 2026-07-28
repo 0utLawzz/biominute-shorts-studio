@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Scale, Apple, Clock } from 'lucide-react';
+import { Plane, TrendingDown, BrainCircuit } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -18,12 +18,12 @@ export function Scene2() {
       <div className="absolute top-[150px] flex flex-col items-center gap-5 z-10 w-full px-10">
         <motion.div className="bg-[#10b981]/10 border border-[#10b981]/30 px-8 py-4 rounded-2xl"
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ...SPRING_SMOOTH }}>
-          <span className="text-[#10b981] font-display font-bold text-[22px] uppercase tracking-wider">What Actually Matters</span>
+          <span className="text-[#10b981] font-display font-bold text-[22px] uppercase tracking-wider">Social Jetlag</span>
         </motion.div>
         {[
-          { icon: Scale, color: '#10b981', label: 'Total daily intake', body: 'Calories in vs. out over the whole day matters far more than the timing of your first meal' },
-          { icon: Apple, color: '#f97316', label: 'Food quality counts', body: 'What you eat across the day drives metabolic health more than whether you skip breakfast' },
-          { icon: Clock, color: '#10b981', label: 'Hunger is a valid signal', body: 'If you\'re not hungry in the morning, your body isn\'t signaling a need for food yet' },
+          { icon: Plane, color: '#10b981', label: 'Irregular wake times act like jetlag', body: 'Varying wake times by 2+ hours across the week shifts your body clock like crossing time zones' },
+          { icon: TrendingDown, color: '#f97316', label: 'Linked to worse metabolic markers', body: 'Social jetlag correlates with higher BMI, insulin resistance, and inflammatory markers' },
+          { icon: BrainCircuit, color: '#10b981', label: 'Mood takes the hit first', body: 'Even mild social jetlag is linked to poorer mood, slower reaction times, and brain fog' },
         ].map((item, i) => {
           const Icon = item.icon;
           return (
@@ -44,9 +44,9 @@ export function Scene2() {
       <div className="absolute w-full px-12 text-center z-20" style={{ bottom: BOTTOM_SAFE_ZONE_PX + 80 }}>
         <motion.h2 className="text-[#f8fafc] text-[46px] font-bold uppercase tracking-wider font-display leading-tight"
           initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 1.8 }}>
-          Daily Totals
+          Irregular Timing
           <motion.span className="text-[#10b981] block mt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.4, ...SPRING_SNAPPY }}>
-            Win the Race
+            Has Real Costs
           </motion.span>
         </motion.h2>
       </div>

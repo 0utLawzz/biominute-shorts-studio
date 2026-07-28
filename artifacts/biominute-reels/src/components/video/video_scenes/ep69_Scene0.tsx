@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { UtensilsCrossed, Flame, Scale } from 'lucide-react';
+import { Droplets, Flame, Zap } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -22,35 +22,35 @@ export function Scene0() {
           initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.3, ...SPRING_SNAPPY }}>
           <motion.div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <div className="relative">
-              <motion.div className="absolute inset-0 bg-[#f97316]/20 blur-[30px] rounded-full"
+              <motion.div className="absolute inset-0 bg-[#10b981]/20 blur-[30px] rounded-full"
                 animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 3, repeat: Infinity }} />
-              <UtensilsCrossed size={96} color="#f97316" strokeWidth={1.3} />
+              <Droplets size={96} color="#10b981" strokeWidth={1.3} />
             </div>
           </motion.div>
           <motion.div className="absolute top-0 right-0" animate={{ opacity: [0.7, 1, 0.7], scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity }}>
-            <Flame size={52} color="#10b981" strokeWidth={1.5} />
+            <Flame size={52} color="#f97316" strokeWidth={1.5} />
           </motion.div>
           <motion.div className="absolute bottom-0 left-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
-            <Scale size={44} color="#f97316" strokeWidth={1.5} />
+            <Zap size={44} color="#10b981" strokeWidth={1.5} />
           </motion.div>
         </motion.div>
         <motion.div className="flex items-center gap-3 bg-[#f97316]/10 border border-[#f97316]/30 px-7 py-4 rounded-2xl"
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8, ...SPRING_SMOOTH }}>
-          <Flame size={20} color="#f97316" />
+          <Droplets size={20} color="#f97316" />
           <span className="text-[#f97316] font-display font-bold text-[18px] uppercase tracking-wider">S1 • Morning Habits</span>
         </motion.div>
       </div>
       <div className="absolute w-full px-12 text-center z-20" style={{ bottom: BOTTOM_SAFE_ZONE_PX + 90 }}>
         <motion.h1 className="text-[#f8fafc] text-[44px] font-bold uppercase tracking-wider font-display leading-tight"
           initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }}>
-          Does Skipping
-          <motion.span className="text-[#f97316] block mt-2 drop-shadow-md"
+          Can a Cold Shower
+          <motion.span className="text-[#10b981] block mt-2 drop-shadow-md"
             initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.9, ...SPRING_SNAPPY }}>
-            Breakfast
+            Boost Your
           </motion.span>
-          <motion.span className="text-[#10b981] block mt-1 drop-shadow-md"
+          <motion.span className="text-[#f97316] block mt-1 drop-shadow-md"
             initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 1.3, ...SPRING_SNAPPY }}>
-            Slow Your Metabolism?
+            Metabolism?
           </motion.span>
         </motion.h1>
       </div>
