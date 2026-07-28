@@ -404,7 +404,7 @@ function QueueCard({ episode, urgent }: { episode: any; urgent: boolean }) {
           <p className="mb-4 line-clamp-3 font-sans text-base font-bold leading-snug">{episode.hookTitle}</p>
           <div className="mb-4 flex items-center justify-between font-mono text-xs">
             <span className="text-destructive bg-muted">{dueLabel}</span>
-            <span className="text-[#555]">{episode.duration || "--:--"}</span>
+            <span className="text-foreground bg-ring">{episode.duration || "--:--"}</span>
           </div>
           <div className="flex items-center justify-center gap-2 border-2 border-[#0C0C0C] bg-[#0C0C0C] py-2.5 font-mono text-xs font-bold uppercase text-[#FAF7EE] transition group-hover:bg-[#0A6B52]">
             <ActionIcon size={14} />
