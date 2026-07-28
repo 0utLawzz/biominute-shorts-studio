@@ -16,6 +16,18 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 
 ## User requests → Agent actions
 
+### Request — Produce Episodes 76–80 in small batches
+*(Session: 2026-07-28)*
+
+**User said:** Continue production through Episode 80 in small parts because of the session limit, keep publishing completed parts to GitHub, and defer the date correction.
+
+**Agent did:**
+1. Produced Episodes 76–78 as one batch, rendering valid 1080×1920 MP4s and uploading private scheduled YouTube videos.
+2. Produced Episodes 79–80 as a second batch, rendering valid 1080×1920 MP4s and uploading private scheduled YouTube videos.
+3. Preserved all existing database date and schedule values without attempting the later date fix.
+4. Synchronized all five rows as `scheduled` / `exported`, regenerated the static dashboard, and restored temporary scene/config swaps.
+5. Verified the YouTube schedule successfully (`15 OK, 0 failed`) and pushed the 76–78 batch to GitHub; the 79–80 batch is ready for its separate commit/push.
+
 ### Request — Produce Episodes 71–75 in small batches
 *(Session: 2026-07-28)*
 
