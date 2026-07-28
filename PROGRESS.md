@@ -16,6 +16,18 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 
 ## User requests → Agent actions
 
+### Request — Integrate the Production Queue dashboard design
+*(Session: 2026-07-28)*
+
+**User said:** Apply the selected Production Queue canvas design to the BioMinute Publishing Dashboard artifact.
+
+**Agent did:**
+1. Replaced the dashboard body with the approved Production Queue hierarchy while preserving the shared navbar, auth, API data, sync workbook action, filters, episode detail navigation, and PKT timestamp formatting.
+2. Added a live-backed Action Required queue using upcoming episodes and a searchable, season/status-filterable dense library.
+3. Kept the uploaded reference images untracked and out of the implementation; they remain available under `attached_assets/`.
+4. Removed the unsupported `defaultMuted` JSX attribute from the existing preview queue so the dashboard package typecheck passes without changing its existing `muted` behavior.
+5. Verified `pnpm --filter @workspace/publishing-dashboard run typecheck`, dashboard build, diff whitespace checks, workflow restart, and clean Vite/API logs. The build retains the pre-existing non-blocking tooltip sourcemap warning.
+
 ### Request — Stop dashboard audio and prevent duplicate batch exports
 *(Session: 2026-07-28)*
 

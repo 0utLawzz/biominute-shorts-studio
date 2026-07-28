@@ -12,6 +12,7 @@
 - [run-production spawn fix](run-production-spawn.md) — tsx not in PATH; use scripts/node_modules/.bin/tsx directly. Default BIOMINUTE_EXPORT_URL must be port 25078 + /biominute-reels/.
 - [Episode seeding status rules](episode-seeding-status-rules.md) — workbook 51–65 are approved, 66–100 are scripted; existing 1–50 published/scheduled status and post dates are preserved during re-seed.
 - [Dashboard pipeline status header](dashboard-pipeline-status.md) — Navbar shows live counts from /api/episodes/stats and a system-health readout that changes based on building/scheduled/approved/published state.
+- [Dashboard Production Queue](dashboard-production-queue.md) — approved dashboard layout is action-first, live-backed, and routes queue actions through existing episode detail workflows.
 - [Social platform setup guide](social-platforms-setup.md) — `docs/Social-Platforms-Setup.md` is the canonical reference for connecting YouTube, Facebook, TikTok, Instagram, X/Twitter, and LinkedIn; YouTube is the only fully integrated platform.
 - [YouTube refresh token lifecycle](youtube-refresh-token-lifecycle.md) — `invalid_grant` means the refresh token is revoked or expired; run `scripts/src/youtube-reauth.ts` and update the Replit secret.
 - [Export folder naming convention](export-folder-naming-convention.md) — export folders must use descriptive slugs (`Episode-51-does-washing-your-hair...`), never generic names like `Episode-51-build`.

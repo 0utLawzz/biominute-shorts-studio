@@ -1,51 +1,70 @@
-import React, { useState, useEffect } from "react";
-import { 
-  useGetEpisodeStats, 
-  useListEpisodes, 
+import React, { useMemo, useState } from "react";
+import {
+  Episode,
+  useGetEpisodeStats,
   useGetUpcomingEpisodes,
-  ListEpisodesStatus 
+  useListEpisodes,
+  ListEpisodesStatus,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { EpisodeCard } from "../components/EpisodeCard";
+import {
+  Calendar,
+  ChevronRight,
+  Filter,
+  Hammer,
+  Loader2,
+  MoreHorizontal,
+  Play,
+  RefreshCw,
+  Search,
+} from "lucide-react";
+import { Link } from "wouter";
 import { Navbar } from "../components/Navbar";
 import { YouTubeBanner } from "../components/YouTubeBanner";
-import { differenceInDays } from "date-fns";
-import { Loader2, PlusCircle, RefreshCw } from "lucide-react";
-import { Link } from "wouter";
-import { formatPKT, formatPKTimeSec, formatPKDateLong } from "../lib/date";
+import { formatPKT } from "../lib/date";
+
+const SEASONS = [
+  { key: "all", label: "All" },
+  { key: "S1: Morning Habits", label: "S1" },
+  { key: "S2: Movement & Body", label: "S2" },
+  { key: "S3: Sleep & Recovery", label: "S3" },
+  { key: "S4: Stress & Mind", label: "S4" },
+  { key: "S5: Nutrition & Myths", label: "S5" },
+  { key: "S6: Healthy Aging & Longevity", label: "S6" },
+] as const;
+
+const STATUS_FILTERS = [
+  "all",
+  "draft",
+  "scripted",
+  "complete",
+  "scheduled",
+  "published",
+  "building",
+] as const;
+
+const STATUS_COLORS: Record<string, { bg: string; text: string; accent: string }> = {
+  published: { bg: "#8B2FC9", text: "#FFFFFF", accent: "#8B2FC9" },
+  complete: { bg: "#0A6B52", text: "#FFFFFF", accent: "#0A6B52" },
+  building: { bg: "#C9A800", text: "#0C0C0C", accent: "#C9A800" },
+  scheduled: { bg: "#0D9970", text: "#FFFFFF", accent: "#0D9970" },
+  scripted: { bg: "#C94A00", text: "#FFFFFF", accent: "#C94A00" },
+  draft: { bg: "#E2DDD0", text: "#555555", accent: "#555555" },
+};
 
 export default function Dashboard() {
   const [activeSeason, setActiveSeason] = useState<string>("all");
   const [activeStatus, setActiveStatus] = useState<ListEpisodesStatus | "all">("all");
+  const [search, setSearch] = useState("");
   const [syncing, setSyncing] = useState(false);
   const [syncToast, setSyncToast] = useState<{ ok: boolean; msg: string } | null>(null);
   const queryClient = useQueryClient();
 
-  const SEASONS = [
-    { key: "all", label: "All" },
-    { key: "S1: Morning Habits", label: "S1" },
-    { key: "S2: Movement & Body", label: "S2" },
-    { key: "S3: Sleep & Recovery", label: "S3" },
-    { key: "S4: Stress & Mind", label: "S4" },
-    { key: "S5: Nutrition & Myths", label: "S5" },
-    { key: "S6: Healthy Aging & Longevity", label: "S6" },
-  ];
-
-  const STATUS_FILTERS = [
-    "all", "draft", "scripted", "complete", "scheduled", "published", "building"
-  ] as const;
-
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
   const { data: stats, isLoading: statsLoading } = useGetEpisodeStats();
   const { data: upcoming, isLoading: upcomingLoading } = useGetUpcomingEpisodes();
-  const { data: episodes, isLoading: episodesLoading } = useListEpisodes({ 
-    season: activeSeason === "all" ? undefined : activeSeason, 
-    status: activeStatus === "all" ? undefined : activeStatus 
+  const { data: episodes, isLoading: episodesLoading } = useListEpisodes({
+    season: activeSeason === "all" ? undefined : activeSeason,
+    status: activeStatus === "all" ? undefined : activeStatus,
   });
 
   async function handleSyncWorkbook() {
@@ -68,191 +87,262 @@ export default function Dashboard() {
     }
   }
 
+  const filteredEpisodes = useMemo(() => {
+    const needle = search.trim().toLowerCase();
+    if (!needle) return episodes ?? [];
+    return (episodes ?? []).filter((episode) =>
+      [episode.hookTitle, episode.youtubeTitle, String(episode.epNumber), episode.season]
+        .join(" ")
+        .toLowerCase()
+        .includes(needle),
+    );
+  }, [episodes, search]);
+
+  const byStatus = stats?.byStatus;
+  const inDraft = (byStatus?.draft ?? 0) + (byStatus?.scripted ?? 0);
+
   return (
-    <div className="min-h-screen bg-[#EDEAE0] pb-20">
+    <div className="min-h-screen bg-[#EDEAE0] pb-20 text-[#0C0C0C]">
       <Navbar />
       <YouTubeBanner />
 
-      <main className="max-w-7xl mx-auto px-6 pt-10">
-        
-        {/* STATS HEADER */}
-        <section className="mb-12">
-          <div className="flex items-end justify-between mb-6">
-            <div>
-              <h1 className="font-display text-6xl text-[#0C0C0C] leading-none uppercase tracking-wide">
-                Overview
-              </h1>
-              <div className="flex items-center gap-3 mt-2">
-                <span className="font-mono text-sm text-[#555] tracking-widest uppercase">
-                  {formatPKDateLong(now)}
-                </span>
-                <span className="font-mono text-sm font-bold text-[#0C0C0C] bg-[#D4A800] border-[2px] border-[#0C0C0C] px-2 py-0.5 shadow-[2px_2px_0_#0C0C0C] tabular-nums">
-                  {formatPKTimeSec(now)}
-                </span>
-                <span className="font-mono text-[10px] text-[#888] uppercase tracking-wider">PKT</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              {syncToast && (
-                <span className={`font-mono text-xs font-bold px-3 py-2 border-[2px] border-[#0C0C0C] shadow-[2px_2px_0_#0C0C0C] ${syncToast.ok ? "bg-[#0A6B52] text-white" : "bg-[#C94A00] text-white"}`}>
-                  {syncToast.msg}
-                </span>
-              )}
-              <button
-                onClick={handleSyncWorkbook}
-                disabled={syncing}
-                className="flex items-center gap-2 bg-[#FAF7EE] text-[#0C0C0C] font-mono font-bold text-xs px-4 py-2 border-[2px] border-[#0C0C0C] shadow-[3px_3px_0_#0C0C0C] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer uppercase disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-[3px_3px_0_#0C0C0C]"
-              >
-                <RefreshCw size={14} className={syncing ? "animate-spin" : ""} />
-                {syncing ? "Syncing…" : "Sync Workbook"}
-              </button>
-              <div className="bg-[#D4A800] text-[#0C0C0C] font-display text-xl px-4 py-1 border-[3px] border-[#0C0C0C] shadow-[4px_4px_0_#0C0C0C] rotate-1">
-                STATUS REPORT
-              </div>
-              <Link href="/new">
-                <span className="flex items-center gap-2 bg-[#0C0C0C] text-[#FAF7EE] font-mono font-bold text-xs px-4 py-2 border-[2px] border-[#0C0C0C] shadow-[3px_3px_0_#C9A800] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all cursor-pointer uppercase">
-                  <PlusCircle size={14} />
-                  New Episode
-                </span>
-              </Link>
-            </div>
+      <main className="mx-auto max-w-[1500px] px-5 pt-10 sm:px-8">
+        <section className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h1 className="font-display text-6xl uppercase leading-none md:text-7xl">
+              Production Queue
+            </h1>
+            <p className="mt-2 font-mono text-xs uppercase tracking-[0.18em] text-[#555]">
+              Focus on what needs attention next.
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <StatCard label="Total" value={stats?.total} loading={statsLoading} color="bg-[#FAF7EE]" />
-            <StatCard label="Published" value={stats?.byStatus.published} loading={statsLoading} color="bg-[#FAF7EE]" textColor="text-[#8B2FC9]" />
-            <StatCard label="Complete" value={stats?.byStatus.complete} loading={statsLoading} color="bg-[#FAF7EE]" textColor="text-[#0A6B52]" />
-            <StatCard label="Building" value={stats?.byStatus.building} loading={statsLoading} color="bg-[#FAF7EE]" textColor="text-[#C9A800]" href="/building" />
-            <StatCard label="Scheduled" value={stats?.byStatus.scheduled} loading={statsLoading} color="bg-[#FAF7EE]" textColor="text-[#0A6B52]" href="/scheduled" />
+          <div className="flex flex-wrap items-stretch gap-3">
+            <div className="flex border-2 border-[#0C0C0C] bg-[#FAF7EE] shadow-[3px_3px_0_#0C0C0C]">
+              <QueueStat label="In Draft" value={inDraft} loading={statsLoading} />
+              <QueueStat label="Building" value={byStatus?.building} loading={statsLoading} color="#C9A800" />
+              <QueueStat label="Complete" value={byStatus?.complete} loading={statsLoading} color="#0A6B52" />
+            </div>
+            <button
+              onClick={handleSyncWorkbook}
+              disabled={syncing}
+              title="Sync the latest workbook into the episode library"
+              className="flex items-center gap-2 border-2 border-[#0C0C0C] bg-[#FAF7EE] px-3 py-2 font-mono text-[10px] font-bold uppercase shadow-[3px_3px_0_#0C0C0C] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-60"
+            >
+              <RefreshCw size={13} className={syncing ? "animate-spin" : ""} />
+              {syncing ? "Syncing…" : "Sync Workbook"}
+            </button>
           </div>
         </section>
 
-        {/* UPCOMING STRIP */}
-        <section className="mb-14 relative">
-          <div className="absolute -top-3 -left-3 bg-[#0A6B52] text-white font-mono font-bold text-sm px-3 py-1 border-[2.5px] border-[#0C0C0C] shadow-[3px_3px_0_#0C0C0C] -rotate-3 z-10">
-            NEXT UP
+        {syncToast && (
+          <div
+            className={`mb-6 border-2 border-[#0C0C0C] px-4 py-2 font-mono text-xs font-bold shadow-[3px_3px_0_#0C0C0C] ${
+              syncToast.ok ? "bg-[#0A6B52] text-white" : "bg-[#C94A00] text-white"
+            }`}
+          >
+            {syncToast.msg}
           </div>
-          <div className="bg-[#E2DDD0] border-[3px] border-[#0C0C0C] p-6 shadow-[5px_5px_0_#0C0C0C]">
-            {upcomingLoading ? (
-              <div className="flex justify-center py-6"><Loader2 className="animate-spin text-[#0C0C0C]" /></div>
-            ) : upcoming && upcoming.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {upcoming.slice(0, 3).map((ep) => {
-                  const days = ep.postDate
-                    ? differenceInDays(new Date(ep.postDate), new Date())
-                    : null;
-                  const daysLabel = days === null
-                    ? "DATE TBD"
-                    : days < 0
-                    ? "PAST DUE"
-                    : days === 0
-                    ? "TODAY"
-                    : `IN ${days} DAYS`;
-                  const daysStyle = days !== null && days < 0
-                    ? "text-[#8B2FC9] border-[#8B2FC9]"
-                    : "text-[#C94A00] border-[#0C0C0C]";
-                  return (
-                    <div key={ep.id} className="bg-[#FAF7EE] border-2 border-[#0C0C0C] p-4 flex flex-col justify-between shadow-[3px_3px_0_#0C0C0C]">
-                      <div>
-                        <div className="flex justify-between items-start mb-2">
-                          <span className="font-display text-2xl text-[#0C0C0C]">EP {ep.epNumber}</span>
-                          <span className={`font-mono text-xs font-bold bg-[#FAF7EE] border-2 px-2 py-0.5 ${daysStyle}`}>
-                            {daysLabel}
-                          </span>
-                        </div>
-                        <p className="font-sans font-medium text-sm line-clamp-2">{ep.hookTitle}</p>
-                      </div>
-                      <div className="mt-4 font-mono text-xs text-[#555] font-bold">
-                        {formatPKT(ep.postDate)}
-                      </div>
-                    </div>
-                  );
-                })}
+        )}
+
+        <ActionQueue episodes={upcoming ?? []} loading={upcomingLoading} />
+
+        <section className="mt-14">
+          <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="flex items-center gap-3">
+              <h2 className="font-display text-5xl uppercase leading-none">Full Library</h2>
+              <span className="border-2 border-[#0C0C0C] bg-[#C9A800] px-2 py-1 font-mono text-[10px] font-bold uppercase shadow-[2px_2px_0_#0C0C0C]">
+                {filteredEpisodes.length} Entries
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <div className="flex items-center border-2 border-[#0C0C0C] bg-[#FAF7EE] px-3 py-2 shadow-[3px_3px_0_#0C0C0C]">
+                <Search size={14} className="mr-2 text-[#555]" />
+                <input
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="SEARCH EPISODES..."
+                  aria-label="Search episodes"
+                  className="w-48 bg-transparent font-mono text-xs uppercase outline-none placeholder:text-[#888]"
+                />
               </div>
+              <div className="flex border-2 border-[#0C0C0C] bg-[#FAF7EE] shadow-[3px_3px_0_#0C0C0C]">
+                <Filter size={14} className="m-2.5 shrink-0" />
+                {SEASONS.map((season) => (
+                  <button
+                    key={season.key}
+                    onClick={() => setActiveSeason(season.key)}
+                    className={`border-l-2 border-[#0C0C0C] px-2.5 py-2 font-mono text-[10px] font-bold uppercase transition ${
+                      activeSeason === season.key ? "bg-[#0C0C0C] text-[#FAF7EE]" : "hover:bg-[#E2DDD0]"
+                    }`}
+                  >
+                    {season.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-4 flex flex-wrap gap-2">
+            {STATUS_FILTERS.map((status) => (
+              <button
+                key={status}
+                onClick={() => setActiveStatus(status as ListEpisodesStatus | "all")}
+                className={`border-2 border-[#0C0C0C] px-3 py-1.5 font-mono text-[10px] font-bold uppercase shadow-[2px_2px_0_#0C0C0C] transition ${
+                  activeStatus === status
+                    ? "translate-x-[2px] translate-y-[2px] bg-[#0C0C0C] text-[#FAF7EE] shadow-none"
+                    : "bg-[#FAF7EE] hover:-translate-x-px hover:-translate-y-px"
+                }`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
+
+          <div className="overflow-hidden border-[3px] border-[#0C0C0C] bg-[#FAF7EE] shadow-[5px_5px_0_#0C0C0C]">
+            <div className="hidden grid-cols-[80px_105px_minmax(240px,1fr)_125px_145px_55px] gap-4 border-b-[3px] border-[#0C0C0C] bg-[#E2DDD0] p-3 font-mono text-[10px] font-bold uppercase text-[#555] md:grid">
+              <div>Season</div>
+              <div>Episode</div>
+              <div>Title</div>
+              <div>Status</div>
+              <div>Post Date</div>
+              <div className="text-center">Open</div>
+            </div>
+
+            {episodesLoading ? (
+              <div className="flex justify-center py-20">
+                <Loader2 className="animate-spin" />
+              </div>
+            ) : filteredEpisodes.length > 0 ? (
+              filteredEpisodes.map((episode) => <LibraryRow key={episode.id} episode={episode} />)
             ) : (
-              <div className="text-center font-mono font-bold text-[#555] py-4 uppercase">
-                No upcoming episodes scheduled
+              <div className="px-6 py-20 text-center">
+                <p className="font-display text-3xl uppercase">No Episodes Found</p>
+                <p className="mt-2 font-mono text-xs uppercase text-[#555]">Try adjusting your filters.</p>
               </div>
             )}
           </div>
         </section>
-
-        {/* FULL LIST */}
-        <section>
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <h2 className="font-display text-4xl text-[#0C0C0C]">Episode Library</h2>
-            
-            {/* Filters */}
-            <div className="flex flex-wrap gap-4">
-              {/* Season Tabs */}
-              <div className="flex border-[3px] border-[#0C0C0C] bg-[#FAF7EE] shadow-[3px_3px_0_#0C0C0C] flex-wrap">
-                {SEASONS.map((s) => (
-                  <button
-                    key={s.key}
-                    onClick={() => setActiveSeason(s.key)}
-                    className={`font-mono font-bold px-4 py-1.5 uppercase text-sm border-r-[3px] border-[#0C0C0C] last:border-r-0 transition-colors ${
-                      activeSeason === s.key ? "bg-[#C94A00] text-white" : "hover:bg-[#E2DDD0] text-[#0C0C0C]"
-                    }`}
-                  >
-                    {s.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Status Toggles */}
-              <div className="flex flex-wrap gap-2">
-                {STATUS_FILTERS.map((status) => (
-                  <button
-                    key={status}
-                    onClick={() => setActiveStatus(status as any)}
-                    className={`font-mono text-xs font-bold px-3 py-1.5 uppercase border-[2px] border-[#0C0C0C] shadow-[2px_2px_0_#0C0C0C] transition-all
-                      ${activeStatus === status 
-                        ? "bg-[#0C0C0C] text-[#FAF7EE] translate-x-[2px] translate-y-[2px] shadow-none" 
-                        : "bg-[#FAF7EE] text-[#0C0C0C] hover:-translate-y-[1px] hover:-translate-x-[1px] hover:shadow-[3px_3px_0_#0C0C0C]"
-                      }`}
-                  >
-                    {status}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {episodesLoading ? (
-            <div className="flex justify-center py-20"><Loader2 className="animate-spin w-8 h-8 text-[#0C0C0C]" /></div>
-          ) : episodes && episodes.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {episodes.map(ep => (
-                <EpisodeCard key={ep.id} episode={ep} />
-              ))}
-            </div>
-          ) : (
-             <div className="bg-[#FAF7EE] border-[3px] border-[#0C0C0C] p-12 text-center shadow-[5px_5px_0_#0C0C0C]">
-                <p className="font-display text-2xl text-[#0C0C0C]">NO EPISODES FOUND</p>
-                <p className="font-mono text-sm text-[#555] mt-2">Try adjusting your filters.</p>
-             </div>
-          )}
-        </section>
-
       </main>
     </div>
   );
 }
 
-function StatCard({ label, value, loading, color, textColor = "text-[#0C0C0C]", href }: { 
-  label: string; value?: number | string; loading: boolean; color: string; textColor?: string; href?: string;
+function ActionQueue({
+  episodes,
+  loading,
+}: {
+  episodes: Episode[];
+  loading: boolean;
 }) {
-  const content = (
-    <div className={`${color} border-[3px] border-[#0C0C0C] p-5 shadow-[4px_4px_0_#0C0C0C] ${href ? "hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_#0C0C0C] transition-all cursor-pointer" : ""}`}>
-      <p className="font-mono text-xs font-bold uppercase text-[#555] mb-1">{label}</p>
-      {loading ? (
-         <div className="h-10 flex items-center"><Loader2 className="w-5 h-5 animate-spin" /></div>
-      ) : (
-        <p className={`font-display text-5xl leading-none ${textColor}`}>{value ?? 0}</p>
-      )}
+  return (
+    <section className="relative">
+      <div className="absolute -left-3 -top-4 z-10 -rotate-2 border-2 border-[#0C0C0C] bg-[#0C0C0C] px-4 py-1.5 font-mono text-sm font-bold uppercase tracking-wider text-[#FAF7EE] shadow-[3px_3px_0_#0C0C0C]">
+        Action Required
+      </div>
+      <div className="border-[3px] border-[#0C0C0C] bg-[#E2DDD0] p-5 pt-8 shadow-[8px_8px_0_#0C0C0C]">
+        {loading ? (
+          <div className="flex justify-center py-10">
+            <Loader2 className="animate-spin" />
+          </div>
+        ) : episodes.length > 0 ? (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            {episodes.slice(0, 3).map((episode, index) => (
+              <QueueCard episode={episode} key={episode.id} urgent={index === 0 && episode.status === "building"} />
+            ))}
+          </div>
+        ) : (
+          <div className="py-10 text-center font-mono text-xs font-bold uppercase text-[#555]">
+            No upcoming episodes scheduled
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function QueueCard({ episode, urgent }: { episode: any; urgent: boolean }) {
+  const daysOut = episode.postDate
+    ? Math.ceil((new Date(episode.postDate).getTime() - Date.now()) / 86_400_000)
+    : null;
+  const dueLabel =
+    daysOut === null ? "DATE TBD" : daysOut < 0 ? `LATE BY ${Math.abs(daysOut)}D` : daysOut === 0 ? "DUE TODAY" : `DUE IN ${daysOut}D`;
+  const action = episode.status === "building" ? "Review Render" : episode.status === "complete" ? "Schedule" : "Edit Script";
+  const ActionIcon = episode.status === "building" ? Hammer : episode.status === "complete" ? Play : MoreHorizontal;
+  const colors = STATUS_COLORS[episode.status] ?? STATUS_COLORS.draft;
+
+  return (
+    <Link href={`/episodes/${episode.id}`}>
+      <article className="group relative flex h-full cursor-pointer flex-col border-2 border-[#0C0C0C] bg-[#FAF7EE] shadow-[3px_3px_0_#0C0C0C] transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[7px_7px_0_#0C0C0C]">
+        {urgent && <span className="absolute -right-2 -top-2 h-4 w-4 animate-pulse rounded-full border-2 border-[#0C0C0C] bg-[#C94A00]" />}
+        <div className="flex items-start justify-between border-b-2 border-[#0C0C0C] bg-white p-4">
+          <div>
+            <div className="font-mono text-[10px] font-bold text-[#555]">{seasonCode(episode.season)}</div>
+            <div className="font-display text-3xl leading-none">EP {episode.epNumber}</div>
+          </div>
+          <StatusPill status={episode.status} />
+        </div>
+        <div className="flex flex-1 flex-col justify-between p-4">
+          <p className="mb-4 line-clamp-3 font-sans text-base font-bold leading-snug">{episode.hookTitle}</p>
+          <div className="mb-4 flex items-center justify-between font-mono text-xs">
+            <span className={daysOut !== null && daysOut < 0 ? "font-bold text-[#C94A00]" : "text-[#555]"}>{dueLabel}</span>
+            <span className="text-[#555]">{episode.duration || "--:--"}</span>
+          </div>
+          <div className="flex items-center justify-center gap-2 border-2 border-[#0C0C0C] bg-[#0C0C0C] py-2.5 font-mono text-xs font-bold uppercase text-[#FAF7EE] transition group-hover:bg-[#0A6B52]">
+            <ActionIcon size={14} />
+            {action}
+          </div>
+        </div>
+      </article>
+    </Link>
+  );
+}
+
+function LibraryRow({ episode }: { episode: any }) {
+  return (
+    <Link href={`/episodes/${episode.id}`}>
+      <div className="group grid cursor-pointer grid-cols-1 gap-2 border-b-2 border-[#CCC] p-4 transition hover:bg-white md:grid-cols-[80px_105px_minmax(240px,1fr)_125px_145px_55px] md:items-center md:gap-4 md:p-3">
+        <div className="font-mono text-xs font-bold text-[#888]">{seasonCode(episode.season)}</div>
+        <div className="font-display text-2xl leading-none">EP {episode.epNumber}</div>
+        <div className="min-w-0">
+          <div className="truncate font-sans text-sm font-bold">{episode.hookTitle}</div>
+          <div className="mt-1 truncate font-mono text-[10px] uppercase text-[#777] md:hidden">{episode.youtubeTitle}</div>
+        </div>
+        <div><StatusPill status={episode.status} /></div>
+        <div className="flex items-center gap-2 font-mono text-xs text-[#555]">
+          <Calendar size={13} />
+          {formatPKT(episode.postDate)}
+        </div>
+        <div className="flex justify-end">
+          <ChevronRight className="opacity-40 transition group-hover:translate-x-1 group-hover:opacity-100" size={17} />
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function QueueStat({ label, value, loading, color = "#0C0C0C" }: { label: string; value?: number; loading: boolean; color?: string }) {
+  return (
+    <div className="flex min-w-[74px] flex-col border-r border-[#0C0C0C]/20 px-3 py-2 last:border-r-0">
+      <span className="font-mono text-[9px] font-bold uppercase text-[#555]">{label}</span>
+      {loading ? <Loader2 size={18} className="mt-1 animate-spin" /> : <span className="font-display text-2xl leading-none" style={{ color }}>{value ?? 0}</span>}
     </div>
   );
+}
 
-  if (href) return <Link href={href}>{content}</Link>;
-  return content;
+function StatusPill({ status }: { status: string }) {
+  const colors = STATUS_COLORS[status] ?? STATUS_COLORS.draft;
+  return (
+    <span
+      className="inline-flex min-w-[78px] items-center justify-center border-2 border-[#0C0C0C] px-2 py-1 font-mono text-[10px] font-bold uppercase"
+      style={{ backgroundColor: colors.bg, color: colors.text }}
+    >
+      {status}
+    </span>
+  );
+}
+
+function seasonCode(season: string) {
+  return season.split(":")[0].trim();
 }
