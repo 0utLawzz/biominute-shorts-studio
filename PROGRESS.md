@@ -16,6 +16,16 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 
 ## User requests → Agent actions
 
+### Request — Silence reels preview audio and verify Episodes 66–80
+*(Session: 2026-07-28)*
+
+**Agent did:**
+1. Traced the unexpected preview sound to both the background `AudioEngine` autoplay race and 268 scene-level `<audio>` elements that call `.play()` directly.
+2. Made iframe preview mode hard-silent: no audio control is exposed, the background starts muted, and preview media playback is blocked before scene effects run. Export mode remains intentionally audible; FFmpeg still mixes background music into final MP4s.
+3. Queried the development database for Episodes 66–80. All 15 remain `scripted`; Ep 66 reports an `exported` build stage and Ep 67–70 report `rendering`, but none has `date_built` or a YouTube video ID, so they are not completed builds.
+4. Verified the reels production build with `PORT=25078 BASE_PATH=/biominute-reels/`, publishing-dashboard typecheck/build, diff whitespace checks, and the running reels preview. The dashboard build retains its existing non-blocking tooltip sourcemap warning.
+
+
 ### Request — Integrate the Production Queue dashboard design
 *(Session: 2026-07-28)*
 

@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp, Repeat } from 'lucide-react';
 
-import { AudioMuteButton, useAudioState } from '@/lib/audio/AudioEngine';
 import { SCENE_DURATIONS } from '@/lib/video';
 import VideoTemplate from './VideoTemplate';
 import { useSceneControls } from './useSceneControls';
@@ -16,9 +15,7 @@ interface ControlBarProps {
   activeIndex: number;
   activeDuration: number;
   tick: number;
-  audioMuted: boolean;
   onToggleLock: () => void;
-  onToggleAudio: () => void;
   onJumpTo: (index: number) => void;
   onToggleCollapsed: () => void;
 }
@@ -81,9 +78,7 @@ function ControlBar({
   activeIndex,
   activeDuration,
   tick,
-  audioMuted,
   onToggleLock,
-  onToggleAudio,
   onJumpTo,
   onToggleCollapsed,
 }: ControlBarProps) {
@@ -109,10 +104,6 @@ function ControlBar({
       >
         <Repeat className="w-8 h-8" />
       </button>
-
-      <div className="w-px self-stretch bg-white/15" aria-hidden="true" />
-
-      <AudioMuteButton muted={audioMuted} toggle={onToggleAudio} />
 
       <div className="w-px self-stretch bg-white/15" aria-hidden="true" />
 
@@ -157,8 +148,6 @@ export default function VideoWithControls() {
     toggleLock,
   } = useSceneControls(SCENE_DURATIONS);
 
-  const { muted: audioMuted, toggleMuted: toggleAudioMuted } = useAudioState();
-
   const sensorRef = useRef<HTMLDivElement | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [hovering, setHovering] = useState(false);
@@ -200,6 +189,35 @@ export default function VideoWithControls() {
 
   const barVisible = !collapsed || hovering || tapPinned;
 
+  // Preview mode is always silent. Scene-specific SFX are legacy <audio>
+  // elements that call play() directly, so a DOM observer alone can race
+  // their effects. Block media playback at the browser boundary instead.
+  useLayoutEffect(() => {
+    if (!isIframed) return;
+    const mediaPrototype = HTMLMediaElement.prototype;
+    const originalPlay = mediaPrototype.play;
+    mediaPrototype.play = function blockedPreviewPlay() {
+      this.pause();
+      this.muted = true;
+      this.volume = 0;
+      return Promise.resolve();
+    };
+    const silence = () => {
+      document.querySelectorAll<HTMLAudioElement>("audio").forEach((audio) => {
+        audio.muted = true;
+        audio.volume = 0;
+        audio.pause();
+      });
+    };
+    silence();
+    const observer = new MutationObserver(silence);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      observer.disconnect();
+      mediaPrototype.play = originalPlay;
+    };
+  }, [isIframed]);
+
   // Export path: force unmuted so final renders include audio
   if (!isIframed) {
     return (
@@ -215,7 +233,7 @@ export default function VideoWithControls() {
         key={mountKey}
         durations={durations}
         loop
-        muted={audioMuted}
+        muted
         onSceneChange={onSceneChange}
       />
       <div
@@ -235,9 +253,7 @@ export default function VideoWithControls() {
           activeIndex={activeIndex}
           activeDuration={activeDuration}
           tick={tick}
-          audioMuted={audioMuted}
           onToggleLock={toggleLock}
-          onToggleAudio={toggleAudioMuted}
           onJumpTo={jumpTo}
           onToggleCollapsed={handleToggleCollapsed}
         />

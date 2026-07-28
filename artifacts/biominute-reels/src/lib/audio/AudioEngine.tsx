@@ -61,15 +61,21 @@ export function AudioEngine({
       }
     };
 
-    // Try to auto-play immediately (works when browser allows it)
-    bg.play().then(() => {
+    // Never start audio while muted. The previous unconditional play() call
+    // could produce a loud burst before the mute effect ran.
+    if (muted) {
+      bg.muted = true;
       setAudioCtxReady(true);
-    }).catch(() => {
-      // Browser blocked autoplay — wait for first user gesture
-      window.addEventListener('pointerdown', tryPlay, { once: true });
-      window.addEventListener('keydown', tryPlay, { once: true });
-      window.addEventListener('touchstart', tryPlay, { once: true });
-    });
+    } else {
+      bg.play().then(() => {
+        setAudioCtxReady(true);
+      }).catch(() => {
+        // Browser blocked autoplay — wait for first user gesture
+        window.addEventListener('pointerdown', tryPlay, { once: true });
+        window.addEventListener('keydown', tryPlay, { once: true });
+        window.addEventListener('touchstart', tryPlay, { once: true });
+      });
+    }
 
     return () => {
       window.removeEventListener('pointerdown', tryPlay);
@@ -78,7 +84,7 @@ export function AudioEngine({
       bg.pause();
       bgRef.current = null;
     };
-  }, [bgPath, volume]);
+  }, [bgPath, volume, muted]);
 
   // Handle mute/unmute
   useEffect(() => {
