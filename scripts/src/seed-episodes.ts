@@ -1,8 +1,8 @@
 // Seed: populates the `episodes` table from the newest master workbook
 // in attached_assets/ (Production, Social, Schedule tabs).
-// - Existing rows (1-36) are updated with workbook metadata only; their real
-//   publish/schedule status and YouTube IDs are preserved.
-// - New rows (37-50) and the two pipeline test slots (TEST-1, TEST-2) are inserted.
+// - Existing rows are updated with workbook metadata; rows with live YouTube or
+//   pipeline state keep their real publish/schedule status and dates.
+// - New rows and the two pipeline test slots (TEST-1, TEST-2) are inserted.
 import ExcelJS from "exceljs";
 import fs from "node:fs";
 import path from "node:path";
@@ -257,9 +257,13 @@ async function main() {
   // Upsert: preserve existing publish/schedule state for real episodes
   // -------------------------------------------------------------------------
   const existing = await db
-    .select({ epNumber: episodesTable.epNumber, status: episodesTable.status })
+    .select({
+      epNumber: episodesTable.epNumber,
+      status: episodesTable.status,
+      youtubeVideoId: episodesTable.youtubeVideoId,
+    })
     .from(episodesTable);
-  const existingMap = new Map(existing.map((e) => [e.epNumber, e.status]));
+  const existingMap = new Map(existing.map((e) => [e.epNumber, e]));
 
   const toInsert = rows.filter((r) => !existingMap.has(r.epNumber));
   const toUpdate = rows.filter((r) => existingMap.has(r.epNumber));
@@ -273,11 +277,14 @@ async function main() {
   const LOCKED_STATUSES = new Set<string>(["published", "scheduled"]);
 
   for (const row of toUpdate) {
-    const currentStatus = existingMap.get(row.epNumber)!;
+    const current = existingMap.get(row.epNumber)!;
+    const currentStatus = current.status;
 
-    // Episodes 1–50 that are already published/scheduled keep their live state
-    // AND keep their existing post/schedule dates so we don't wipe real history.
-    const preserveLiveState = row.epNumber <= 50 && LOCKED_STATUSES.has(currentStatus);
+    // Any episode with a YouTube ID has externally managed publishing truth.
+    // Preserve it even when this workbook is an older copy. Also preserve
+    // explicit published/scheduled pipeline states without an ID.
+    const preserveLiveState =
+      Boolean(current.youtubeVideoId) || LOCKED_STATUSES.has(currentStatus);
 
     // scheduledPublishAt is recomputed from postDate + 09:00 UTC whenever a postDate
     // is present (fixes cumulative-drift bugs). For complete/scripted without a date, clear it.
@@ -290,11 +297,8 @@ async function main() {
       scheduledPublishAt = null;
     }
 
-    // Only overwrite status when the episode is NOT already live (1–50 published/scheduled).
-    // Status always comes from row.status, which was already derived purely from the
-    // workbook's own Status column in workbookStatusToDb() above — no hardcoded
-    // episode-number ranges, ever. This is what makes future workbook edits (any
-    // episode range, not just 51-100) sync correctly without code changes.
+    // Only overwrite status when the episode has no preserved live/pipeline state.
+    // Otherwise status comes from the workbook's own Status column.
     let statusOverride: { status?: DbStatus } = {};
     if (!preserveLiveState) {
       statusOverride = { status: row.status as DbStatus };

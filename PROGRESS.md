@@ -16,6 +16,19 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 
 ## User requests → Agent actions
 
+### Request — Seed the uploaded master workbook without overwriting live state
+*(Session: 2026-07-28)*
+
+**User said:** Use the uploaded older workbook to take missing episode data, update the seed script and database, and push the changes to GitHub.
+
+**Agent did:**
+1. Used `attached_assets/BioMinute-Master-Workbook_1785267003956.xlsx` as the newest workbook source.
+2. Ran the seed successfully: 102 existing rows updated, 0 rows inserted.
+3. Preserved all existing YouTube-backed status, post dates, and scheduled publish times, including the completed Episodes 51–80 batches, despite the workbook being older.
+4. Updated the seed script so any existing YouTube ID preserves externally managed publish state, not only Episodes 1–50.
+5. Confirmed Episodes 81–100 remain scripted and regenerated the static dashboard.
+6. Passed scripts typecheck and publishing-dashboard typecheck/build; the existing tooltip sourcemap warning remains non-blocking.
+
 ### Request — Produce Episodes 76–80 in small batches
 *(Session: 2026-07-28)*
 
