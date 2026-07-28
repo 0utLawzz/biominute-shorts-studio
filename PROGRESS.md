@@ -16,6 +16,23 @@ This file exists so a freshly-spawned agent (or the user themselves) can reconst
 
 ## User requests → Agent actions
 
+### Request — Stop dashboard audio and prevent duplicate batch exports
+*(Session: 2026-07-28)*
+
+**User said:** Dashboard background music keeps playing even though audio belongs only in reels; also asked why `export-all-episodes.sh` exported Episodes 61–65 twice and requested GitHub batch-push/import guidance.
+
+**Agent did:**
+1. Traced the audio source: exported MP4 files intentionally contain BGM/SFX, while dashboard video previews were not enforcing a hard mute boundary.
+2. Added `muted`, `defaultMuted`, and inline playback enforcement to the React dashboard preview and generated static dashboard.
+3. Regenerated `exports/dashboard.html` so existing static video previews also carry the mute guard.
+4. Changed `scripts/export-all-episodes.sh` to accept explicit episode numbers, skip existing MP4s by default, support intentional `FORCE_EXPORT=1` rerenders, and stop auto-pushing.
+5. Added the GitHub import/batch checklist to `replit.md` and `.agents/memory/github-batch-import-checklist.md`; no token value was exposed.
+6. Restarted the dashboard workflow and verified the updated frontend hot-loaded. Shell syntax, generated dashboard mute attributes, and diff checks passed.
+
+**Root cause of the 61–65 repeat:** the old script had a hard-coded 61–65 list and always ran those five exports whenever invoked; it also committed/pushed automatically, making reruns confusing. The new explicit/idempotent behavior prevents that.
+
+**Known unrelated verification blockers:** dashboard standalone `tsc --noEmit` requires the generated API client build; reels standalone typecheck still reports older Ep73–74 animated-prop errors. Neither comes from the audio/export guard change.
+
 ### Request 1 — Schedule Ep 50 Facebook posts (1/day, immediate delete-all reset)
 *(Session: 2026-07-27, FB reset)*
 

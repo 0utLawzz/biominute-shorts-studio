@@ -121,9 +121,23 @@ bash scripts/push-to-github.sh "feat: export Episode NN — <title>"
 
 This stages, commits, and pushes the new `exports/Episode-NN-slug/` folder and updated `production-log.md`.
 
+For episode batches, pass the exact episode numbers to the exporter. Existing MP4s
+are skipped automatically, so rerunning the same command will not export them twice:
+
+```bash
+bash scripts/export-all-episodes.sh 61 62 63 64 65
+bash scripts/push-to-github.sh "feat: export episodes 61-65"
+```
+
+Use `FORCE_EXPORT=1` only when an intentional re-render is needed. The exporter
+does not push automatically; this keeps each batch reviewable and prevents an
+accidental rerun from creating a confusing duplicate push.
+
 ---
 
 ## Audio policy
 
 - Background music and scene SFX are part of the **video reels** only.
 - The publishing dashboard does **not** play background music or sound effects.
+- Dashboard video previews are always muted (`muted`, `defaultMuted`, and inline playback)
+  because exported MP4 files intentionally contain audio for YouTube.

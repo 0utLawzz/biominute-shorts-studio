@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Full sequential export for Episodes 61–65
-# Usage: bash scripts/export-all-episodes.sh
+# Full sequential export for an explicit episode batch.
+# Usage: bash scripts/export-all-episodes.sh 61 62 63 64 65
+# With no arguments, it keeps the legacy 61–65 default.
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT"
 
@@ -13,13 +14,28 @@ CONFIG_FILE="artifacts/biominute-reels/src/lib/video/config.ts"
 
 # ─── Episode definitions ───────────────────────────────────────────────
 # Format: "ep_num|scene_prefix|export_dir|config_comment_scene0"
-EPISODES=(
-  "61|ep61|exports/Episode-61-is-decaf-coffee-actually-caffeine|Hook: \"Is Decaf Coffee Actually Caffeine-Free?\""
-  "62|ep62|exports/Episode-62-does-sugar-really-cause-hyperactivity|Hook: \"Does Sugar Really Cause Hyperactivity in Kids?\""
-  "63|ep63|exports/Episode-63-can-apple-cider-vinegar-really-help|Hook: \"Can Apple Cider Vinegar Really Help You Lose Weight?\""
-  "64|ep64|exports/Episode-64-is-it-bad-to-work-out-on-an-empty|Hook: \"Is It Bad to Work Out on an Empty Stomach?\""
-  "65|ep65|exports/Episode-65-does-napping-during-the-day-ruin|Hook: \"Does Napping During the Day Ruin Your Night Sleep?\""
+declare -A EP_DEFS=(
+  [61]="61|ep61|exports/Episode-61-is-decaf-coffee-actually-caffeine|Hook: \"Is Decaf Coffee Actually Caffeine-Free?\""
+  [62]="62|ep62|exports/Episode-62-does-sugar-really-cause-hyperactivity|Hook: \"Does Sugar Really Cause Hyperactivity in Kids?\""
+  [63]="63|ep63|exports/Episode-63-can-apple-cider-vinegar-really-help|Hook: \"Can Apple Cider Vinegar Really Help You Lose Weight?\""
+  [64]="64|ep64|exports/Episode-64-is-it-bad-to-work-out-on-an-empty|Hook: \"Is It Bad to Work Out on an Empty Stomach?\""
+  [65]="65|ep65|exports/Episode-65-does-napping-during-the-day-ruin|Hook: \"Does Napping During the Day Ruin Your Night Sleep?\""
 )
+
+REQUESTED_EPISODES=("$@")
+if [ "${#REQUESTED_EPISODES[@]}" -eq 0 ]; then
+  REQUESTED_EPISODES=(61 62 63 64 65)
+fi
+
+EPISODES=()
+for ep_num in "${REQUESTED_EPISODES[@]}"; do
+  if [ -z "${EP_DEFS[$ep_num]+x}" ]; then
+    echo "❌ Episode ${ep_num} is not configured in this batch script."
+    echo "   Add its scene prefix, export folder, and hook comment before exporting it."
+    exit 1
+  fi
+  EPISODES+=("${EP_DEFS[$ep_num]}")
+done
 
 # ─── Start Vite dev server ─────────────────────────────────────────────
 echo "▶ Starting Vite dev server on port $VITE_PORT..."
@@ -65,6 +81,10 @@ for ep_def in "${EPISODES[@]}"; do
   # Ensure output dir exists
   mkdir -p "$out_dir"
   MP4_PATH="$ROOT/$out_dir/episode.mp4"
+  if [ -f "$MP4_PATH" ] && [ "${FORCE_EXPORT:-0}" != "1" ]; then
+    echo "   ⏭️  $MP4_PATH already exists; skipping. Use FORCE_EXPORT=1 to re-export."
+    continue
+  fi
   TMP_DIR="/tmp/biominute-ep${ep_num}"
   mkdir -p "$TMP_DIR"
 
@@ -80,12 +100,8 @@ done
 
 echo ""
 echo "══════════════════════════════════════════"
-echo "  All 5 episodes exported. Pushing to GitHub..."
+echo "  Batch export complete. Push this batch with:"
+echo "  bash scripts/push-to-github.sh \"feat: export episodes ${REQUESTED_EPISODES[*]}\""
 echo "══════════════════════════════════════════"
-
-git add -A
-git commit -m "ep61-65: export 5 episodes (Decaf Coffee → Napping)" || true
-git push origin "$(git branch --show-current)"
-
 echo ""
-echo "🎉 Done! Episodes 61–65 exported and pushed to GitHub."
+echo "🎉 Done! Episodes ${REQUESTED_EPISODES[*]} exported."

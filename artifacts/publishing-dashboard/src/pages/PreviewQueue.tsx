@@ -102,6 +102,8 @@ export default function PreviewQueue() {
                     key={selected.id}
                     controls
                     muted
+                    defaultMuted
+                    playsInline
                     className="max-h-[480px] max-w-full"
                     style={{ aspectRatio: "9/16", maxHeight: 480 }}
                   >

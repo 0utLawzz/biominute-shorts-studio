@@ -126,6 +126,18 @@ To connect YouTube, Facebook, TikTok, Instagram, X/Twitter, or LinkedIn, see `do
 
 `.github/workflows/neon_workflow.yml` creates a Neon database branch for every pull request and deletes it when the PR closes. It requires `NEON_API_KEY` (secret) and `NEON_PROJECT_ID` (repository variable).
 
+## Imported-project and GitHub batch checklist
+
+When this project is imported or resumed:
+
+1. Read `PROGRESS.md` first, then inspect the README, workspace packages, workflows, GitHub remote, and push scripts.
+2. Confirm `GITHUB_TOKEN` is available as a Replit Secret without printing or exposing its value.
+3. Split work into small logical batches (for example, five episodes or one focused fix).
+4. Run the relevant typecheck/build and preview checks after each batch.
+5. Push a completed batch with `bash scripts/push-to-github.sh "descriptive message"`.
+6. Keep export runs explicit and repeat-safe: pass episode numbers to `scripts/export-all-episodes.sh`; existing MP4s are skipped unless `FORCE_EXPORT=1`.
+7. Never commit secrets, generated credentials, or token values.
+
 ## User Preferences
 
 - Keep existing project structure and stack intact.
