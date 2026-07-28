@@ -60,7 +60,7 @@ function generateDashboard(episodes: Episode[]): string {
     .map((ep) => {
       const folder = findEpisodeFolder(ep.epNumber);
       const thumb = folder
-        ? `        <video class="thumb" poster="${folder}/thumbnail.png" controls muted defaultMuted playsinline preload="none">
+        ? `        <video class="thumb" poster="${folder}/thumbnail.png" muted defaultMuted playsinline preload="none">
           <source src="${folder}/episode.mp4" type="video/mp4">
         </video>`
         : `        <div class="thumb placeholder">Not produced yet</div>`;

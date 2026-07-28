@@ -100,7 +100,6 @@ export default function PreviewQueue() {
                 <div className="bg-[#0C0C0C] border-b-[3px] border-[#0C0C0C] flex items-center justify-center" style={{ minHeight: 360 }}>
                   <video
                     key={selected.id}
-                    controls
                     muted
                     defaultMuted
                     playsInline

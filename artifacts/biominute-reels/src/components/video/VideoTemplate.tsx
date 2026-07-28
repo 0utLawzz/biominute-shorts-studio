@@ -21,7 +21,7 @@ declare global {
 export default function VideoTemplate({
   durations = SCENE_DURATIONS,
   loop = true,
-  muted = false,
+  muted = true,
   onSceneChange,
 }: {
   durations?: Record<string, number>;
@@ -90,7 +90,7 @@ export default function VideoTemplate({
       <AudioEngine
         currentSceneKey={currentSceneKey}
         muted={muted}
-        volume={0.35}
+        volume={0.12}
         assets={{
           background: 'audio/background.mp3',
         }}

@@ -18,9 +18,10 @@ interface AudioEngineProps {
 export function useAudioState() {
   const [muted, setMuted] = useState(() => {
     if (typeof window === 'undefined') return false;
-    // Default is UNMUTED — only mute if the user explicitly set it
+    // Start quietly muted so opening the reel preview never surprises the user.
+    // Audio can still be enabled intentionally from the player control.
     const stored = window.localStorage.getItem('biominute-audio-muted');
-    return stored === 'true';
+    return stored === null ? true : stored === 'true';
   });
 
   const toggleMuted = () => {
@@ -37,7 +38,7 @@ export function useAudioState() {
 export function AudioEngine({
   assets,
   muted = true,
-  volume = 0.35,
+  volume = 0.12,
 }: AudioEngineProps) {
   const bgRef = useRef<HTMLAudioElement | null>(null);
   const [audioCtxReady, setAudioCtxReady] = useState(false);

@@ -126,7 +126,7 @@ async function main() {
       console.log('Mixing background music from:', BG_MUSIC_PATH);
       // Force 60fps CFR output so the MP4 stays in sync with the looped audio track.
       execSync(
-        `ffmpeg -y -i "${videoPath}" -stream_loop -1 -i "${BG_MUSIC_PATH}" -vf "scale=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:force_original_aspect_ratio=decrease,pad=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:(ow-iw)/2:(oh-ih)/2,format=yuv420p" -r 60 -vsync cfr -c:v libx264 -preset fast -crf 23 -movflags +faststart -c:a aac -b:a 128k -shortest "${mp4Path}"`,
+        `ffmpeg -y -i "${videoPath}" -stream_loop -1 -i "${BG_MUSIC_PATH}" -vf "scale=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:force_original_aspect_ratio=decrease,pad=${VIDEO_WIDTH}:${VIDEO_HEIGHT}:(ow-iw)/2:(oh-ih)/2,format=yuv420p" -r 60 -vsync cfr -map 0:v:0 -map 1:a:0 -c:v libx264 -preset fast -crf 23 -movflags +faststart -af "volume=0.10" -c:a aac -b:a 128k -shortest "${mp4Path}"`,
         { stdio: 'inherit' }
       );
     } else {
