@@ -586,4 +586,29 @@ Skip appends for: typo fixes, infra config, deploy artefacts, files moved inside
 9. Ep 44 rendered locally (MP4 ready at `exports/Episode-44-*/episode.mp4`); Facebook rejected Aug 28 (30 days) — eligible tomorrow (July 30).
 10. Pre-rendering Ep 45–55 locally so they are ready as the window shifts daily.
 
-**Stage status: Facebook has 43/100 IDs. Ep 44 MP4 ready locally (upload eligible July 30). Ep 45–55 pre-rendering in progress. Ep 56–100 pending.**
+**Stage status: Facebook has 43/100 IDs. Ep 44 MP4 ready locally (upload eligible July 30). Ep 45–55 pre-rendering in progress. Ep 56–90 pending.**
+
+### Request 17 — Export Episodes 91–100 to complete the season
+*(Session: 2026-07-29)*
+
+**User said:** Continue where we left off — finish Episodes 91–100.
+
+**Agent did:**
+1. Restored all secrets and confirmed all three workflows running.
+2. Confirmed Episodes 91–100 already had YouTube IDs and are in `scheduled` status — no re-uploading or date changes needed.
+3. All ten episodes had archived scene files (Content.ts + Scene0–4.tsx) already in place from the original Workbook scene generation.
+4. Rendered all ten episodes to descriptive export folders and validated every MP4 at 1080×1920 (all ~44s):
+   - Ep 91 — `exports/Episode-91-is-organic-food-healthier/`
+   - Ep 92 — `exports/Episode-92-need-protein-shake-after-workout/`
+   - Ep 93 — `exports/Episode-93-spicy-food-boost-metabolism/`
+   - Ep 94 — `exports/Episode-94-bottled-water-safer-than-tap/`
+   - Ep 95 — `exports/Episode-95-chewing-gum-lose-weight/`
+   - Ep 96 — `exports/Episode-96-puzzles-brain-games-prevent-memory-decline/`
+   - Ep 97 — `exports/Episode-97-taking-stairs-add-years-to-life/`
+   - Ep 98 — `exports/Episode-98-loneliness-bad-for-physical-health/`
+   - Ep 99 — `exports/Episode-99-strength-training-slow-aging/`
+   - Ep 100 — `exports/Episode-100-how-to-break-bad-habits/`
+5. Restored the active render scenes and configuration to the baseline Episode 82 state.
+6. Did not run Facebook publishing — all 10 episodes remain Facebook-pending.
+
+**Stage status: All 100 regular episodes (Ep 1–100) have local MP4 exports. 86 are on YouTube (scheduled), 14 published, 0 scripted. Facebook has 43/100 IDs.**
