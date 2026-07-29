@@ -21,7 +21,7 @@ export const CANVAS_STYLE = {
 // Scene durations for the current episode. The video player uses these to
 // advance scenes automatically. Keep the total loop duration in sync with
 // the exported MP4 length so the record/export control captures the full video.
-// EP 42 — "Can Probiotics Actually Improve Your Gut Health?"
+// EP 38 — "Can Vitamin C Actually Prevent a Cold?"
 export const SCENE_DURATIONS = {
   0: 4500, // Scene 0
   1: 6500, // Scene 1

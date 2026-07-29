@@ -26,11 +26,17 @@ const EXPORTS_DIR = path.join(WORKSPACE_ROOT, "exports");
 const REELS_URL = process.env.BIOMINUTE_EXPORT_URL ?? "http://localhost:25078/biominute-reels/";
 const EXPORT_SCRIPT = path.join(WORKSPACE_ROOT, "scripts/src/export-video.ts");
 
-const DEFAULT_SCENE_DURATIONS = { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 };
+// 5-scene default (no Scene5) — used for Ep 34-35, 42-55+ which only have Scene0-4 archived
+const DEFAULT_SCENE_DURATIONS_5 = { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500 };
+// 6-scene default — used for Ep 36-41 which have Scene0-5 archived
+const DEFAULT_SCENE_DURATIONS_6 = { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 };
+// Legacy alias kept for any callers that still reference the old constant
+const DEFAULT_SCENE_DURATIONS = DEFAULT_SCENE_DURATIONS_5;
 
 // Per-episode scene durations. Source: exports/production-log.md
 // Ep 25-30 used 4500/7000/6500/6000/6500/5000 (six scenes).
-// Ep 36-50 used 4500/6500/7000/6000/6500/5000 (six scenes).
+// Ep 36-41 used 4500/6500/7000/6000/6500/5000 (six scenes, Scene0-5 archived).
+// Ep 34-35, 42+ used 4500/6500/7000/6000/6500 (five scenes, Scene0-4 only).
 const SCENE_DURATIONS: Record<number, Record<number, number>> = {
   25: { 0: 4500, 1: 7000, 2: 6500, 3: 6000, 4: 6500, 5: 5000 },
   26: { 0: 4500, 1: 7000, 2: 6500, 3: 6000, 4: 6500, 5: 5000 },
@@ -38,20 +44,13 @@ const SCENE_DURATIONS: Record<number, Record<number, number>> = {
   28: { 0: 4500, 1: 7000, 2: 6500, 3: 6000, 4: 6500, 5: 5000 },
   29: { 0: 4500, 1: 7000, 2: 6500, 3: 6000, 4: 6500, 5: 5000 },
   30: { 0: 4500, 1: 7000, 2: 6500, 3: 6000, 4: 6500, 5: 5000 },
+  // Ep 36-41: six-scene episodes (Scene0-5 archived)
   36: { 0: 4500, 1: 7000, 2: 6500, 3: 6000, 4: 6500, 5: 5000 },
   37: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
   38: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
   39: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
   40: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
   41: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
-  43: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
-  44: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
-  45: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
-  46: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
-  47: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
-  48: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
-  49: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
-  50: { 0: 4500, 1: 6500, 2: 7000, 3: 6000, 4: 6500, 5: 5000 },
 };
 
 function slugify(title: string | null | undefined): string {
@@ -76,8 +75,17 @@ if (missing.length) {
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const db = drizzle(pool);
 
+/** Returns the highest scene index archived for this episode (e.g. 4 or 5). */
+function maxArchivedScene(epNumber: number): number {
+  for (let i = 5; i >= 0; i--) {
+    if (fs.existsSync(path.join(REELS_SRC, `ep${epNumber}_Scene${i}.tsx`))) return i;
+  }
+  throw new Error(`No archived scenes found for episode ${epNumber}`);
+}
+
 function swapScenes(epNumber: number): void {
-  for (let i = 0; i <= 4; i++) {
+  const max = maxArchivedScene(epNumber);
+  for (let i = 0; i <= max; i++) {
     const archived = path.join(REELS_SRC, `ep${epNumber}_Scene${i}.tsx`);
     const active = path.join(REELS_SRC, `Scene${i}.tsx`);
     if (!fs.existsSync(archived)) {
@@ -152,7 +160,11 @@ async function processEpisode(epNumber: number): Promise<void> {
   if (!rows.length) throw new Error(`Episode ${epNumber} not found in DB`);
   const ep = rows[0];
 
-  const durations = SCENE_DURATIONS[epNumber] ?? DEFAULT_SCENE_DURATIONS;
+  // Auto-select durations: use per-episode map if defined; otherwise pick the
+  // right default based on how many scene files are actually archived.
+  const maxScene = maxArchivedScene(epNumber);
+  const defaultDurations = maxScene >= 5 ? DEFAULT_SCENE_DURATIONS_6 : DEFAULT_SCENE_DURATIONS_5;
+  const durations = SCENE_DURATIONS[epNumber] ?? defaultDurations;
   const slug = slugify(ep.hookTitle);
 
   const padded = String(epNumber).padStart(2, "0");
