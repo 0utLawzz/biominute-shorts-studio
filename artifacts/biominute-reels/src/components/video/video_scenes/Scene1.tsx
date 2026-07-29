@@ -1,61 +1,36 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Droplets, Flame, Thermometer } from 'lucide-react';
+import { Droplets, ShieldCheck, TrendingDown } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
-const SPRING_SNAPPY = { type: 'spring', stiffness: 400, damping: 30 } as const;
 const SPRING_SMOOTH = { type: 'spring', stiffness: 120, damping: 25 } as const;
+const SPRING_SNAPPY = { type: 'spring', stiffness: 400, damping: 30 } as const;
 
 export function Scene1() {
   const audioRef = useRef<HTMLAudioElement>(null);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.volume = 0.6;
-      audioRef.current.play().catch(() => {});
-    }
-  }, []);
+  useEffect(() => { if (audioRef.current) { audioRef.current.currentTime = 0; audioRef.current.volume = 0.6; audioRef.current.play().catch(() => {}); } }, []);
 
   return (
-    <motion.div
-      className="absolute inset-0 w-full h-full bg-[#0F172A] flex flex-col items-center justify-center overflow-hidden font-body"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }}
-      transition={{ duration: 0.8 }}
-    >
+    <motion.div className="absolute inset-0 w-full h-full bg-[#0F172A] flex flex-col items-center justify-center overflow-hidden font-body"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }} transition={{ duration: 0.8 }}>
       <audio ref={audioRef} src={`${BASE_URL}audio/sfx-pop.mp3`} preload="auto" />
-
       <div className="absolute top-[160px] flex flex-col items-center gap-5 z-10 w-full px-10">
-        <motion.div
-          className="bg-[#2F6FED]/10 border border-[#2F6FED]/30 px-8 py-4 rounded-2xl"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, ...SPRING_SMOOTH }}
-        >
-          <span className="text-[#2F6FED] font-display font-bold text-[22px] uppercase tracking-wider">When They Matter</span>
+        <motion.div className="bg-[#2F6FED]/10 border border-[#2F6FED]/30 px-8 py-4 rounded-2xl"
+          initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ...SPRING_SMOOTH }}>
+          <span className="text-[#2F6FED] font-display font-bold text-[22px] uppercase tracking-wider">What Fluoride Actually Does</span>
         </motion.div>
-
         {[
-          { icon: Droplets, color: '#2F6FED', title: 'Plain water is enough', body: 'Covers most daily activity and hydration needs just fine' },
-          { icon: Flame, color: '#f97316', title: 'Heavy sweat = electrolytes', body: 'Intense exercise, illness, heat — sodium loss is real' },
-          { icon: Thermometer, color: '#10b981', title: 'Hot climates & illness', body: 'Vomiting, diarrhea, or extreme heat tip the balance' },
+          { icon: ShieldCheck, color: '#10b981', title: 'Strengthens tooth enamel', body: 'Remineralises teeth and reverses early decay spots' },
+          { icon: TrendingDown, color: '#2F6FED', title: 'Major reduction in cavities', body: '~25% fewer dental cavities since fluoridation began' },
+          { icon: Droplets, color: '#f97316', title: 'Safe at water levels used', body: 'Decades of study confirm no harm at 0.7 mg/L (US standard)' },
         ].map((item, i) => {
           const Icon = item.icon;
           return (
-            <motion.div
-              key={i}
-              className="bg-[#1e293b] border border-[#334155] rounded-[24px] px-7 py-4 flex items-center gap-5 w-full"
-              initial={{ x: -40, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.9 + i * 0.3, ...SPRING_SMOOTH }}
-            >
-              <div
-                className="w-[58px] h-[58px] rounded-full flex items-center justify-center shrink-0"
-                style={{ backgroundColor: `${item.color}20`, border: `3px solid ${item.color}40` }}
-              >
+            <motion.div key={i} className="bg-[#1e293b] border border-[#334155] rounded-[24px] px-7 py-4 flex items-center gap-5 w-full"
+              initial={{ x: -40, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.9 + i * 0.3, ...SPRING_SMOOTH }}>
+              <div className="w-[58px] h-[58px] rounded-full flex items-center justify-center shrink-0"
+                style={{ backgroundColor: `${item.color}20`, border: `3px solid ${item.color}40` }}>
                 <Icon size={28} color={item.color} strokeWidth={1.8} />
               </div>
               <div>
@@ -66,25 +41,13 @@ export function Scene1() {
           );
         })}
       </div>
-
-      <div
-        className="absolute w-full px-12 text-center z-20"
-        style={{ bottom: BOTTOM_SAFE_ZONE_PX + 80 }}
-      >
-        <motion.h2
-          className="text-[#f8fafc] text-[46px] font-bold uppercase tracking-wider font-display leading-tight"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-        >
-          Context
-          <motion.span
-            className="text-[#f97316] block mt-2 drop-shadow-md"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1.6, ...SPRING_SNAPPY }}
-          >
-            Is Everything
+      <div className="absolute w-full px-12 text-center z-20" style={{ bottom: BOTTOM_SAFE_ZONE_PX + 80 }}>
+        <motion.h2 className="text-[#f8fafc] text-[46px] font-bold uppercase tracking-wider font-display leading-tight"
+          initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 1.8 }}>
+          70+ Years
+          <motion.span className="text-[#10b981] block mt-2 drop-shadow-md"
+            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 2.4, ...SPRING_SNAPPY }}>
+            of Data
           </motion.span>
         </motion.h2>
       </div>
