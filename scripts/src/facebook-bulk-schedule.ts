@@ -11,7 +11,8 @@
  *   pnpm --filter @workspace/scripts exec tsx ./src/facebook-bulk-schedule.ts 36 37 38 39 40
  *   FB_SLOT_START_OFFSET_DAYS=8 pnpm --filter @workspace/scripts exec tsx ./src/facebook-bulk-schedule.ts 36 37 38
  *
- * Slot pacing: tomorrow 09:00 UTC + (startOffset + indexInList) * 24h.
+ * Existing YouTube scheduled_publish_at is authoritative. The fallback slot
+ * is tomorrow at 09:00 UTC + offset when no fixed date exists.
  */
 
 import fs from "node:fs";
@@ -74,11 +75,19 @@ function computeSlotDate(now: Date, indexInRun: number): Date {
 }
 
 function assertSlotIsValid(slot: Date, now: Date): void {
-  const SECONDS_MAX = 75 * 24 * 60 * 60;
+  // Facebook rejected a September 5 slot from the July 29 run, while the
+  // August 26 slot was accepted. Keep a conservative 28-day preflight so a
+  // blocked run never starts a chunk upload session.
+  const maxDays = Number(process.env.FB_MAX_SCHEDULE_DAYS || "28");
+  const SECONDS_MAX = maxDays * 24 * 60 * 60;
   const SECONDS_MIN = 10 * 60;
   const diffSec = Math.floor((slot.getTime() - now.getTime()) / 1000);
   if (diffSec < SECONDS_MIN) throw new Error(`Slot too soon: ${slot.toISOString()}`);
-  if (diffSec > SECONDS_MAX) throw new Error(`Slot > 75 days: ${slot.toISOString()}`);
+  if (diffSec > SECONDS_MAX) {
+    throw new Error(
+      `Slot > ${maxDays} days (Facebook scheduling window): ${slot.toISOString()}`,
+    );
+  }
 }
 
 async function uploadChunkedToFacebook(
