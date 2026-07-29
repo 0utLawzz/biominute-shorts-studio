@@ -37,6 +37,13 @@ import { episodesTable } from "@workspace/db";
 // ---------------------------------------------------------------------------
 const args = process.argv.slice(2);
 const BACKFILL_ALL = args.includes("--all");
+const PUBLISH_NOW = args.includes("--now");
+const TARGET_EPISODE = (() => {
+  const idx = args.indexOf("--episode");
+  if (idx === -1) return null;
+  const n = parseInt(args[idx + 1], 10);
+  return Number.isInteger(n) && n > 0 ? n : null;
+})();
 const BACKFILL_NUM = (() => {
   const idx = args.indexOf("--num");
   if (idx === -1) return null;
@@ -53,7 +60,7 @@ const EPISODE_END = (() => {
   const n = idx === -1 ? 50 : parseInt(args[idx + 1], 10);
   return Number.isInteger(n) && n >= EPISODE_START ? n : 50;
 })();
-const RUN_ONCE = !BACKFILL_ALL && !BACKFILL_NUM;
+const RUN_ONCE = !BACKFILL_ALL && !BACKFILL_NUM && !TARGET_EPISODE;
 const EFFECTIVE_BATCH_SIZE = BACKFILL_ALL ? Infinity : (BACKFILL_NUM ?? 1);
 
 // ---------------------------------------------------------------------------
@@ -275,8 +282,8 @@ async function processEpisode(
   now: Date,
 ): Promise<RunResult> {
   const epNumber = ep.epNumber;
-  const slot = computeSlotDate(now, indexInRun);
-  assertSlotIsValid(slot, now);
+  const slot = PUBLISH_NOW ? null : computeSlotDate(now, indexInRun);
+  if (slot) assertSlotIsValid(slot, now);
 
   console.log(
     `\n=== ${TEST_MODE ? "[TEST_MODE] " : ""}Scheduling Episode ${epNumber} ===`,
@@ -297,7 +304,9 @@ async function processEpisode(
   }
   const videoPath = path.join(exportFolder, "episode.mp4");
   console.log(`  Video       : ${videoPath}`);
-  console.log(`  Schedule    : ${slot.toISOString()} (Facebook publish time)`);
+  console.log(
+    `  Mode        : ${PUBLISH_NOW ? "publish immediately" : `${slot!.toISOString()} (Facebook publish time)`}`,
+  );
 
   const youtubeConfirmedBefore = !!ep.youtubeVideoId;
 
@@ -311,7 +320,7 @@ async function processEpisode(
     .trim();
 
   if (TEST_MODE) {
-    console.log(`  [TEST_MODE] would schedule: "${title}"`);
+    console.log(`  [TEST_MODE] would ${PUBLISH_NOW ? "publish immediately" : `schedule for ${slot!.toISOString()}`}: "${title}"`);
     console.log(`  [TEST_MODE] description preview:\n${description.slice(0, 200)}...`);
     console.log(`  [TEST_MODE] no Facebook API call, DB unchanged.`);
     return {
@@ -324,11 +333,15 @@ async function processEpisode(
   }
 
   console.log(`  Title       : ${title}`);
-  console.log("  Uploading to Facebook Graph API as a Scheduled post...");
+  console.log(
+    `  Uploading to Facebook Graph API as a ${PUBLISH_NOW ? "published" : "scheduled"} post...`,
+  );
 
   const facebookVideoId = await uploadChunkedToFacebook(videoPath, slot, title, description);
   const facebookUrl = `https://www.facebook.com/watch/?v=${facebookVideoId}`;
-  console.log(`  ✓ Scheduled : ${facebookUrl} @ ${slot.toISOString()}`);
+  console.log(
+    `  ✓ ${PUBLISH_NOW ? "Published" : "Scheduled"}: ${facebookUrl} @ ${slot?.toISOString() ?? "now"}`,
+  );
 
   await db
     .update(episodesTable)
@@ -376,9 +389,11 @@ async function processEpisode(
     `\n=== ${TEST_MODE ? "[TEST_MODE] " : ""}Facebook schedule-publish ===` +
       (RUN_ONCE ? "" : ` (backfill batch size: ${EFFECTIVE_BATCH_SIZE === Infinity ? "all" : EFFECTIVE_BATCH_SIZE})`),
   );
-  console.log(`  Mode        : ${BACKFILL_ALL ? "backfill-all" : BACKFILL_NUM ? `backfill-num=${BACKFILL_NUM}` : "daily (1 episode)"}`);
+  console.log(
+    `  Mode        : ${PUBLISH_NOW ? "publish-now" : TARGET_EPISODE ? `episode=${TARGET_EPISODE}` : BACKFILL_ALL ? "backfill-all" : BACKFILL_NUM ? `backfill-num=${BACKFILL_NUM}` : "daily (1 episode)"}`,
+  );
   console.log(`  Run started : ${now.toISOString()} UTC`);
-  console.log(`  First slot  : ${computeSlotDate(now, 0).toISOString()} UTC`);
+  if (!PUBLISH_NOW) console.log(`  First slot  : ${computeSlotDate(now, 0).toISOString()} UTC`);
 
   const limit = EFFECTIVE_BATCH_SIZE === Infinity ? 1000 : EFFECTIVE_BATCH_SIZE;
 
@@ -389,11 +404,12 @@ async function processEpisode(
       and(
         gte(episodesTable.epNumber, EPISODE_START),
         lte(episodesTable.epNumber, EPISODE_END),
+        ...(TARGET_EPISODE ? [eq(episodesTable.epNumber, TARGET_EPISODE)] : []),
         isNull(episodesTable.facebookVideoId),
       ),
     )
     .orderBy(asc(episodesTable.epNumber))
-    .limit(limit);
+    .limit(TARGET_EPISODE ? 1 : limit);
 
   if (eligible.length === 0) {
     console.log(
