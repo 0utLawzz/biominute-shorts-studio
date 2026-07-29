@@ -22,3 +22,4 @@
 - [API codegen export barrel](api-codegen-export-barrel.md) — generated Zod runtime schemas and TypeScript types need selective exports to avoid name collisions.
 - [GitHub batch import and push checklist](github-batch-import-checklist.md) — verify imported repos, split work into small batches, and make exports explicit/idempotent before pushing.
 - [Pipeline publish executable path](pipeline-publish-executable-path.md) — pipeline commands run from the scripts package, so publish gates must resolve executables from the workspace root.
+- [Facebook scheduling window](facebook-scheduling-window.md) — Facebook rejects valid future dates outside its current scheduling window; retry pending rendered episodes when eligible.

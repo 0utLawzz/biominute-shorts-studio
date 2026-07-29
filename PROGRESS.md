@@ -495,3 +495,20 @@ Append a new section every time:
 - A pivot in pipeline direction happens (e.g., social-platform changes).
 
 Skip appends for: typo fixes, infra config, deploy artefacts, files moved inside `artifacts/`.
+
+### Request 12 — Fix Episode 42 and start Episodes 52–60
+*(Session: 2026-07-29)*
+
+**User said:** "fix ep 42 and start from ep 52 to 60"
+
+**Agent did:**
+1. Confirmed Episodes 42 and 52–60 already had YouTube IDs and scheduled YouTube dates, so this was handled as a Facebook-only batch with no YouTube re-uploads or date changes.
+2. Regenerated the missing archived scene source for Episode 42 from the database workbook content.
+3. Rendered and validated Episodes 42 and 52–60 as 1080×1920 MP4s. Episode 42 was safely removed locally after successful Facebook scheduling; Episodes 52–60 remain available locally for retry.
+4. Restored the active render scenes and configuration to the baseline Episode 82 state.
+5. Scheduled Episode 42 on Facebook for **2026-08-26 09:00 UTC**:
+   - Facebook ID: `2078067452790549`
+6. Attempted Episodes 52–60 on their existing YouTube dates (**2026-09-05 through 2026-09-13 09:00 UTC**). Facebook rejected all nine requests with `(#100) The specified scheduled publish time is invalid` because those dates are outside Facebook's current scheduling window. No Facebook IDs were written for Episodes 52–60.
+7. Current state: Episode 42 has both platform IDs; Episodes 52–60 have valid local MP4s and YouTube IDs, but are pending Facebook scheduling when the dates enter Facebook's allowed window.
+
+**Stage status: Episode 42 complete; Episodes 52–60 rendered and awaiting Facebook scheduling-window eligibility.**
