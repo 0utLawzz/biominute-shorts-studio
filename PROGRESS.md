@@ -526,3 +526,18 @@ Skip appends for: typo fixes, infra config, deploy artefacts, files moved inside
 5. Did not run any Facebook publishing or scheduling command. Final database verification confirms Episodes 61–70 still have empty Facebook IDs.
 
 **Stage status: Episodes 61–70 data and exports complete; Facebook intentionally untouched.**
+
+### Request 14 — Export Episodes 71–81 without publishing
+*(Session: 2026-07-29)*
+
+**User said:** "Now Start makjng 71 to 81. I think just yahi baki reh gaie hain. After that We start fixing Scedule date issue .."
+
+**Agent did:**
+1. Confirmed Episodes 71–81 already had YouTube IDs and preserved all YouTube records without re-uploading or changing dates.
+2. Generated/confirmed archived episode content and scene sources for Episodes 71–81.
+3. Rendered all eleven episodes to descriptive export folders and validated every MP4 at 1080×1920.
+4. Restarted the reels workflow once after a transient disconnect during Episode 76, then completed the remaining exports.
+5. Restored the active render scenes and configuration to the baseline Episode 82 state.
+6. Did not run any Facebook publishing or scheduling command. Final database verification confirms Episodes 71–81 still have empty Facebook IDs.
+
+**Stage status: Episodes 71–81 data and exports complete; Facebook intentionally untouched. Ready to address the scheduling-date issue next.**
