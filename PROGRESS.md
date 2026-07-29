@@ -512,3 +512,17 @@ Skip appends for: typo fixes, infra config, deploy artefacts, files moved inside
 7. Current state: Episode 42 has both platform IDs; Episodes 52–60 have valid local MP4s and YouTube IDs, but are pending Facebook scheduling when the dates enter Facebook's allowed window.
 
 **Stage status: Episode 42 complete; Episodes 52–60 rendered and awaiting Facebook scheduling-window eligibility.**
+
+### Request 13 — Export Episodes 61–70 without publishing
+*(Session: 2026-07-29)*
+
+**User said:** "JUST MAKE EPISODE AND DATA AND EXPORT. DONT PUBLISH TO FACEBOOK YET UNLESS WE DONT COMPLETE ALL. START EP-61-70"
+
+**Agent did:**
+1. Confirmed Episodes 61–70 already had YouTube IDs and preserved all of them without re-uploading or changing YouTube dates.
+2. Generated/confirmed archived episode content and scene sources for Episodes 61–70.
+3. Rendered all ten episodes to descriptive export folders and validated every MP4 at 1080×1920.
+4. Restored the active render scenes and configuration to the baseline Episode 82 state.
+5. Did not run any Facebook publishing or scheduling command. Final database verification confirms Episodes 61–70 still have empty Facebook IDs.
+
+**Stage status: Episodes 61–70 data and exports complete; Facebook intentionally untouched.**
