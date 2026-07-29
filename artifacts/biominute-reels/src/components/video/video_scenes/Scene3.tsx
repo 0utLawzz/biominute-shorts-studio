@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { ShieldCheck, Droplets, CheckCircle2 } from 'lucide-react';
+import { Moon, ShieldCheck, Calendar } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -18,17 +18,17 @@ export function Scene3() {
       <div className="absolute top-[150px] flex flex-col items-center gap-5 z-10 w-full px-10">
         <motion.div className="bg-[#10b981]/10 border border-[#10b981]/30 px-8 py-4 rounded-2xl"
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ...SPRING_SMOOTH }}>
-          <span className="text-[#10b981] font-display font-bold text-[22px] uppercase tracking-wider">The Scientific Consensus</span>
+          <span className="text-[#10b981] font-display font-bold text-[22px] uppercase tracking-wider">Consistency Wins</span>
         </motion.div>
         {[
-          { icon: ShieldCheck, color: '#10b981', label: 'CDC, WHO, ADA agree', body: 'Community water fluoridation is safe and effective for dental health' },
-          { icon: Droplets, color: '#2F6FED', label: 'Drink your tap water', body: 'At 0.7 mg/L, fluoride intake is well within safe limits globally' },
-          { icon: CheckCircle2, color: '#f97316', label: 'Concerns use extreme doses', body: 'High-dose studies don\'t apply to regulated water systems' },
+          { icon: Calendar, color: '#10b981', label: 'Same time every night', body: 'A stable sleep schedule prevents debt from building — much better than binge recovery' },
+          { icon: Moon, color: '#7c3aed', label: '7–9 hours is non-negotiable', body: 'Prioritise sleep on weeknights; the body runs its essential repair work during this window' },
+          { icon: ShieldCheck, color: '#2F6FED', label: 'Catch-up is OK if needed', body: 'Weekend sleep is still better than nothing — just don\'t use it as a strategy to ignore debt' },
         ].map((item, i) => {
           const Icon = item.icon;
           return (
             <motion.div key={i} className="bg-[#1e293b] border border-[#334155] rounded-[24px] px-7 py-5 flex items-center gap-5 w-full"
-              initial={{ x: 40, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.8 + i * 0.3, ...SPRING_SMOOTH }}>
+              initial={{ x: -40, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.8 + i * 0.3, ...SPRING_SMOOTH }}>
               <div className="w-[58px] h-[58px] rounded-full flex items-center justify-center shrink-0"
                 style={{ backgroundColor: `${item.color}20`, border: `3px solid ${item.color}40` }}>
                 <Icon size={28} color={item.color} strokeWidth={1.8} />
@@ -44,9 +44,9 @@ export function Scene3() {
       <div className="absolute w-full px-12 text-center z-20" style={{ bottom: BOTTOM_SAFE_ZONE_PX + 80 }}>
         <motion.h2 className="text-[#f8fafc] text-[46px] font-bold uppercase tracking-wider font-display leading-tight"
           initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 1.8 }}>
-          Drink Up,
+          Every Night
           <motion.span className="text-[#10b981] block mt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.4, ...SPRING_SNAPPY }}>
-            It's Safe
+            Counts
           </motion.span>
         </motion.h2>
       </div>

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Droplets, ShieldCheck, TrendingDown } from 'lucide-react';
+import { Moon, AlertTriangle, Activity } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -16,14 +16,14 @@ export function Scene1() {
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }} transition={{ duration: 0.8 }}>
       <audio ref={audioRef} src={`${BASE_URL}audio/sfx-pop.mp3`} preload="auto" />
       <div className="absolute top-[160px] flex flex-col items-center gap-5 z-10 w-full px-10">
-        <motion.div className="bg-[#2F6FED]/10 border border-[#2F6FED]/30 px-8 py-4 rounded-2xl"
+        <motion.div className="bg-[#7c3aed]/10 border border-[#7c3aed]/30 px-8 py-4 rounded-2xl"
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, ...SPRING_SMOOTH }}>
-          <span className="text-[#2F6FED] font-display font-bold text-[22px] uppercase tracking-wider">What Fluoride Actually Does</span>
+          <span className="text-[#7c3aed] font-display font-bold text-[22px] uppercase tracking-wider">What the Science Says</span>
         </motion.div>
         {[
-          { icon: ShieldCheck, color: '#10b981', title: 'Strengthens tooth enamel', body: 'Remineralises teeth and reverses early decay spots' },
-          { icon: TrendingDown, color: '#2F6FED', title: 'Major reduction in cavities', body: '~25% fewer dental cavities since fluoridation began' },
-          { icon: Droplets, color: '#f97316', title: 'Safe at water levels used', body: 'Decades of study confirm no harm at 0.7 mg/L (US standard)' },
+          { icon: Moon, color: '#7c3aed', title: 'Fatigue & mood recover', body: 'Catch-up sleep relieves short-term sleepiness and improves mood within a day or two' },
+          { icon: AlertTriangle, color: '#f97316', title: 'Metabolic damage lingers', body: 'Insulin sensitivity and inflammation don\'t fully recover — the deficit leaves a mark' },
+          { icon: Activity, color: '#2F6FED', title: 'Cognitive gaps remain', body: '2019 Current Biology study: reaction time and attention impairments persist after weekend recovery' },
         ].map((item, i) => {
           const Icon = item.icon;
           return (
@@ -44,10 +44,10 @@ export function Scene1() {
       <div className="absolute w-full px-12 text-center z-20" style={{ bottom: BOTTOM_SAFE_ZONE_PX + 80 }}>
         <motion.h2 className="text-[#f8fafc] text-[46px] font-bold uppercase tracking-wider font-display leading-tight"
           initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 1.8 }}>
-          70+ Years
-          <motion.span className="text-[#10b981] block mt-2 drop-shadow-md"
+          Partial,
+          <motion.span className="text-[#f97316] block mt-2 drop-shadow-md"
             initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 2.4, ...SPRING_SNAPPY }}>
-            of Data
+            Not Full
           </motion.span>
         </motion.h2>
       </div>
