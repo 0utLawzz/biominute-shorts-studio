@@ -1,7 +1,7 @@
 /**
  * reconcile-yt-status.mjs
  *
- * Reads the YouTube Data API privacyStatus + publishAt for every Ep 1-65
+ * Reads the YouTube Data API privacyStatus + publishAt for every Ep 1-100
  * with a youtube_video_id, and reconciles the DB:
  *
  *   - privacyStatus=public                  → status='published'
@@ -9,7 +9,7 @@
  *   - private + publishAt<=now              → status='published' (live)
  *   - yt id not found (deleted/unknown)     → leave DB status untouched
  *
- * Episodes without an yt id (66-100) are forced to status='scripted'.
+ * Episodes without a yt id (66-100) are forced to status='scripted'.
  */
 import pg from "pg";
 import { google } from "googleapis";
@@ -41,7 +41,7 @@ async function fetchStatus(ids) {
 const ytRows = await pool.query(
   `SELECT "ep_number", "youtube_video_id"
    FROM episodes
-   WHERE "ep_number" BETWEEN 1 AND 65
+   WHERE "ep_number" BETWEEN 1 AND 100
      AND "youtube_video_id" IS NOT NULL
    ORDER BY "ep_number"`,
 );
@@ -89,11 +89,11 @@ for (const u of updates) {
   );
 }
 
-// Force Ep 66-100 to scripted
+// Force episodes without a YouTube ID to scripted.
 const scripted = await pool.query(
   `UPDATE episodes
    SET status = 'scripted', updated_at = NOW()
-   WHERE ep_number BETWEEN 66 AND 100
+   WHERE ep_number BETWEEN 1 AND 100
      AND youtube_video_id IS NULL
    RETURNING ep_number`,
 );

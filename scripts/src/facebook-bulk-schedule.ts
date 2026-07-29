@@ -165,22 +165,24 @@ async function processEpisode(
   indexInRun: number,
   now: Date,
 ): Promise<{ epNumber: number; facebookVideoId: string; scheduledPublishAt: Date } | null> {
-  const slot = computeSlotDate(now, indexInRun);
-  assertSlotIsValid(slot, now);
-
   const exportFolder = findExportFolder(epNumber);
   if (!exportFolder) {
     console.log(`  ⏭ Ep ${epNumber}: no local MP4 — skipping FB upload`);
     return null;
   }
   const videoPath = path.join(exportFolder, "episode.mp4");
-  console.log(`\n=== Scheduling Episode ${epNumber} ===`);
-  console.log(`  Video       : ${videoPath}`);
-  console.log(`  Schedule    : ${slot.toISOString()} (Facebook publish time)`);
-
   const rows = await db.select().from(episodesTable).where(eq(episodesTable.epNumber, epNumber));
   if (!rows.length) throw new Error(`Episode ${epNumber} not found in DB`);
   const ep = rows[0];
+  // Match Facebook to the authoritative YouTube schedule whenever available.
+  // The fallback keeps this script usable for episodes that have no YouTube date.
+  const slot = ep.scheduledPublishAt
+    ? new Date(ep.scheduledPublishAt)
+    : computeSlotDate(now, indexInRun);
+  assertSlotIsValid(slot, now);
+  console.log(`\n=== Scheduling Episode ${epNumber} ===`);
+  console.log(`  Video       : ${videoPath}`);
+  console.log(`  Schedule    : ${slot.toISOString()} (Facebook publish time)`);
 
   const title = ep.youtubeTitle ?? ep.hookTitle ?? `Episode ${epNumber}`;
   const description = [

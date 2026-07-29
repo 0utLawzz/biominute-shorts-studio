@@ -541,3 +541,20 @@ Skip appends for: typo fixes, infra config, deploy artefacts, files moved inside
 6. Did not run any Facebook publishing or scheduling command. Final database verification confirms Episodes 71–81 still have empty Facebook IDs.
 
 **Stage status: Episodes 71–81 data and exports complete; Facebook intentionally untouched. Ready to address the scheduling-date issue next.**
+
+### Request 15 — Correct the publishing schedule dates
+*(Session: 2026-07-29)*
+
+**User said:** Leave published YouTube videos untouched, correct the remaining daily schedule, complete Facebook scheduling, seed the database, update GitHub, and publish the app.
+
+**Agent did:**
+1. Reconciled all YouTube episodes 1–100 against the live YouTube API. Episodes 1–14 are public and were left untouched.
+2. Found the schedule overlap beginning at Episode 66. Existing private YouTube videos were rescheduled in place to the canonical daily 09:00 UTC cadence; no videos were deleted or re-uploaded.
+3. Canonical schedule is Episode 15 on 2026-07-30 through Episode 100 on 2026-10-23. Live YouTube verification now reports 14 published and 86 scheduled episodes.
+4. Extended YouTube reconciliation to inspect Episodes 1–100 and corrected the database status for Episodes 66–70 from `scripted` to `scheduled`.
+5. Updated the Facebook bulk scheduler to use each episode's authoritative YouTube `scheduled_publish_at` instead of creating an independent offset cadence. Fixed a variable-order bug discovered during the first retry.
+6. Retried Facebook Episode 52 after the correction. Facebook rejected the 2026-09-05 slot with `(#100) The specified scheduled publish time is invalid`; no duplicate Facebook post or database ID was created. The remaining 49 missing Facebook posts remain pending until Facebook's current scheduling window accepts their dates.
+7. Seeded the workbook metadata without overwriting live YouTube publishing state and regenerated `exports/dashboard.html`. Typechecks passed for the scripts and all workspace artifacts.
+8. Restarted the reels workflow successfully. All configured workflows are running.
+
+**Stage status: YouTube schedule and dashboard complete; Facebook has 51/100 IDs and 49 posts pending Facebook API eligibility.**
