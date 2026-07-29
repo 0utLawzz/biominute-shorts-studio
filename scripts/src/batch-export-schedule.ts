@@ -218,8 +218,11 @@ function exportVideo(epNumber: number, outputPath: string): void {
   fs.mkdirSync(exportDir, { recursive: true });
 
   console.log(`  🎬 Rendering EP${epNumber} → ${outputPath}`);
+  // Use tsx directly (avoids pnpm exec process group, which is SIGHUP-sensitive in
+  // background sessions). Resolves to scripts/node_modules/.bin/tsx.
+  const tsxBin = path.join(WORKSPACE_ROOT, 'scripts/node_modules/.bin/tsx');
   const result = spawnSync(
-    'pnpm', ['exec', 'tsx', EXPORT_SCRIPT, outputPath],
+    tsxBin, [EXPORT_SCRIPT, outputPath],
     {
       cwd: path.join(WORKSPACE_ROOT, 'scripts'),
       env: { ...process.env, BIOMINUTE_EXPORT_URL: REELS_URL },
