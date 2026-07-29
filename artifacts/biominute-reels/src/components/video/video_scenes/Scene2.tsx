@@ -1,15 +1,13 @@
 import { motion } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
-import { Calendar, Clock, TrendingDown } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { Droplets, Zap, User } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
-const SPRING_SNAPPY = { type: 'spring', stiffness: 400, damping: 30 } as const;
 const SPRING_SMOOTH = { type: 'spring', stiffness: 120, damping: 25 } as const;
 
 export function Scene2() {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [days, setDays] = useState(10);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -17,11 +15,6 @@ export function Scene2() {
       audioRef.current.volume = 0.6;
       audioRef.current.play().catch(() => {});
     }
-    // Tick the illness duration down
-    const t = setInterval(() => {
-      setDays((v) => (v > 7 ? v - 1 : 7));
-    }, 400);
-    return () => clearInterval(t);
   }, []);
 
   return (
@@ -32,104 +25,75 @@ export function Scene2() {
       exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }}
       transition={{ duration: 0.8 }}
     >
-      <audio ref={audioRef} src={`${BASE_URL}audio/sfx-sparkle.mp3`} preload="auto" />
+      <audio ref={audioRef} src={`${BASE_URL}audio/sfx-pop.mp3`} preload="auto" />
 
-      <div className="absolute top-[180px] flex flex-col items-center gap-5 z-10 w-full px-10">
+      <div className="absolute top-[130px] z-10 w-[90%] flex flex-col items-center gap-5">
+        {/* Everyday scenario */}
         <motion.div
-          className="bg-[#2F6FED]/10 border border-[#2F6FED]/30 px-8 py-4 rounded-2xl"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, ...SPRING_SMOOTH }}
+          className="w-full bg-[#2F6FED]/10 border border-[#2F6FED]/30 rounded-[28px] p-6 flex items-center gap-5"
+          initial={{ x: -50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.4, ...SPRING_SMOOTH }}
         >
-          <span className="text-[#2F6FED] font-display font-bold text-[22px] uppercase tracking-wider">The Duration Effect</span>
+          <div className="w-20 h-20 rounded-full bg-[#2F6FED]/20 border-2 border-[#2F6FED]/50 flex items-center justify-center shrink-0">
+            <User size={40} color="#2F6FED" strokeWidth={1.5} />
+          </div>
+          <div>
+            <p className="text-[#2F6FED] font-display font-bold text-[22px] uppercase">Everyday Activity</p>
+            <p className="text-[#94a3b8] text-[19px] mt-1">Desk work, light walking</p>
+            <p className="text-[#10b981] font-bold text-[20px] mt-2">✓ Water is enough</p>
+          </div>
         </motion.div>
 
-        {/* Calendar comparison */}
-        <div className="flex gap-4 w-full">
-          {/* Without regular vitamin C — longer illness */}
-          <motion.div
-            className="flex-1 rounded-[24px] p-6 flex flex-col items-center gap-3 border"
-            style={{ backgroundColor: '#33415530', borderColor: '#64748b45' }}
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.5, ...SPRING_SNAPPY }}
-          >
-            <Calendar size={44} color="#94a3b8" strokeWidth={1.8} />
-            <span className="text-[#94a3b8] font-display font-bold text-[18px] uppercase text-center leading-tight">No Regular<br/>Vitamin C</span>
-            <div className="w-full h-4 bg-[#1e293b] rounded-full overflow-hidden mt-2">
-              <motion.div
-                className="h-full bg-[#94a3b8]"
-                initial={{ width: '0%' }}
-                animate={{ width: '100%' }}
-                transition={{ delay: 1.0, duration: 1.2 }}
-              />
-            </div>
-            <span className="text-[#64748b] font-body text-[16px] text-center">~10 days</span>
-          </motion.div>
-
-          {/* With regular vitamin C — shorter */}
-          <motion.div
-            className="flex-1 rounded-[24px] p-6 flex flex-col items-center gap-3 border"
-            style={{ backgroundColor: '#10b98118', borderColor: '#10b98145' }}
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.7, ...SPRING_SNAPPY }}
-          >
-            <Clock size={44} color="#10b981" strokeWidth={1.8} />
-            <span className="text-[#10b981] font-display font-bold text-[18px] uppercase text-center leading-tight">Regular<br/>Vitamin C</span>
-            <div className="w-full h-4 bg-[#1e293b] rounded-full overflow-hidden mt-2">
-              <motion.div
-                className="h-full bg-[#10b981]"
-                initial={{ width: '0%' }}
-                animate={{ width: '70%' }}
-                transition={{ delay: 1.0, duration: 1.2 }}
-              />
-            </div>
-            <span className="text-[#64748b] font-body text-[16px] text-center">~7 days</span>
-          </motion.div>
-        </div>
-
-        {/* Duration ticker */}
         <motion.div
-          className="w-full bg-[#1e293b] border border-[#334155] rounded-[28px] px-8 py-6 flex flex-col items-center gap-3"
+          className="text-[#64748b] font-display text-[24px] uppercase tracking-widest"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9 }}
+        >
+          vs
+        </motion.div>
+
+        {/* Heavy loss scenario */}
+        <motion.div
+          className="w-full bg-[#f97316]/10 border border-[#f97316]/30 rounded-[28px] p-6 flex items-center gap-5"
+          initial={{ x: 50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 1.1, ...SPRING_SMOOTH }}
+        >
+          <div className="w-20 h-20 rounded-full bg-[#f97316]/20 border-2 border-[#f97316]/50 flex items-center justify-center shrink-0">
+            <Zap size={40} color="#f97316" strokeWidth={1.5} />
+          </div>
+          <div>
+            <p className="text-[#f97316] font-display font-bold text-[22px] uppercase">Heavy Sweat Loss</p>
+            <p className="text-[#94a3b8] text-[19px] mt-1">1hr+ exercise, illness, heat</p>
+            <p className="text-[#f97316] font-bold text-[20px] mt-2">⚡ Electrolytes help</p>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="bg-[#1e293b] border border-[#334155] rounded-2xl px-7 py-4 flex items-center gap-4 w-full mt-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, ...SPRING_SMOOTH }}
+          transition={{ delay: 2.0, ...SPRING_SMOOTH }}
         >
-          <div className="flex items-center gap-3">
-            <TrendingDown size={28} color="#10b981" strokeWidth={1.8} />
-            <span className="text-[#94a3b8] font-display font-bold text-[20px] uppercase tracking-wide">Illness duration</span>
-          </div>
-          <motion.span
-            className="text-[#10b981] font-display font-bold text-[64px] leading-none tabular-nums"
-            key={days}
-          >
-            {days}d
-          </motion.span>
-          <span className="text-[#64748b] font-body text-[18px]">modest shortening for consistent takers</span>
+          <Droplets size={30} color="#14b8a6" />
+          <p className="text-[#94a3b8] text-[20px]">Most casual exercisers only need water</p>
         </motion.div>
       </div>
 
       <div
         className="absolute w-full px-12 text-center z-20"
-        style={{ bottom: BOTTOM_SAFE_ZONE_PX + 80 }}
+        style={{ bottom: BOTTOM_SAFE_ZONE_PX + 60 }}
       >
-        <motion.h2
-          className="text-[#f8fafc] text-[50px] font-bold uppercase tracking-wider font-display leading-tight"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
+        <motion.p
+          className="text-[#64748b] font-body text-[18px]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2.6 }}
         >
-          Shorten,
-          <motion.span
-            className="text-[#10b981] block mt-2 drop-shadow-md"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1.6, ...SPRING_SNAPPY }}
-          >
-            Not Stop
-          </motion.span>
-        </motion.h2>
+          Source: Sawka MN et al. — ACSM hydration guidelines
+        </motion.p>
       </div>
     </motion.div>
   );

@@ -21,12 +21,11 @@ export const CANVAS_STYLE = {
 // Scene durations for the current episode. The video player uses these to
 // advance scenes automatically. Keep the total loop duration in sync with
 // the exported MP4 length so the record/export control captures the full video.
-// EP 38 — "Can Vitamin C Actually Prevent a Cold?"
+// EP 44 — "Do You Need Electrolytes Beyond Just Water?"
 export const SCENE_DURATIONS = {
   0: 4500, // Scene 0
   1: 6500, // Scene 1
   2: 7000, // Scene 2
   3: 6000, // Scene 3
   4: 6500, // Scene 4
-  5: 5000, // Scene 5
 } as const;

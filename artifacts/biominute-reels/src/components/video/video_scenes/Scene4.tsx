@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { BookOpen, MessageCircle, Repeat } from 'lucide-react';
+import { BookOpen, MessageCircle, Droplets } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -35,16 +35,16 @@ export function Scene4() {
           animate={{ scale: 1, opacity: 1, y: 0 }}
           transition={{ delay: 0.2, ...SPRING_SMOOTH }}
         >
-          <div className="absolute top-6 right-8 w-4 h-4 bg-[#10b981] rounded-full" />
+          <div className="absolute top-6 right-8 w-4 h-4 bg-[#14b8a6] rounded-full" />
 
           <motion.div
-            className="flex items-center gap-2 bg-[#10b981]/10 border border-[#10b981]/30 px-5 py-2 rounded-full mb-5"
+            className="flex items-center gap-2 bg-[#14b8a6]/10 border border-[#14b8a6]/30 px-5 py-2 rounded-full mb-5"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, ...SPRING_SMOOTH }}
           >
-            <Repeat size={18} color="#10b981" />
-            <span className="text-[#10b981] font-display font-bold text-[15px] uppercase tracking-wide">Consistency Is Key</span>
+            <Droplets size={18} color="#14b8a6" />
+            <span className="text-[#14b8a6] font-display font-bold text-[15px] uppercase tracking-wide">Hydration</span>
           </motion.div>
 
           <motion.div
@@ -52,7 +52,7 @@ export function Scene4() {
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.6, ...SPRING_SNAPPY }}
           >
-            <div className="w-24 h-24 rounded-full bg-[#f97316] flex items-center justify-center">
+            <div className="w-24 h-24 rounded-full bg-[#2F6FED] flex items-center justify-center">
               <MessageCircle size={48} color="#f8fafc" strokeWidth={1.8} />
             </div>
           </motion.div>
@@ -63,9 +63,9 @@ export function Scene4() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.0, duration: 0.8 }}
           >
-            Do You Take
-            <span className="text-[#f97316] block mt-2">Vitamin C</span>
-            <span className="text-[#10b981] block mt-1">During Cold Season?</span>
+            Electrolyte Drinks —
+            <span className="text-[#2F6FED] block mt-2">Daily or Only</span>
+            <span className="text-[#14b8a6] block mt-1">When Active?</span>
           </motion.h2>
 
           <motion.div
@@ -90,7 +90,7 @@ export function Scene4() {
         <div className="flex items-center gap-4 text-[#94a3b8] text-[20px] font-medium bg-[#0F172A]/90 px-6 py-4 rounded-xl backdrop-blur-sm border border-white/10 shadow-lg">
           <BookOpen className="shrink-0" size={26} />
           <p className="leading-relaxed text-left">
-            Source: Hemilä H, Chalker E (2013), Cochrane Database of Systematic Reviews
+            Source: Sawka MN et al. — ACSM hydration and electrolyte guidelines
           </p>
         </div>
       </motion.div>

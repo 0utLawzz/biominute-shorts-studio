@@ -558,3 +558,32 @@ Skip appends for: typo fixes, infra config, deploy artefacts, files moved inside
 8. Restarted the reels workflow successfully. All configured workflows are running.
 
 **Stage status: YouTube schedule and dashboard complete; Facebook has 51/100 IDs and 49 posts pending Facebook API eligibility.**
+
+### Request 16 — Complete Facebook scheduling in small batches
+*(Session: 2026-07-29)*
+
+**User said:** Complete the Facebook job in small batches and continuously push to GitHub.
+
+**Agent did:**
+1. Re-imported project to Replit; installed all workspace dependencies via `pnpm install`.
+2. Restored all 17 Replit Secrets (DATABASE_URL, YOUTUBE_*, FACEBOOK_*, DASHBOARD_PASSWORD, GITHUB_TOKEN, SESSION_SECRET).
+3. All three workflows restarted and confirmed running: api-server, publishing-dashboard, biominute-reels.
+4. Identified 67 episodes missing Facebook IDs (Ep 34–100). All have YouTube IDs and scheduled dates.
+5. Fixed `batch-render-fb-restore.ts` to auto-detect scene count per episode (5 scenes for Ep 34-35/42+, 6 scenes for Ep 36-41) rather than hard-coding Scene0–4.
+6. Discovered Facebook scheduling window is exactly 29 days from current date (Aug 27 from July 29). Aug 28 (30 days) is rejected.
+7. **Batch 1 (Ep 34–38):** Rendered → Facebook scheduled → local files deleted (YouTube+FB confirmed):
+   - Ep 34: FB `1750560676079741` @ 2026-08-18 09:00 UTC
+   - Ep 35: FB `1599693078426680` @ 2026-08-19 09:00 UTC
+   - Ep 36: FB `1899088134599466` @ 2026-08-20 09:00 UTC
+   - Ep 37: FB `1036666739285195` @ 2026-08-21 09:00 UTC
+   - Ep 38: FB `1703736797568057` @ 2026-08-22 09:00 UTC
+8. **Batch 2 (Ep 39–43):** Rendered → Facebook scheduled → local files deleted:
+   - Ep 39: FB `1510224837546044` @ 2026-08-23 09:00 UTC
+   - Ep 40: FB `1059941983282635` @ 2026-08-24 09:00 UTC
+   - Ep 41: FB `2237197683736450` @ 2026-08-25 09:00 UTC
+   - Ep 42: FB `1966040960776265` @ 2026-08-26 09:00 UTC
+   - Ep 43: FB `1582656933250971` @ 2026-08-27 09:00 UTC
+9. Ep 44 rendered locally (MP4 ready at `exports/Episode-44-*/episode.mp4`); Facebook rejected Aug 28 (30 days) — eligible tomorrow (July 30).
+10. Pre-rendering Ep 45–55 locally so they are ready as the window shifts daily.
+
+**Stage status: Facebook has 43/100 IDs. Ep 44 MP4 ready locally (upload eligible July 30). Ep 45–55 pre-rendering in progress. Ep 56–100 pending.**

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { Citrus, Clock, XCircle } from 'lucide-react';
+import { Droplets, Flame, Thermometer } from 'lucide-react';
 import { BOTTOM_SAFE_ZONE_PX } from '@/lib/video';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -28,40 +28,29 @@ export function Scene1() {
     >
       <audio ref={audioRef} src={`${BASE_URL}audio/sfx-pop.mp3`} preload="auto" />
 
-      <div className="absolute top-[185px] flex flex-col items-center gap-5 z-10 w-full px-10">
+      <div className="absolute top-[160px] flex flex-col items-center gap-5 z-10 w-full px-10">
         <motion.div
-          className="bg-[#10b981]/10 border border-[#10b981]/30 px-8 py-4 rounded-2xl"
+          className="bg-[#2F6FED]/10 border border-[#2F6FED]/30 px-8 py-4 rounded-2xl"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, ...SPRING_SMOOTH }}
         >
-          <span className="text-[#10b981] font-display font-bold text-[22px] uppercase tracking-wider">What the Evidence Says</span>
+          <span className="text-[#2F6FED] font-display font-bold text-[22px] uppercase tracking-wider">When They Matter</span>
         </motion.div>
 
-        {/* Central vitamin C icon */}
-        <motion.div
-          className="w-[160px] h-[160px] rounded-full flex items-center justify-center"
-          style={{ backgroundColor: '#f9731618', border: '4px solid #f9731655' }}
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.5, ...SPRING_SNAPPY }}
-        >
-          <Citrus size={80} color="#f97316" strokeWidth={1.6} />
-        </motion.div>
-
-        {/* Key insight cards */}
         {[
-          { icon: XCircle, color: '#f97316', title: 'It does NOT prevent colds', body: 'For most healthy people, regular vitamin C does not stop infection' },
-          { icon: Clock, color: '#10b981', title: 'May shorten duration', body: 'Consistent use may modestly reduce how long symptoms last' },
+          { icon: Droplets, color: '#2F6FED', title: 'Plain water is enough', body: 'Covers most daily activity and hydration needs just fine' },
+          { icon: Flame, color: '#f97316', title: 'Heavy sweat = electrolytes', body: 'Intense exercise, illness, heat — sodium loss is real' },
+          { icon: Thermometer, color: '#10b981', title: 'Hot climates & illness', body: 'Vomiting, diarrhea, or extreme heat tip the balance' },
         ].map((item, i) => {
           const Icon = item.icon;
           return (
             <motion.div
               key={i}
-              className="bg-[#1e293b] border border-[#334155] rounded-[24px] px-7 py-5 flex items-center gap-5 w-full"
+              className="bg-[#1e293b] border border-[#334155] rounded-[24px] px-7 py-4 flex items-center gap-5 w-full"
               initial={{ x: -40, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 1.0 + i * 0.35, ...SPRING_SMOOTH }}
+              transition={{ delay: 0.9 + i * 0.3, ...SPRING_SMOOTH }}
             >
               <div
                 className="w-[58px] h-[58px] rounded-full flex items-center justify-center shrink-0"
@@ -83,19 +72,19 @@ export function Scene1() {
         style={{ bottom: BOTTOM_SAFE_ZONE_PX + 80 }}
       >
         <motion.h2
-          className="text-[#f8fafc] text-[50px] font-bold uppercase tracking-wider font-display leading-tight"
+          className="text-[#f8fafc] text-[46px] font-bold uppercase tracking-wider font-display leading-tight"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
         >
-          Prevention?
+          Context
           <motion.span
             className="text-[#f97316] block mt-2 drop-shadow-md"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 1.6, ...SPRING_SNAPPY }}
           >
-            Not Proven
+            Is Everything
           </motion.span>
         </motion.h2>
       </div>
