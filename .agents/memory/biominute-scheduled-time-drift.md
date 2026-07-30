@@ -12,4 +12,4 @@ description: Why uploaded YouTube videos can end up on a different publish hour 
 - Dry-run first: append `--dry`.
 - This only changes the hour, not the calendar date. If you need to change dates too, use a custom DB update plus a YouTube `videos.update` call, or re-upload.
 
-**Current context:** As of 2026-07-20, episodes 6–36 are scheduled on YouTube at `14:00 UTC` while episodes 37–50 are stored at `09:00 UTC`. This is exactly the kind of drift the rule above prevents.
+**Current context:** As of 2026-07-30, the active cadence for Ep 47–100 is `09:00 UTC` daily (`2:00 PM PKT`), while Ep 46 was intentionally made public immediately. Always verify live YouTube status after any manual publish or seed.

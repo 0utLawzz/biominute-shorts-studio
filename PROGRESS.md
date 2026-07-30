@@ -627,3 +627,17 @@ Skip appends for: typo fixes, infra config, deploy artefacts, files moved inside
 6. Restarted the publishing-dashboard workflow to pick up component changes.
 
 **Stage status: All 100 episodes have local MP4s ready for Facebook. Facebook scheduling for Ep 44 (Aug 28) will succeed after ~09:00 UTC today. Ep 45–100 eligible day-by-day afterward.**
+
+### Request 19 — Publish Ep 46 now and keep Ep 47–100 on the 2:00 PM PKT cadence
+*(Session: 2026-07-30)*
+
+**User said:** Publish Ep 46, “Is Fasted Cardio Better for Fat Loss?”, now. Schedule Ep 47 onward from 31-Aug-2026 at 2:00 PM PKT, following the same daily pattern through Ep 100.
+
+**Agent did:**
+1. Verified the existing YouTube video IDs and live privacy/publish times for Ep 46–100 before making changes.
+2. Changed the existing Ep 46 YouTube video (`B8m8w5PCRiY`) from private scheduled to public without re-uploading it.
+3. Updated Ep 46 in the database to `published`, cleared its scheduled publish time, and stored the current publish timestamp.
+4. Confirmed Ep 47–100 were already correctly scheduled in place at `09:00 UTC` (`2:00 PM PKT`) daily from 31-Aug-2026 through 23-Oct-2026.
+5. Reconciled YouTube status and completed a final live verification: 55/55 episodes in the Ep 46–100 range matched the requested state.
+
+**Stage status: Ep 46 is published now. Ep 47–100 remain scheduled daily at 2:00 PM PKT. Ep 1–100 totals are 16 published and 84 scheduled.**
