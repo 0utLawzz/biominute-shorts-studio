@@ -23,3 +23,4 @@
 - [GitHub batch import and push checklist](github-batch-import-checklist.md) — verify imported repos, split work into small batches, and make exports explicit/idempotent before pushing.
 - [Pipeline publish executable path](pipeline-publish-executable-path.md) — pipeline commands run from the scripts package, so publish gates must resolve executables from the workspace root.
 - [Facebook scheduling window](facebook-scheduling-window.md) — Facebook rejects valid future dates outside its current scheduling window; retry pending rendered episodes when eligible.
+- [Social image text overlay](social-image-text-overlay.md) — generate text-free backgrounds, then add exact promotional copy with a deterministic transparent overlay.

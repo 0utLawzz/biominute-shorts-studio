@@ -36,3 +36,9 @@ id = "E_BQ6KU4X5Vm4CKhPCu8f"
 uri = "file://artifacts/biominute-reels/public/audio/sfx-pop.mp3"
 type = "audio"
 title = "clean ui pop"
+
+[[outputs]]
+id = "HIFKzI7aPcVCvPq4861K7"
+uri = "file://attached_assets/generated_images/social-reels-engine.png"
+type = "image"
+title = "Social Reels Engine — Promotional Social Image"
