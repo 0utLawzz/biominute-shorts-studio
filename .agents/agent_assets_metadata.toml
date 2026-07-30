@@ -42,3 +42,45 @@ id = "HIFKzI7aPcVCvPq4861K7"
 uri = "file://attached_assets/generated_images/social-reels-engine.png"
 type = "image"
 title = "Social Reels Engine — Promotional Social Image"
+
+[[outputs]]
+id = "KKnDHSzr-D_Gx1PWSg7_y"
+uri = "file://attached_assets/generated_images/social-reels-engine-01-import.png"
+type = "image"
+title = "Day 1 — Easy Data Import"
+
+[[outputs]]
+id = "Xk2llf_szhF0N0tbbZN-J"
+uri = "file://attached_assets/generated_images/social-reels-engine-02-bulk.png"
+type = "image"
+title = "Day 2 — Bulk Reel Generation"
+
+[[outputs]]
+id = "JWFClNxcK41tnCvskJ1Nf"
+uri = "file://attached_assets/generated_images/social-reels-engine-03-templates.png"
+type = "image"
+title = "Day 3 — Reusable Templates"
+
+[[outputs]]
+id = "UDxp5j7n2IdQVR0Ddf_8y"
+uri = "file://attached_assets/generated_images/social-reels-engine-04-export.png"
+type = "image"
+title = "Day 4 — Fast Batch Export"
+
+[[outputs]]
+id = "q5hhR0kBuiYiS08TL6Ih7"
+uri = "file://attached_assets/generated_images/social-reels-engine-05-schedule.png"
+type = "image"
+title = "Day 5 — Smart Scheduling"
+
+[[outputs]]
+id = "UWIUwI7voEObWCxPKQgfi"
+uri = "file://attached_assets/generated_images/social-reels-engine-06-workflow.png"
+type = "image"
+title = "Day 6 — Complete Workflow"
+
+[[outputs]]
+id = "A94dKvdDZeLanPHuIGDE6"
+uri = "file://attached_assets/social-reels-engine-weekly-posting-pack.md"
+type = "text"
+title = "Social Reels Engine — Weekly Posting Pack"
