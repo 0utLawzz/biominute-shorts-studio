@@ -98,13 +98,8 @@ const YouTubeSection = ({ status }: { status: YouTubeStatus | undefined }) => {
         <div className="bg-white border-2 border-[#0C0C0C] p-4">
           <div className="font-mono text-xs text-[#555] uppercase">Channel</div>
           <div className="font-display text-base mt-1 truncate">
-            {status?.channelId ? (
-              <LinkOut href={`https://youtube.com/channel/${status.channelId}`}>
-                {status?.channelName ?? status.channelId}
-              </LinkOut>
-            ) : (
-              "—"
-            )}
+            {status?.channelName ?? "—"}
+            {status?.channelId ? <span className="font-mono text-xs text-[#555]"> ({status.channelId})</span> : null}
           </div>
         </div>
         <div className="bg-white border-2 border-[#0C0C0C] p-4">
@@ -177,16 +172,10 @@ const FacebookSection = ({ status }: { status: FacebookStatus | undefined }) => 
           </div>
         </div>
         <div className="bg-white border-2 border-[#0C0C0C] p-4">
-          <div className="font-mono text-xs text-[#555] uppercase">Page</div>
+          <div className="font-mono text-xs text-[#555] uppercase">Page ID set</div>
           <div className="flex items-center gap-2 mt-1">
             <StatusDot ok={status?.hasPageId ?? null} />
-            {status?.pageId ? (
-              <LinkOut href={`https://facebook.com/${status.pageId}`}>
-                facebook.com/{status.pageId}
-              </LinkOut>
-            ) : (
-              <span className="font-mono text-sm truncate">—</span>
-            )}
+            <span className="font-mono text-sm truncate">{status?.pageId ?? "—"}</span>
           </div>
         </div>
         <div className="bg-white border-2 border-[#0C0C0C] p-4">
