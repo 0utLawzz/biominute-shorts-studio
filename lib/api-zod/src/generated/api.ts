@@ -269,7 +269,8 @@ export const UpdateEpisodeBody = zod.object({
   "hashtags": zod.string().optional(),
   "buildStage": zod.string().nullish(),
   "buildNote": zod.string().nullish(),
-  "scheduledPublishAt": zod.string().optional()
+  "scheduledPublishAt": zod.string().optional(),
+  "facebookVideoId": zod.string().nullish()
 })
 
 export const UpdateEpisodeResponse = zod.object({

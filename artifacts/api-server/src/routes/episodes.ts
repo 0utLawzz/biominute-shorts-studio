@@ -152,6 +152,7 @@ router.get("/episodes/social-rows", async (req, res): Promise<void> => {
 
   const all = await db
     .select({
+      id: episodesTable.id,
       epNumber: episodesTable.epNumber,
       hookTitle: episodesTable.hookTitle,
       status: episodesTable.status,
@@ -181,10 +182,12 @@ router.get("/episodes/social-rows", async (req, res): Promise<void> => {
           (entry) => entry.isDirectory() && entry.name.startsWith(`Episode-${padded}-`),
         )?.name ?? null;
       return {
+        id: row.id,
         epNumber: row.epNumber,
         hookTitle: row.hookTitle,
         status: row.status,
         hasFolder: folderName !== null,
+        folderName: folderName,
         hasVideoFile: folderName !== null
           ? await awaitFileExists(path.join(EXPORTS_DIR, folderName, "episode.mp4"))
           : false,
@@ -335,7 +338,7 @@ router.patch("/episodes/:id", async (req, res): Promise<void> => {
     return;
   }
 
-  const { status, youtubeTitle, citationCta, hashtags, scheduledPublishAt, buildStage, buildNote } = bodyParsed.data;
+  const { status, youtubeTitle, citationCta, hashtags, scheduledPublishAt, buildStage, buildNote, facebookVideoId } = bodyParsed.data;
 
   const updateData: Record<string, unknown> = { updatedAt: new Date() };
   if (status !== undefined) updateData.status = status;
@@ -347,6 +350,7 @@ router.patch("/episodes/:id", async (req, res): Promise<void> => {
   if (scheduledPublishAt !== undefined) {
     updateData.scheduledPublishAt = scheduledPublishAt ? new Date(scheduledPublishAt) : null;
   }
+  if (facebookVideoId !== undefined) updateData.facebookVideoId = facebookVideoId ?? null;
 
   const [updated] = await db
     .update(episodesTable)

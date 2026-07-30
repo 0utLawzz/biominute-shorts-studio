@@ -185,6 +185,12 @@ export default function Analytics() {
                     <div className="flex items-center gap-1"><Facebook className="w-3 h-3" /> FB Views</div>
                   </th>
                   <th className="text-left p-3 font-bold uppercase">
+                    <div className="flex items-center gap-1"><ThumbsUp className="w-3 h-3" style={{color:"#1877F2"}} /> FB Likes</div>
+                  </th>
+                  <th className="text-left p-3 font-bold uppercase">
+                    <div className="flex items-center gap-1"><MessageSquare className="w-3 h-3" style={{color:"#1877F2"}} /> FB Cmts</div>
+                  </th>
+                  <th className="text-left p-3 font-bold uppercase">
                     <Share2 className="w-3 h-3" /> Shares
                   </th>
                   <th className="text-left p-3 font-bold uppercase">
@@ -210,6 +216,12 @@ export default function Analytics() {
                       <td className="p-3 tabular-nums">{ep.youtubeComments.toLocaleString()}</td>
                       <td className="p-3 tabular-nums font-bold" style={{ color: ep.facebookViews ? "#1877F2" : "#999" }}>
                         {ep.facebookViews.toLocaleString()}
+                      </td>
+                      <td className="p-3 tabular-nums" style={{ color: ep.facebookLikes ? "#1877F2" : "#999" }}>
+                        {ep.facebookLikes.toLocaleString()}
+                      </td>
+                      <td className="p-3 tabular-nums" style={{ color: ep.facebookComments ? "#1877F2" : "#999" }}>
+                        {ep.facebookComments.toLocaleString()}
                       </td>
                       <td className="p-3 tabular-nums">{ep.facebookShares.toLocaleString()}</td>
                       <td className="p-3">

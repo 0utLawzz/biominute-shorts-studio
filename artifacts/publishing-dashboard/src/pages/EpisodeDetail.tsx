@@ -37,6 +37,7 @@ export default function EpisodeDetail() {
   const [pendingStatus, setPendingStatus] = useState<string>("");
   const [fbStatus, setFbStatus] = useState<{ connected: boolean } | null>(null);
   const [fbIsPending, setFbIsPending] = useState(false);
+  const [exportInfo, setExportInfo] = useState<{ hasFolder: boolean; hasVideoFile: boolean } | null>(null);
   const [ytAnalytics, setYtAnalytics] = useState<{ views: number; likes: number; comments: number } | null>(null);
   const [fbAnalytics, setFbAnalytics] = useState<{ views: number; likes: number; comments: number; shares: number } | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
@@ -51,6 +52,18 @@ export default function EpisodeDetail() {
       .then((data) => setFbStatus(data as { connected: boolean }))
       .catch(() => setFbStatus({ connected: false }));
   }, []);
+
+  // Check export folder presence for this episode
+  useEffect(() => {
+    if (!episode?.epNumber) return;
+    fetch(`/api/episodes/social-rows?episodes=${episode.epNumber}`)
+      .then((r) => r.json())
+      .then((data: { rows?: { hasFolder: boolean; hasVideoFile: boolean }[] }) => {
+        const row = data.rows?.[0];
+        if (row) setExportInfo({ hasFolder: row.hasFolder, hasVideoFile: row.hasVideoFile });
+      })
+      .catch(() => {});
+  }, [episode?.epNumber]);
 
   useEffect(() => {
     if (episode && initRef.current !== episode.id) {
@@ -312,21 +325,29 @@ export default function EpisodeDetail() {
             {fbStatus?.connected &&
               !episode.facebookVideoId &&
               ["building", "scheduled", "published", "complete"].includes(episode.status) && (
-              <button
-                onClick={handlePublishFacebook}
-                disabled={fbIsPending}
-                className="brutal-btn flex items-center justify-center gap-2 py-3 text-white border-[2.5px] border-[#0C0C0C]"
-                style={{ backgroundColor: "#1877F2" }}
-              >
-                {fbIsPending ? (
-                  <Loader2 className="animate-spin w-5 h-5" />
-                ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97H15.83c-1.491 0-1.956.93-1.956 1.886v2.268h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
-                  </svg>
+              <div className="flex flex-col gap-1">
+                <button
+                  onClick={handlePublishFacebook}
+                  disabled={fbIsPending || exportInfo?.hasVideoFile === false}
+                  title={!exportInfo?.hasVideoFile ? "No local export found — run production or paste the video file first" : "Upload to Facebook"}
+                  className="brutal-btn flex items-center justify-center gap-2 py-3 text-white border-[2.5px] border-[#0C0C0C] disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: "#1877F2" }}
+                >
+                  {fbIsPending ? (
+                    <Loader2 className="animate-spin w-5 h-5" />
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97H15.83c-1.491 0-1.956.93-1.956 1.886v2.268h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/>
+                    </svg>
+                  )}
+                  POST TO FACEBOOK
+                </button>
+                {exportInfo?.hasVideoFile === false && (
+                  <p className="font-mono text-[10px] text-[#C94A00] font-bold uppercase">
+                    ⚠ No local export — paste episode.mp4 first
+                  </p>
                 )}
-                POST TO FACEBOOK
-              </button>
+              </div>
             )}
 
             {episode.facebookVideoId && (

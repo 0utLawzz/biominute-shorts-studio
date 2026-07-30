@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Loader2, Youtube, Facebook, Folder, FileVideo, ExternalLink, RefreshCw } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { customFetch } from "@workspace/api-client-react";
 import { Navbar } from "../components/Navbar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/tabs";
 import { formatPKT } from "../lib/date";
 
 interface SocialRow {
+  id: number;
   epNumber: number;
   hookTitle: string;
   status: string;
   hasFolder: boolean;
+  folderName: string | null;
   hasVideoFile: boolean;
   youtubeVideoId: string | null;
   facebookVideoId: string | null;
@@ -49,17 +51,97 @@ const YouTubePill = ({ row }: { row: SocialRow }) => {
   );
 };
 
-const FacebookPill = ({ row }: { row: SocialRow }) => {
-  if (!row.facebookVideoId) return <CheckPill ok={false} />;
+/** Clicking ✗ opens an inline prompt to manually record an FB video ID */
+const FacebookPill = ({ row, onMarkManual }: { row: SocialRow; onMarkManual: (id: number, value: string) => void }) => {
+  const [editing, setEditing] = useState(false);
+  const [inputVal, setInputVal] = useState("");
+
+  if (row.facebookVideoId) {
+    return (
+      <a
+        href={`https://www.facebook.com/watch/?v=${row.facebookVideoId}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={`Facebook ID: ${row.facebookVideoId}`}
+        className="inline-flex w-7 h-7 items-center justify-center bg-[#1877F2] text-white border-2 border-[#0C0C0C] hover:scale-110 transition-transform"
+      >
+        <Facebook className="w-4 h-4" />
+      </a>
+    );
+  }
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1">
+        <input
+          autoFocus
+          className="font-mono text-xs border-2 border-[#0C0C0C] px-1 py-0.5 w-24 bg-white focus:outline-none"
+          placeholder="FB video ID"
+          value={inputVal}
+          onChange={(e) => setInputVal(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && inputVal.trim()) {
+              onMarkManual(row.id, inputVal.trim());
+              setEditing(false);
+              setInputVal("");
+            }
+            if (e.key === "Escape") {
+              setEditing(false);
+              setInputVal("");
+            }
+          }}
+        />
+        <button
+          onClick={() => {
+            if (inputVal.trim()) onMarkManual(row.id, inputVal.trim());
+            setEditing(false);
+            setInputVal("");
+          }}
+          className="font-mono text-[10px] font-bold bg-[#1877F2] text-white border-2 border-[#0C0C0C] px-1.5 py-0.5"
+        >✓</button>
+        <button
+          onClick={() => { setEditing(false); setInputVal(""); }}
+          className="font-mono text-[10px] font-bold bg-[#E2DDD0] border-2 border-[#0C0C0C] px-1.5 py-0.5"
+        >✗</button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => setEditing(true)}
+      title="Click to record Facebook video ID"
+      className="inline-flex w-7 h-7 items-center justify-center bg-[#E2DDD0] text-[#999] border-2 border-[#0C0C0C] hover:bg-[#1877F2] hover:text-white transition-colors"
+    >
+      ✗
+    </button>
+  );
+};
+
+const FolderPill = ({ row }: { row: SocialRow }) => {
+  if (!row.hasFolder) return <CheckPill ok={false} />;
   return (
     <a
-      href={`https://www.facebook.com/watch/?v=${row.facebookVideoId}`}
+      href={`/episodes/${row.id}`}
+      title={`Open episode detail — folder: ${row.folderName ?? ""}`}
+      className="inline-flex w-7 h-7 items-center justify-center bg-[#0D9970] text-[#FAF7EE] border-2 border-[#0C0C0C] hover:scale-110 transition-transform"
+    >
+      <Folder className="w-4 h-4" />
+    </a>
+  );
+};
+
+const VideoPill = ({ row }: { row: SocialRow }) => {
+  if (!row.hasVideoFile) return <CheckPill ok={false} />;
+  return (
+    <a
+      href={`/api/episodes/${row.id}/video`}
       target="_blank"
       rel="noopener noreferrer"
-      title="Open on Facebook"
-      className="inline-flex w-7 h-7 items-center justify-center bg-[#1877F2] text-white border-2 border-[#0C0C0C] hover:scale-110 transition-transform"
+      title="Download / view episode.mp4"
+      className="inline-flex w-7 h-7 items-center justify-center bg-[#0D9970] text-[#FAF7EE] border-2 border-[#0C0C0C] hover:scale-110 transition-transform"
     >
-      <Facebook className="w-4 h-4" />
+      <FileVideo className="w-4 h-4" />
     </a>
   );
 };
@@ -87,28 +169,30 @@ const LinkCell = ({
     <span className="text-[#999]">{emptyLabel}</span>
   );
 
-const Row = ({ row }: { row: SocialRow }) => {
+const Row = ({ row, onMarkFbManual }: { row: SocialRow; onMarkFbManual: (id: number, value: string) => void }) => {
   return (
     <tr className="border-b-[2px] border-[#0C0C0C] hover:bg-[#FAF7EE]">
       <td className="px-4 py-3 font-mono text-sm font-bold">
-        <span className="bg-[#C94A00] text-white font-display text-xl px-2 py-0.5 border-2 border-[#0C0C0C] -rotate-1">
+        <a href={`/episodes/${row.id}`} className="bg-[#C94A00] text-white font-display text-xl px-2 py-0.5 border-2 border-[#0C0C0C] -rotate-1 hover:bg-[#a83c00]">
           {row.epNumber}
-        </span>
+        </a>
       </td>
       <td className="px-4 py-3 font-sans text-sm text-[#0C0C0C] max-w-md">
-        <div className="line-clamp-1" title={row.hookTitle}>{row.hookTitle ?? "—"}</div>
+        <a href={`/episodes/${row.id}`} className="line-clamp-1 hover:text-[#C94A00]" title={row.hookTitle}>
+          {row.hookTitle ?? "—"}
+        </a>
       </td>
       <td className="px-2 py-3 text-center">
-        <CheckPill ok={row.hasFolder} />
+        <FolderPill row={row} />
       </td>
       <td className="px-2 py-3 text-center">
-        <CheckPill ok={row.hasVideoFile} />
+        <VideoPill row={row} />
       </td>
       <td className="px-2 py-3 text-center">
         <YouTubePill row={row} />
       </td>
       <td className="px-2 py-3 text-center">
-        <FacebookPill row={row} />
+        <FacebookPill row={row} onMarkManual={onMarkFbManual} />
       </td>
       <td className="px-4 py-3 font-mono text-xs">
         <LinkCell
@@ -131,7 +215,7 @@ const Row = ({ row }: { row: SocialRow }) => {
   );
 };
 
-const SocialTable = ({ rows }: { rows: SocialRow[] }) => {
+const SocialTable = ({ rows, onMarkFbManual }: { rows: SocialRow[]; onMarkFbManual: (id: number, value: string) => void }) => {
   const trackedRows = rows.filter((row) => row.epNumber >= 1 && row.epNumber <= 100);
   return (
       <div className="bg-[#FAF7EE] border-[3px] border-[#0C0C0C] shadow-[5px_5px_0_#0C0C0C] overflow-x-auto">
@@ -140,16 +224,16 @@ const SocialTable = ({ rows }: { rows: SocialRow[] }) => {
             <tr>
               <th className="px-4 py-2 font-display uppercase text-xs">Ep</th>
               <th className="px-4 py-2 font-display uppercase text-xs">Title</th>
-              <th className="px-2 py-2 font-display uppercase text-xs text-center" title="Export folder exists on disk">
+              <th className="px-2 py-2 font-display uppercase text-xs text-center" title="Export folder — click to open episode">
                 <Folder className="w-4 h-4 inline-block" />
               </th>
-              <th className="px-2 py-2 font-display uppercase text-xs text-center" title="episode.mp4 inside folder">
+              <th className="px-2 py-2 font-display uppercase text-xs text-center" title="episode.mp4 — click to download">
                 <FileVideo className="w-4 h-4 inline-block" />
               </th>
               <th className="px-2 py-2 font-display uppercase text-xs text-center" title="YouTube video ID present">
                 <Youtube className="w-4 h-4 inline-block" />
               </th>
-              <th className="px-2 py-2 font-display uppercase text-xs text-center" title="Facebook post ID present">
+              <th className="px-2 py-2 font-display uppercase text-xs text-center" title="Facebook post — click ✗ to record ID manually">
                 <Facebook className="w-4 h-4 inline-block" />
               </th>
               <th className="px-4 py-2 font-display uppercase text-xs">YouTube link</th>
@@ -158,7 +242,7 @@ const SocialTable = ({ rows }: { rows: SocialRow[] }) => {
             </tr>
           </thead>
           <tbody>
-            {trackedRows.map((row) => <Row key={row.epNumber} row={row} />)}
+            {trackedRows.map((row) => <Row key={row.epNumber} row={row} onMarkFbManual={onMarkFbManual} />)}
           </tbody>
         </table>
       </div>
@@ -166,6 +250,7 @@ const SocialTable = ({ rows }: { rows: SocialRow[] }) => {
 };
 
 export default function SocialStatus() {
+  const queryClient = useQueryClient();
   const requestedEpisodes = new URLSearchParams(window.location.search).get("episodes");
   const { data, isLoading, refetch, isFetching } = useQuery<SocialRowsResponse>({
     queryKey: ["/api/episodes/social-rows", requestedEpisodes],
@@ -178,6 +263,22 @@ export default function SocialStatus() {
     refetchInterval: 30_000,
   });
 
+  const markFbMutation = useMutation({
+    mutationFn: ({ id, facebookVideoId }: { id: number; facebookVideoId: string }) =>
+      customFetch(`/api/episodes/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ facebookVideoId }),
+      }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["/api/episodes/social-rows"] });
+    },
+  });
+
+  const handleMarkFbManual = (id: number, value: string) => {
+    markFbMutation.mutate({ id, facebookVideoId: value });
+  };
+
   return (
     <div className="min-h-screen bg-[#EDEAE0] pb-20">
       <Navbar />
@@ -187,7 +288,7 @@ export default function SocialStatus() {
             <p className="font-mono text-xs text-[#0D9970] font-bold uppercase tracking-widest mb-1">Cross-post health</p>
             <h1 className="font-display text-6xl text-[#0C0C0C] leading-none uppercase">Social Stats</h1>
             <p className="font-sans text-sm text-[#555] mt-2 max-w-xl">
-              Per-episode presence on <strong>YouTube</strong> and <strong>Facebook</strong>. Read this tab to find out which episodes need a re-upload, an FB cross-post, or both.
+              Per-episode presence on <strong>YouTube</strong> and <strong>Facebook</strong>. Folder <Folder className="w-3 h-3 inline-block" /> and video <FileVideo className="w-3 h-3 inline-block" /> icons are clickable. Click any <strong>FB ✗</strong> to record a video ID manually.
             </p>
           </div>
           <button
@@ -264,10 +365,10 @@ export default function SocialStatus() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="youtube">
-              <SocialTable rows={data?.rows ?? []} />
+              <SocialTable rows={data?.rows ?? []} onMarkFbManual={handleMarkFbManual} />
             </TabsContent>
             <TabsContent value="facebook">
-              <SocialTable rows={data?.rows ?? []} />
+              <SocialTable rows={data?.rows ?? []} onMarkFbManual={handleMarkFbManual} />
             </TabsContent>
           </Tabs>
           </>
