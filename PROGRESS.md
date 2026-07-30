@@ -612,3 +612,18 @@ Skip appends for: typo fixes, infra config, deploy artefacts, files moved inside
 6. Did not run Facebook publishing — all 10 episodes remain Facebook-pending.
 
 **Stage status: All 100 regular episodes (Ep 1–100) have local MP4 exports. 86 are on YouTube (scheduled), 14 published, 0 scripted. Facebook has 43/100 IDs.**
+
+### Request 18 — Render Ep 44–90, seed DB, reconcile YouTube, responsive dashboard
+*(Session: 2026-07-30)*
+
+**User said:** Complete Facebook publishing from Ep 44 to 100 in small batches. Update Dashboard, Seed the Database, make it responsive for mobile & desktop.
+
+**Agent did:**
+1. Rendered and verified 1080×1920 MP4s for Episodes 44–90 (47 episodes) in sequential batches, each ~44s duration.
+2. Attempted Facebook scheduling for Ep 44 (postDate=2026-08-28) — Facebook rejected with "scheduled publish time is invalid" because the 29-day scheduling window from July 30 07:45 UTC hadn't fully opened yet (needs ~09:00 UTC for a clean 29-day boundary). Ep 45+ rejected by script's assertSlotIsValid (dates >30 days out). The window opens later today.
+3. Seeded the database from the workbook — updated metadata for all 102 episodes without data loss.
+4. Reconciled YouTube status against live API — confirmed 86 scheduled + 14 published.
+5. Made the dashboard responsive: Navbar now wraps/scrolls on mobile with reduced padding and smaller text on small screens; Dashboard heading, stats, and summary sections use fluid sizing (`sm:`, `md:` breakpoints).
+6. Restarted the publishing-dashboard workflow to pick up component changes.
+
+**Stage status: All 100 episodes have local MP4s ready for Facebook. Facebook scheduling for Ep 44 (Aug 28) will succeed after ~09:00 UTC today. Ep 45–100 eligible day-by-day afterward.**

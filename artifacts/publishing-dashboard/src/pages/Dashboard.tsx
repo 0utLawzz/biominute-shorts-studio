@@ -173,18 +173,18 @@ export default function Dashboard() {
       <Navbar />
       <YouTubeBanner />
       <main className="mx-auto max-w-[1500px] px-5 pt-10 sm:px-8">
-        <section className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+        <section className="mb-6 sm:mb-8 flex flex-col gap-4 sm:gap-5 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="font-display uppercase md:text-7xl text-primary text-[52px]">
+            <h1 className="font-display uppercase text-[32px] sm:text-[42px] md:text-7xl text-primary">
               Production Queue
             </h1>
-            <p className="mt-2 font-mono text-xs uppercase tracking-[0.18em] text-[#555]">
+            <p className="mt-1 sm:mt-2 font-mono text-[10px] sm:text-xs uppercase tracking-[0.18em] text-[#555]">
               Focus on what needs attention next.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-stretch gap-3">
-            <div className="flex border-2 border-[#0C0C0C] bg-[#FAF7EE] shadow-[3px_3px_0_#0C0C0C] text-center font-medium text-[20px]">
+          <div className="flex flex-wrap items-stretch gap-2 sm:gap-3">
+            <div className="flex border-2 border-[#0C0C0C] bg-[#FAF7EE] shadow-[3px_3px_0_#0C0C0C] text-center font-medium text-[16px] sm:text-[20px]">
               <QueueStat label="In Draft" value={inDraft} loading={statsLoading} />
               <QueueStat label="Building" value={byStatus?.building} loading={statsLoading} color="#C9A800" />
               <QueueStat label="Complete" value={byStatus?.complete} loading={statsLoading} color="#0A6B52" />

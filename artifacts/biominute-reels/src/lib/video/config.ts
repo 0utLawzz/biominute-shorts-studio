@@ -7,7 +7,7 @@ export const SAFE_ZONE_PX = VIDEO_WIDTH * SAFE_ZONE_PADDING;
 export const BOTTOM_SAFE_ZONE_RATIO = 0.30;
 export const BOTTOM_SAFE_ZONE_PX = VIDEO_HEIGHT * BOTTOM_SAFE_ZONE_RATIO;
 export const CANVAS_STYLE = { width: VIDEO_WIDTH, height: VIDEO_HEIGHT } as const;
-// EP 82 — "Can Weighted Blankets Really Improve Your Sleep?"
+// EP 90 — "Does Drinking Warm Milk Before Bed Help You Sleep?"
 export const SCENE_DURATIONS = {
   0: 4500, // Scene 0
   1: 6500, // Scene 1

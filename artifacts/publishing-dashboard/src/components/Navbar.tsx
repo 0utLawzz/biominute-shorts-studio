@@ -17,8 +17,8 @@ export function Navbar() {
   const tokenHealth = (ytStatus as any)?.tokenHealth as string | undefined;
 
   return (
-    <header className="sticky top-0 z-[100] min-h-[58px] bg-[#0C0C0C] border-b-[3px] border-[#0C0C0C] flex items-center px-6 gap-6">
-      <Link href="/" className="flex items-center gap-1 font-display text-2xl tracking-widest cursor-pointer shrink-0">
+    <header className="sticky top-0 z-[100] min-h-[58px] bg-[#0C0C0C] border-b-[3px] border-[#0C0C0C] flex items-center gap-3 px-3 sm:px-6 sm:gap-6 overflow-x-auto">
+      <Link href="/" className="flex items-center gap-1 font-display text-xl sm:text-2xl tracking-widest cursor-pointer shrink-0">
         <span className="text-[#FAF7EE]">BIOMINUTE</span>
         <span className="text-[#C94A00]">.</span>
         <span className="text-[#0D9970]">SHORTS</span>
@@ -28,7 +28,7 @@ export function Navbar() {
           const isActive = location.startsWith(href);
           return (
             <Link key={href} href={href}>
-              <span className={`whitespace-nowrap border-2 px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-wide transition ${
+              <span className={`whitespace-nowrap border-2 px-2 py-1.5 sm:px-3 sm:py-2 font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-wide transition ${
                 isActive
                   ? "border-[#C9A800] bg-[#C9A800] text-[#0C0C0C]"
                   : "border-transparent text-[#999] hover:border-[#444] hover:text-white"
