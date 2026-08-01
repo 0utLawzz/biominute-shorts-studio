@@ -53,6 +53,7 @@ All secrets are set through Replit's **Secrets** UI (or your deployment environm
 |--------|---------------|
 | `DATABASE_URL` | Replit provisions one automatically, or use an external Neon/Postgres URL. |
 | `SESSION_SECRET` | Any long random string for Express session signing. |
+| `DASHBOARD_PASSWORD` | The password used to unlock the publishing dashboard. |
 
 ### Required for YouTube publishing
 
@@ -84,6 +85,8 @@ All secrets are set through Replit's **Secrets** UI (or your deployment environm
 | `NEON_PROJECT_ID` | Neon Console → Project settings. Set this as a GitHub repository variable (`vars.NEON_PROJECT_ID`). |
 
 See [`docs/Social-Platforms-Setup.md`](Social-Platforms-Setup.md) for the full platform-specific setup guide.
+
+> **Security note:** `youtube-reauth.ts` intentionally does not print refresh tokens. Store the OAuth result directly in Replit Secrets and never put tokens in shell history, logs, screenshots, commits, or issue reports.
 
 ---
 

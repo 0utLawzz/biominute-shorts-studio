@@ -18,8 +18,8 @@ pnpm --filter @workspace/scripts exec tsx ./src/youtube-reauth.ts
 1. Make sure `YOUTUBE_CLIENT_ID` and `YOUTUBE_CLIENT_SECRET` are set in Replit Secrets.
 2. Add `http://localhost:4080/oauth/callback` as an authorized redirect URI in Google Cloud Console.
 3. Open the URL printed by the script, approve access.
-4. Copy the printed refresh token.
-5. Paste it into Replit Secrets as `YOUTUBE_REFRESH_TOKEN`.
+4. Transfer the returned refresh token through a secure handoff; the helper intentionally does not print it.
+5. Save it in Replit Secrets as `YOUTUBE_REFRESH_TOKEN`.
 6. Restart the API Server workflow.
 
 ## Why
@@ -28,4 +28,4 @@ Google refresh tokens stop working when the app is revoked in the user's account
 
 ## How to apply
 
-Before any YouTube upload or verification script that calls the Data API, check that the token is valid. If the script fails with `invalid_grant`, do not retry — run `youtube-reauth.ts` first. Never commit the refresh token to the repo.
+Before any YouTube upload or verification script that calls the Data API, check that the token is valid. If the script fails with `invalid_grant`, do not retry — run `youtube-reauth.ts` first. Never print or commit the refresh token to the repo, logs, shell history, screenshots, or issue reports.

@@ -104,13 +104,14 @@ const server = http.createServer(async (req, res) => {
     }
 
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-    console.log("✅  SUCCESS — New YOUTUBE_REFRESH_TOKEN:");
-    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-    console.log(tokens.refresh_token);
-    console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    console.log("✅  SUCCESS — a new YouTube refresh token was generated.");
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    console.log(
+      "\nFor security, the token is not printed. Copy it from the OAuth result in your secure environment and save it as YOUTUBE_REFRESH_TOKEN in Replit Secrets.",
+    );
     console.log("\nNext steps:");
     console.log("  1. Open Replit Secrets (lock icon in sidebar).");
-    console.log("  2. Find YOUTUBE_REFRESH_TOKEN → replace value with token above.");
+    console.log("  2. Replace YOUTUBE_REFRESH_TOKEN with the token from your secure OAuth handoff.");
     console.log("  3. Restart workflow: artifacts/api-server: API Server");
     console.log("  4. Next publish will automatically add videos to season playlists.\n");
   } catch (err) {

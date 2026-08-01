@@ -135,7 +135,7 @@ The video is uploaded as private and YouTube flips it to public at the episode's
 pnpm --filter @workspace/scripts exec tsx ./src/youtube-reauth.ts
 ```
 
-Open the printed URL, approve, and paste the printed refresh token into Replit Secrets.
+Open the printed URL, approve, and save the returned refresh token directly in Replit Secrets. The script intentionally does not print the token.
 
 ### Push exports to GitHub
 
@@ -144,6 +144,52 @@ bash scripts/push-to-github.sh "feat: export Episode 5"
 ```
 
 Requires the `GITHUB_TOKEN` secret.
+
+---
+
+## Free deployment recommendations
+
+This repository is a multi-service production tool: the publishing dashboard is a static React site, the API is a protected Express service backed by PostgreSQL, the reels artifact is a static preview surface, and video rendering needs Playwright, ffmpeg, and a Linux process.
+
+### Best free option for the complete project: Replit Starter
+
+Replit's free Starter plan supports one published app. It is the simplest option for this repository because the existing artifacts already have Replit deployment configuration and the API, dashboard, and reels services share one workspace.
+
+Before publishing:
+
+1. Confirm the development database is seeded and the schema is current.
+2. Keep `DASHBOARD_PASSWORD`, `SESSION_SECRET`, YouTube credentials, and `DATABASE_URL` in Secrets only.
+3. Publish the API-backed project from the Replit Publishing tool.
+4. Use the generated `.replit.app` URL for the dashboard; do not use the temporary `.replit.dev` preview URL as a production callback.
+5. Choose the publishing geography before the first publish if your plan allows it; the geography is locked after the first publish.
+
+The free plan is a good fit for a private, low-traffic dashboard, but it is not a guarantee of always-on execution. Run episode rendering as an intentional job, not as a background scheduler.
+
+### Good free alternatives for the dashboard only
+
+If you only need a public static dashboard, these services are usually suitable:
+
+- **GitHub Pages** — free static hosting, especially suitable for generated `exports/dashboard.html`.
+- **Cloudflare Pages** — free static hosting with Git-based builds and custom domains.
+- **Netlify** or **Vercel** — free static hosting for the publishing-dashboard build.
+
+These alternatives do not replace the protected API server, PostgreSQL database, YouTube OAuth flow, or video rendering worker. Keep those services on Replit or deploy them separately on a provider that supports persistent server processes and environment secrets.
+
+### Not recommended as the complete free deployment
+
+Static-only hosts cannot run the Express API or the Playwright/ffmpeg renderer. A free serverless host may also suspend or time-limit video rendering. Use them for the dashboard shell only unless you separately deploy an API and worker.
+
+### Production checklist
+
+```bash
+pnpm install
+pnpm --filter @workspace/db push-force
+pnpm --filter @workspace/scripts exec tsx ./src/seed-episodes.ts --dry-run
+pnpm run typecheck
+pnpm run build
+```
+
+The deployment must have the secrets listed in `docs/INSTALL.md`. Never print, commit, or paste a YouTube refresh token into logs or source control.
 
 ---
 
