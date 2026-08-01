@@ -23,6 +23,7 @@ import { Link } from "wouter";
 import { Navbar } from "../components/Navbar";
 import { YouTubeBanner } from "../components/YouTubeBanner";
 import { formatPKT } from "../lib/date";
+import { apiFetch } from "../lib/api";
 
 const SEASONS = [
   { key: "all", label: "All" },
@@ -76,7 +77,7 @@ export default function Dashboard() {
     setSeedState("checking");
     setActionToast(null);
     try {
-      const res = await fetch("/api/episodes/seed", {
+      const res = await apiFetch("/api/episodes/seed", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ apply: false }),
@@ -97,7 +98,7 @@ export default function Dashboard() {
   async function applySeed() {
     setSeedState("applying");
     try {
-      const res = await fetch("/api/episodes/seed", {
+      const res = await apiFetch("/api/episodes/seed", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ apply: true }),
@@ -126,7 +127,7 @@ export default function Dashboard() {
       for (const id of selectedPublishIds) {
         const episode = publishableEpisodes.find((item) => item.id === id);
         if (!episode) continue;
-        const res = await fetch(`/api/youtube/publish/${id}`, {
+        const res = await apiFetch(`/api/youtube/publish/${id}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Navbar } from "../components/Navbar";
 import { StatusBadge } from "../components/StatusBadge";
+import { apiFetch } from "../lib/api";
 import { Youtube, Eye, ThumbsUp, MessageSquare, Share2, RefreshCw, Loader2, Facebook } from "lucide-react";
 
 interface EpisodeAnalytics {
@@ -40,7 +41,7 @@ export default function Analytics() {
     if (showLoader) setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/analytics/episodes");
+      const res = await apiFetch("/api/analytics/episodes");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setData((await res.json()) as AnalyticsData);
     } catch (err) {
@@ -54,7 +55,7 @@ export default function Analytics() {
     setRefreshing(true);
     // Refresh live from YouTube/Facebook APIs for all published episodes
     if (data) {
-      const fbConnected = await fetch("/api/facebook/status")
+      const fbConnected = await apiFetch("/api/facebook/status")
         .then((r) => r.json())
         .then((d) => (d as { connected?: boolean }).connected ?? false)
         .catch(() => false);
@@ -65,12 +66,12 @@ export default function Analytics() {
         const promises: Promise<unknown>[] = [];
         if (ep.youtubeVideoId) {
           promises.push(
-            fetch(`/api/analytics/youtube/${ep.id}`).catch(() => {}),
+            apiFetch(`/api/analytics/youtube/${ep.id}`).catch(() => {}),
           );
         }
         if (ep.facebookVideoId && fbConnected) {
           promises.push(
-            fetch(`/api/analytics/facebook/${ep.id}`).catch(() => {}),
+            apiFetch(`/api/analytics/facebook/${ep.id}`).catch(() => {}),
           );
         }
         await Promise.all(promises);

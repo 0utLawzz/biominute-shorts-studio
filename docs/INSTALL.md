@@ -88,6 +88,16 @@ See [`docs/Social-Platforms-Setup.md`](Social-Platforms-Setup.md) for the full p
 
 > **Security note:** `youtube-reauth.ts` intentionally does not print refresh tokens. Store the OAuth result directly in Replit Secrets and never put tokens in shell history, logs, screenshots, commits, or issue reports.
 
+### Vercel dashboard deployment variables
+
+The Vercel-hosted dashboard only needs this public configuration variable:
+
+| Variable | Value |
+|---|---|
+| `VITE_API_BASE_URL` | Public URL of the separately deployed Express API, without a trailing slash |
+
+Never put `DATABASE_URL`, YouTube credentials, `SESSION_SECRET`, or `DASHBOARD_PASSWORD` in a `VITE_*` variable. Those values would be bundled into browser JavaScript.
+
 ---
 
 ## 4. System dependencies for video export

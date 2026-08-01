@@ -40,11 +40,21 @@ app.use(
 );
 
 // CORS must allow credentials for the session cookie to travel with requests.
+// Set CORS_ORIGIN to the deployed dashboard origin when the UI and API use
+// different domains (for example, Vercel + Replit).
+const configuredCorsOrigin = process.env.CORS_ORIGIN?.trim();
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Reflect any origin (dev tooling, Replit proxy) while keeping credentials.
-      callback(null, origin ?? true);
+      if (!configuredCorsOrigin || !origin) {
+        callback(null, origin ?? true);
+        return;
+      }
+      const allowedOrigins = configuredCorsOrigin
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean);
+      callback(null, allowedOrigins.includes(origin) ? origin : false);
     },
     credentials: true,
   }),
@@ -67,7 +77,9 @@ app.use(
       // appear unauthenticated. Production runs behind HTTPS, so keep the
       // stricter setting there.
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      // Cross-site dashboard/API deployments need SameSite=None. This is
+      // enabled only when an explicit CORS origin is configured.
+      sameSite: configuredCorsOrigin ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
     // In-memory store is fine for a single-instance production tool. If we ever

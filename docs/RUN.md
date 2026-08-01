@@ -193,6 +193,59 @@ The deployment must have the secrets listed in `docs/INSTALL.md`. Never print, c
 
 ---
 
+## Vercel deployment: dashboard only
+
+The repository now includes a root `vercel.json` for deploying the **publishing dashboard** to Vercel. Vercel will build:
+
+```bash
+pnpm --filter @workspace/publishing-dashboard run build
+```
+
+and serve `artifacts/publishing-dashboard/dist/public`.
+
+### Vercel project settings
+
+Import the repository into Vercel with the repository root as the project root. The checked-in `vercel.json` supplies the build and output settings. Add this Vercel environment variable:
+
+```text
+VITE_API_BASE_URL=https://YOUR-API-HOST.example.com
+```
+
+Use the public URL of the API server, with no trailing slash. Do not put YouTube, database, session, or dashboard-password secrets in `VITE_*` variables because Vite exposes them to browser code.
+
+### What happens to the API?
+
+The API is **not** deployed to Vercel by this configuration. It remains a long-running Express service and should stay on Replit Deployments, a VM/container host, or another Node host that supports:
+
+- PostgreSQL connections
+- Express sessions
+- YouTube and Facebook credentials
+- long-running render jobs and child processes
+- Playwright and ffmpeg
+
+After the API is published, set `VITE_API_BASE_URL` in Vercel to that API URL and redeploy the dashboard. The browser then sends requests such as `/api/episodes` to the configured API host instead of the Vercel domain.
+
+For a Vercel dashboard plus separately hosted API, also set this API environment variable:
+
+```text
+CORS_ORIGIN=https://YOUR-DASHBOARD.vercel.app
+```
+
+If multiple dashboard domains are needed, separate them with commas. This enables cross-site session cookies and restricts credentialed browser requests to the listed dashboard origins.
+
+### Recommended split
+
+| Service | Recommended host |
+|---|---|
+| Publishing dashboard | Vercel |
+| Express API + PostgreSQL access | Replit Deployment or long-running Node host |
+| Reels preview | Replit or static hosting |
+| Playwright/ffmpeg rendering | Replit/VM worker |
+
+Do not move the current API directly into Vercel Functions without redesigning the render pipeline. Function execution limits and ephemeral processes are a poor fit for the current `run-production` workflow.
+
+---
+
 ## Workflow notes
 
 - The `biominute-reels` artifact holds **one episode at a time**. Building a new episode overwrites `Scene0.tsx`–`Scene5.tsx`; older `epNN_SceneX.tsx` files are kept for reference but not rendered.

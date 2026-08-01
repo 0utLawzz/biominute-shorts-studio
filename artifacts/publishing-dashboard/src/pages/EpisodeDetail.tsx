@@ -15,6 +15,7 @@ import { StatusBadge } from "../components/StatusBadge";
 import { ArrowLeft, CheckCircle, Youtube, Loader2, Save, Clapperboard, RefreshCw, Eye, ThumbsUp, MessageSquare, Share2 } from "lucide-react";
 import { formatPKT } from "../lib/date";
 import { useToast } from "@/hooks/use-toast";
+import { apiFetch } from "../lib/api";
 
 export default function EpisodeDetail() {
   const params = useParams();
@@ -47,7 +48,7 @@ export default function EpisodeDetail() {
 
   // Facebook credentials check
   useEffect(() => {
-    fetch("/api/facebook/status")
+    apiFetch("/api/facebook/status")
       .then((r) => r.json())
       .then((data) => setFbStatus(data as { connected: boolean }))
       .catch(() => setFbStatus({ connected: false }));
@@ -56,7 +57,7 @@ export default function EpisodeDetail() {
   // Check export folder presence for this episode
   useEffect(() => {
     if (!episode?.epNumber) return;
-    fetch(`/api/episodes/social-rows?episodes=${episode.epNumber}`)
+    apiFetch(`/api/episodes/social-rows?episodes=${episode.epNumber}`)
       .then((r) => r.json())
       .then((data: { rows?: { hasFolder: boolean; hasVideoFile: boolean }[] }) => {
         const row = data.rows?.[0];
@@ -82,7 +83,7 @@ export default function EpisodeDetail() {
     let active = true;
     const refreshRenderStatus = async () => {
       try {
-        const response = await fetch(`/api/episodes/${id}/render-status`);
+        const response = await apiFetch(`/api/episodes/${id}/render-status`);
         if (response.ok && active) {
           setRenderStatus(await response.json());
         }
@@ -158,7 +159,7 @@ export default function EpisodeDetail() {
 
     if (episode?.youtubeVideoId) {
       promises.push(
-        fetch(`/api/analytics/youtube/${id}`)
+        apiFetch(`/api/analytics/youtube/${id}`)
           .then((r) => {
             if (!r.ok) throw new Error(`YouTube: ${r.status}`);
             return r.json();
@@ -175,7 +176,7 @@ export default function EpisodeDetail() {
 
     if (episode?.facebookVideoId) {
       promises.push(
-        fetch(`/api/analytics/facebook/${id}`)
+        apiFetch(`/api/analytics/facebook/${id}`)
           .then((r) => {
             if (!r.ok) throw new Error(`Facebook: ${r.status}`);
             return r.json();
@@ -196,7 +197,7 @@ export default function EpisodeDetail() {
   const handlePublishFacebook = async () => {
     setFbIsPending(true);
     try {
-      const res = await fetch(`/api/facebook/publish/${id}`, { method: "POST" });
+      const res = await apiFetch(`/api/facebook/publish/${id}`, { method: "POST" });
       const data = (await res.json()) as { error?: string; message?: string; facebookVideoId?: string };
       if (!res.ok) throw new Error(data.error ?? "Facebook publish failed");
       refetch();
